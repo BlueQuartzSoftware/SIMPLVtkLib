@@ -117,7 +117,7 @@ protected:
   void updateAlgorithmInput(VSAbstractFilter* filter) override;
 
 private:
-  VTK_PTR(vtkThreshold) m_MaskAlgorithm = nullptr;
+  VTK_PTR(vtkThreshold) m_MaskAlgorithm;
 
   QString m_LastArrayName;
 };

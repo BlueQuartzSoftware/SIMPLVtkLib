@@ -124,17 +124,6 @@ public:
   void disable() override;
 
   /**
-  * @brief Copies the origin and normal values to the spin boxes
-  */
-  void apply() override;
-
-  /**
-  * @brief Resets the VTK plane to the last used normal and origin before 
-  * resetting the input widgets.
-  */
-  void reset() override;
-
-  /**
   * @brief Updates the origin and normal values based on the VTK plane widget 
   * before applying those values to the input widgets.
   */
@@ -163,7 +152,6 @@ protected:
   void updatePlaneWidget();
 
 private:
-  double normal[3];
 
   vtkSmartPointer<vtkPlane> usePlane;
   vtkSmartPointer<vtkPlane> viewPlane;

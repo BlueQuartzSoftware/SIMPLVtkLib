@@ -33,112 +33,77 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "VSMaskWidget.h"
+#include "VSSliceFilterWidget.h"
 
-#include <vtkCellData.h>
-#include <vtkCommand.h>
+#include <QtCore/QString>
+
+#include <vtkAlgorithm.h>
+#include <vtkAlgorithmOutput.h>
+#include <vtkCutter.h>
 #include <vtkDataArray.h>
 #include <vtkDataSet.h>
-#include <vtkImplicitFunction.h>
+#include <vtkDataSetMapper.h>
+#include <vtkImplicitPlaneRepresentation.h>
+#include <vtkImplicitPlaneWidget2.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkSmartPointer.h>
+#include <vtkUnstructuredGridAlgorithm.h>
 
-#include <QDoubleSpinBox>
-#include <QSlider>
-
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilter.h"
+#include "SIMPLVtkLib/QtWidgets/VSMainWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSSliceFilter.h"
+#include "SIMPLVtkLib/Visualization/VtkWidgets/VSPlaneWidget.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSMaskWidget::VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren)
-: VSAbstractWidget(parent, bounds, iren)
+VSSliceFilterWidget::VSSliceFilterWidget(VSSliceFilter* filter, VSMainWidget* mainWidget, QWidget* parent)
+: VSAbstractFilterWidget(parent)
+, m_SliceFilter(filter)
 {
-  setupUi(this);
+  m_SliceWidget = new VSPlaneWidget(this, m_SliceFilter->getBounds(), mainWidget->getActiveViewWidget()->getVisualizationWidget()->GetInteractor());
+  m_SliceWidget->show();
 
-  // adjust the vtkWidget when values are changed
-  connect(maskComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentMaskChanged(int)));
-
-  setMaskName(mask);
+  connect(m_SliceWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSMaskWidget::~VSMaskWidget()
+VSSliceFilterWidget::~VSSliceFilterWidget()
 {
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSMaskWidget::updateMaskNames(vtkDataSet* inputData)
+void VSSliceFilterWidget::setBounds(double* bounds)
 {
-  QString selectedMaskName = maskComboBox->currentText();
-
-  maskComboBox->clear();
-  int numArrays = inputData->GetCellData()->GetNumberOfArrays();
-
-  for(int i = 0; i < numArrays; i++)
+  if(nullptr == bounds)
   {
-    const char* arrayName = inputData->GetCellData()->GetArray(i)->GetName();
-    maskComboBox->addItem(arrayName);
+    return;
   }
 
-  maskComboBox->setCurrentText(selectedMaskName);
+  m_SliceWidget->setBounds(bounds);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSMaskWidget::setMaskName(QString mask)
+void VSSliceFilterWidget::apply()
 {
-  maskComboBox->setCurrentText(mask);
-  emit modified();
+  double origin[3];
+  double normals[3];
+
+  m_SliceWidget->getOrigin(origin);
+  m_SliceWidget->getNormals(normals);
+
+  m_SliceFilter->apply(origin, normals);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QString VSMaskWidget::getMaskName()
+void VSSliceFilterWidget::reset()
 {
-  return maskComboBox->currentText();
-}
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-int VSMaskWidget::getMaskId()
-{
-  return maskComboBox->currentIndex();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSMaskWidget::enable()
-{
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSMaskWidget::disable()
-{
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSMaskWidget::currentMaskChanged(int index)
-{
-  emit modified();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-vtkSmartPointer<vtkImplicitFunction> VSMaskWidget::getImplicitFunction()
-{
-  return nullptr;
 }

@@ -102,8 +102,11 @@ set(Project_SRCS
   
   ${VS_VisualFilters_SRCS}
   ${VS_VisualFilters_HDRS}
-  ${VS_VisualFilters_UIS}
-  ${${PROJECT_NAME}_VisualFilters_Generated_UI_HDRS}
+
+  ${VS_VisualFilterWidgets_SRCS}
+  ${VS_VisualFilterWidgets_HDRS}
+  ${VS_VisualFilterWidgets_UIS}
+  ${${PROJECT_NAME}_VisualFilterWidgets_Generated_UI_HDRS}
 
   ${${PROJECT_NAME}_VtkWidget_HDRS}
   ${${PROJECT_NAME}_VtkWidget_SRCS}

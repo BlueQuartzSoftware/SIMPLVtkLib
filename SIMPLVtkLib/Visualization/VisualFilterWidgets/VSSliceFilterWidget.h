@@ -35,36 +35,61 @@
 
 #pragma once
 
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
-#include "ui_VSMaskWidget.h"
+#include <QtWidgets/QWidget>
 
-#include <vtkSmartPointer.h>
+#include "Visualization/VisualFilterWidgets/VSAbstractFilterWidget.h"
+
+#include <vtkPlane.h>
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
-class vtkDataSet;
+class vtkCutter;
+class vtkImplicitPlaneWidget2;
+class VSPlaneWidget;
+class VSSliceFilter;
+class VSMainWidget;
 
-class SIMPLVtkLib_EXPORT VSMaskWidget : public VSAbstractWidget, private Ui::VSMaskWidget
+/**
+ * @class VSSliceFilterWidget VSSliceFilterWidget.h
+ * SIMPLVtkLib/Visualization/VisualFilters/VSSliceFilterWidget.h
+ * @brief This class controls the slice filter and, as with other classes 
+ * inheriting from VSAbstractFilter, can be chained together to further 
+ * specify what part of the volume should be rendered.
+ */
+class SIMPLVtkLib_EXPORT VSSliceFilterWidget : public VSAbstractFilterWidget
 {
   Q_OBJECT
 
 public:
-  VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren);
-  ~VSMaskWidget();
+  /**
+  * @brief Constructor
+  * @param parentWidget
+  * @param parent
+  */
+  VSSliceFilterWidget(VSSliceFilter* filter, VSMainWidget *mainWidget, QWidget* parent = nullptr);
 
-  int getMaskId();
-  QString getMaskName();
-  void setMaskName(QString mask);
-  void updateMaskNames(vtkDataSet* inputData);
+  /**
+  * @brief Deconstructor
+  */
+  ~VSSliceFilterWidget();
 
-  void enable() override;
-  void disable() override;
+  /**
+  * @brief Sets the filter's bounds
+  * @param bounds
+  */
+  void setBounds(double* bounds);
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
+  /**
+  * @brief Applies changes to the filter and updates the output
+  */
+  void apply() override;
 
-protected slots:
-  void currentMaskChanged(int index);
+  /**
+   * @brief reset
+   */
+  void reset() override;
 
 private:
-
+  VSSliceFilter*                  m_SliceFilter;
+  VSPlaneWidget*                  m_SliceWidget;
 };

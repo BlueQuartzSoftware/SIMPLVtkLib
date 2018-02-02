@@ -35,36 +35,55 @@
 
 #pragma once
 
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
-#include "ui_VSMaskWidget.h"
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Winconsistent-missing-override"
+#endif
 
-#include <vtkSmartPointer.h>
+#include <QtWidgets/QWidget>
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
-class vtkDataSet;
-
-class SIMPLVtkLib_EXPORT VSMaskWidget : public VSAbstractWidget, private Ui::VSMaskWidget
+/**
+* @class VSAbstractFilterWidget VSAbstractFilterWidget.h
+* SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilterWidget.h
+* @brief This is the base class for all visual filter widgets in SIMPLVtkLib.
+* Classes that inherit from this are widgets for the filters that handle various
+* vtk algorithms for filtering out parts of the vtkDataSet input into the top-level
+* VSDataSetFilter.  Filters can be chained together to be more specific about what
+* kind of data should be shown by pushing the output of a filter as the input for
+* each of its child filters.
+*/
+class SIMPLVtkLib_EXPORT VSAbstractFilterWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren);
-  ~VSMaskWidget();
 
-  int getMaskId();
-  QString getMaskName();
-  void setMaskName(QString mask);
-  void updateMaskNames(vtkDataSet* inputData);
+  /**
+  * @brief Deconstructor
+  */
+  ~VSAbstractFilterWidget();
 
-  void enable() override;
-  void disable() override;
+  /**
+  * @brief Applies changes to the filter and updates the output
+  */
+  virtual void apply();
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
+  /**
+  * @brief Resets the filter
+  */
+  virtual void reset();
 
-protected slots:
-  void currentMaskChanged(int index);
+protected:
+  /**
+  * @brief Constructor
+  */
+  VSAbstractFilterWidget(QWidget *parent = nullptr);
 
 private:
 
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

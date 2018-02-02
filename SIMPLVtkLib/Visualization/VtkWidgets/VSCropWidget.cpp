@@ -51,38 +51,34 @@ VSCropWidget::VSCropWidget(QWidget* parent, vtkSmartPointer<vtkImageData> imageD
 : VSAbstractWidget(parent, imageData->GetBounds(), iren)
 {
   setupUi(this);
+
   int imageExtent[6];
   imageData->GetExtent(imageExtent);
 
-  m_imageData = imageData;
+  m_ImageData = imageData;
 
-  voi = new int[6];
-  sampleRate = new int[3]{1, 1, 1};
+  int* sampleRate = new int[3]{1, 1, 1};
 
-  for(int i = 0; i < 6; i++)
-  {
-    voi[i] = imageExtent[i];
-  }
+  xMinSpinBox->setMinimum(imageExtent[0]);
+  xMaxSpinBox->setMinimum(imageExtent[0]);
 
-  xMinSpinBox->setMinimum(voi[0]);
-  xMaxSpinBox->setMinimum(voi[0]);
+  xMinSpinBox->setMaximum(imageExtent[1]);
+  xMaxSpinBox->setMaximum(imageExtent[1]);
 
-  xMinSpinBox->setMaximum(voi[1]);
-  xMaxSpinBox->setMaximum(voi[1]);
+  yMinSpinBox->setMinimum(imageExtent[2]);
+  yMaxSpinBox->setMinimum(imageExtent[2]);
 
-  yMinSpinBox->setMinimum(voi[2]);
-  yMaxSpinBox->setMinimum(voi[2]);
+  yMinSpinBox->setMaximum(imageExtent[3]);
+  yMaxSpinBox->setMaximum(imageExtent[3]);
 
-  yMinSpinBox->setMaximum(voi[3]);
-  yMaxSpinBox->setMaximum(voi[3]);
+  zMinSpinBox->setMinimum(imageExtent[4]);
+  zMaxSpinBox->setMinimum(imageExtent[4]);
 
-  zMinSpinBox->setMinimum(voi[4]);
-  zMaxSpinBox->setMinimum(voi[4]);
+  zMinSpinBox->setMaximum(imageExtent[5]);
+  zMaxSpinBox->setMaximum(imageExtent[5]);
 
-  zMinSpinBox->setMaximum(voi[5]);
-  zMaxSpinBox->setMaximum(voi[5]);
-
-  updateSpinBoxes();
+  setVOI(imageExtent);
+  setSampleRate(sampleRate);
 
   connect(xMinSpinBox, SIGNAL(editingFinished()), this, SIGNAL(modified()));
   connect(xMaxSpinBox, SIGNAL(editingFinished()), this, SIGNAL(modified()));
@@ -103,8 +99,7 @@ VSCropWidget::VSCropWidget(QWidget* parent, vtkSmartPointer<vtkImageData> imageD
 // -----------------------------------------------------------------------------
 VSCropWidget::~VSCropWidget()
 {
-  delete voi;
-  delete sampleRate;
+
 }
 
 // -----------------------------------------------------------------------------
@@ -112,6 +107,15 @@ VSCropWidget::~VSCropWidget()
 // -----------------------------------------------------------------------------
 int* VSCropWidget::getVOI()
 {
+  int* voi = new int[6];
+
+  voi[0] = xMinSpinBox->value();
+  voi[1] = xMaxSpinBox->value();
+  voi[2] = yMinSpinBox->value();
+  voi[3] = yMaxSpinBox->value();
+  voi[4] = zMinSpinBox->value();
+  voi[5] = zMaxSpinBox->value();
+
   return voi;
 }
 
@@ -120,7 +124,38 @@ int* VSCropWidget::getVOI()
 // -----------------------------------------------------------------------------
 int* VSCropWidget::getSampleRate()
 {
+  int* sampleRate = new int[3];
+
+  sampleRate[0] = sampleISpinBox->value();
+  sampleRate[1] = sampleJSpinBox->value();
+  sampleRate[2] = sampleKSpinBox->value();
+
   return sampleRate;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSCropWidget::setVOI(int* voi)
+{
+  xMinSpinBox->setValue(voi[0]);
+  xMaxSpinBox->setValue(voi[1]);
+
+  yMinSpinBox->setValue(voi[2]);
+  yMaxSpinBox->setValue(voi[3]);
+
+  zMinSpinBox->setValue(voi[4]);
+  zMaxSpinBox->setValue(voi[5]);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSCropWidget::setSampleRate(int* sampleRate)
+{
+  sampleISpinBox->setValue(sampleRate[0]);
+  sampleJSpinBox->setValue(sampleRate[1]);
+  sampleKSpinBox->setValue(sampleRate[2]);
 }
 
 // -----------------------------------------------------------------------------
@@ -143,48 +178,4 @@ void VSCropWidget::enable()
 // -----------------------------------------------------------------------------
 void VSCropWidget::disable()
 {
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSCropWidget::apply()
-{
-  voi[0] = xMinSpinBox->value();
-  voi[1] = xMaxSpinBox->value();
-  voi[2] = yMinSpinBox->value();
-  voi[3] = yMaxSpinBox->value();
-  voi[4] = zMinSpinBox->value();
-  voi[5] = zMaxSpinBox->value();
-
-  sampleRate[0] = sampleISpinBox->value();
-  sampleRate[1] = sampleJSpinBox->value();
-  sampleRate[2] = sampleKSpinBox->value();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSCropWidget::reset()
-{
-  updateSpinBoxes();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSCropWidget::updateSpinBoxes()
-{
-  xMinSpinBox->setValue(voi[0]);
-  xMaxSpinBox->setValue(voi[1]);
-
-  yMinSpinBox->setValue(voi[2]);
-  yMaxSpinBox->setValue(voi[3]);
-
-  zMinSpinBox->setValue(voi[4]);
-  zMaxSpinBox->setValue(voi[5]);
-
-  sampleISpinBox->setValue(sampleRate[0]);
-  sampleJSpinBox->setValue(sampleRate[1]);
-  sampleKSpinBox->setValue(sampleRate[2]);
 }

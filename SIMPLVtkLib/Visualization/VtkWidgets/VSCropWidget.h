@@ -79,6 +79,18 @@ public:
   int* getSampleRate();
 
   /**
+  * @brief Sets the volume of interest
+  * @return
+  */
+  void setVOI(int* voi);
+
+  /**
+  * @brief Sets the sample rate for generating the output
+  * @return
+  */
+  void setSampleRate(int* sampleRate);
+
+  /**
   * @brief Returns the vtkImplicitFunction used
   * @return
   */
@@ -94,24 +106,6 @@ public:
   */
   void disable() override;
 
-  /**
-  * @brief Applies the widget values to the filter
-  */
-  void apply() override;
-
-  /**
-  * @brief Resets the widget values
-  */
-  void reset() override;
-
-  /**
-  * @brief Updates the QSpinBox values to match the volume of interest and 
-  * sample rate.
-  */
-  void updateSpinBoxes();
-
 private:
-  vtkSmartPointer<vtkImageData> m_imageData;
-  int* voi;
-  int* sampleRate;
+  vtkSmartPointer<vtkImageData>       m_ImageData;
 };

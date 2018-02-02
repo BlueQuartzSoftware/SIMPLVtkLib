@@ -35,36 +35,72 @@
 
 #pragma once
 
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
-#include "ui_VSMaskWidget.h"
+#include <QtWidgets/QWidget>
 
-#include <vtkSmartPointer.h>
+#include "Visualization/VisualFilterWidgets/VSAbstractFilterWidget.h"
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
+class vtkThreshold;
+class vtkImageData;
 class vtkDataSet;
+class vtkUnstructuredGrid;
+class vtkImplicitDataSet;
+class vtkExtractGeometry;
+class vtkExtractUnstructuredGrid;
+class VSThresholdWidget;
+class VSDataSetFilter;
+class vtkExtractSelectedThresholds;
+class vtkSelection;
+class vtkSelectionNode;
+class vtkTrivialProducer;
+class vtkPointData;
+class vtkCelldata;
+class vtkMergeFilter;
+class VSThresholdFilter;
 
-class SIMPLVtkLib_EXPORT VSMaskWidget : public VSAbstractWidget, private Ui::VSMaskWidget
+/**
+ * @class VSThresholdFilterWidget VSThresholdFilterWidget.h
+ * SIMPLVtkLib/Visualization/VisualFilters/VSThresholdFilterWidget.h
+ * @brief This class handles the thresholding over a given range for a 
+ * specified array. This array does not have to match the data array being 
+ * visualized and is set separately within the filter. As this class inherits
+ * from VSAbstractFilter, it can be chained with other filters to further
+ * specify what part of the volume should be visualized.
+ */
+class SIMPLVtkLib_EXPORT VSThresholdFilterWidget : public VSAbstractFilterWidget
 {
   Q_OBJECT
 
 public:
-  VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren);
-  ~VSMaskWidget();
+  /**
+  * @brief Consructor
+  * @param parentWidget
+  * @param parent
+  */
+  VSThresholdFilterWidget(VSThresholdFilter* filter, QWidget* parent = nullptr);
 
-  int getMaskId();
-  QString getMaskName();
-  void setMaskName(QString mask);
-  void updateMaskNames(vtkDataSet* inputData);
+  /**
+  * @brief Deconstructor
+  */
+  ~VSThresholdFilterWidget();
 
-  void enable() override;
-  void disable() override;
+  /**
+  * @brief Sets the filter bounds
+  * @param bounds
+  */
+  void setBounds(double* bounds);
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
+  /**
+  * @brief Applies changes to the filter and updates the output
+  */
+  void apply() override;
 
-protected slots:
-  void currentMaskChanged(int index);
+  /**
+   * @brief reset
+   */
+  void reset() override;
 
 private:
-
+  VSThresholdFilter*                      m_ThresholdFilter;
 };

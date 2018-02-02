@@ -33,112 +33,87 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "VSMaskWidget.h"
+#include "VSThresholdFilterWidget.h"
 
+#include <QtCore/QString>
+
+#include <vtkAlgorithm.h>
+#include <vtkAlgorithmOutput.h>
+#include <vtkCell.h>
 #include <vtkCellData.h>
-#include <vtkCommand.h>
+#include <vtkCellDataToPointData.h>
 #include <vtkDataArray.h>
 #include <vtkDataSet.h>
-#include <vtkImplicitFunction.h>
+#include <vtkDataSetMapper.h>
+#include <vtkExtractGeometry.h>
+#include <vtkExtractSelectedThresholds.h>
+#include <vtkExtractUnstructuredGrid.h>
+#include <vtkFloatArray.h>
+#include <vtkImageData.h>
+#include <vtkImplicitDataSet.h>
+#include <vtkMergeFilter.h>
+#include <vtkPointData.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkSmartPointer.h>
+#include <vtkSelection.h>
+#include <vtkSelectionNode.h>
+#include <vtkStructuredPoints.h>
+#include <vtkThreshold.h>
+#include <vtkTrivialProducer.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkUnstructuredGridAlgorithm.h>
 
-#include <QDoubleSpinBox>
-#include <QSlider>
-
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
+#include "SIMPLVtkLib/Visualization/VtkWidgets/VSThresholdWidget.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSMaskWidget::VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren)
-: VSAbstractWidget(parent, bounds, iren)
+VSThresholdFilterWidget::VSThresholdFilterWidget(VSThresholdFilter* filter, QWidget* parent)
+: VSAbstractFilterWidget(parent)
+, m_ThresholdFilter(filter)
 {
-  setupUi(this);
+  //VTK_PTR(vtkDataArray) dataArray = getBaseDataArray(parent->getViewScalarId());
+  //double range[2] = {dataArray->GetRange()[0], dataArray->GetRange()[1]};
 
-  // adjust the vtkWidget when values are changed
-  connect(maskComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentMaskChanged(int)));
+  //m_ThresholdWidget = new VSThresholdWidget(thresholdFunctionWidget, range, parent->getBounds(), parent->getInteractor());
+  //m_ThresholdWidget->show();
 
-  setMaskName(mask);
+  //connect(m_ThresholdWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
+
+  //setupScalarsComboBox();
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSMaskWidget::~VSMaskWidget()
+VSThresholdFilterWidget::~VSThresholdFilterWidget()
 {
+  //delete m_ThresholdWidget;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSMaskWidget::updateMaskNames(vtkDataSet* inputData)
+void VSThresholdFilterWidget::setBounds(double* bounds)
 {
-  QString selectedMaskName = maskComboBox->currentText();
-
-  maskComboBox->clear();
-  int numArrays = inputData->GetCellData()->GetNumberOfArrays();
-
-  for(int i = 0; i < numArrays; i++)
+  if(nullptr == bounds)
   {
-    const char* arrayName = inputData->GetCellData()->GetArray(i)->GetName();
-    maskComboBox->addItem(arrayName);
+    return;
   }
-
-  maskComboBox->setCurrentText(selectedMaskName);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSMaskWidget::setMaskName(QString mask)
-{
-  maskComboBox->setCurrentText(mask);
-  emit modified();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-QString VSMaskWidget::getMaskName()
-{
-  return maskComboBox->currentText();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-int VSMaskWidget::getMaskId()
-{
-  return maskComboBox->currentIndex();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSMaskWidget::enable()
+void VSThresholdFilterWidget::apply()
 {
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSMaskWidget::disable()
+void VSThresholdFilterWidget::reset()
 {
-}
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSMaskWidget::currentMaskChanged(int index)
-{
-  emit modified();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-vtkSmartPointer<vtkImplicitFunction> VSMaskWidget::getImplicitFunction()
-{
-  return nullptr;
 }

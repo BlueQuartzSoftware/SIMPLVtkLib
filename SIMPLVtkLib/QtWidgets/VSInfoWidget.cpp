@@ -35,6 +35,13 @@
 
 #include "VSInfoWidget.h"
 
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSClipFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSCropFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSDataSetFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSMaskFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSSliceFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSThresholdFilterWidget.h"
+
 #include "ui_VSInfoWidget.h"
 
 class VSInfoWidget::VSInternals : public Ui::VSInfoWidget
@@ -121,6 +128,12 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter)
   else
   {
     m_ViewSettings = nullptr;
+  }
+
+  if (static_cast<VSClipFilter*>(filter) != nullptr)
+  {
+    VSClipFilter* clipFilter = static_cast<VSClipFilter*>(filter);
+    VSClipFilterWidget* fw = new VSClipFilterWidget(clipFilter, nullptr, this);
   }
 
   updateFilterInfo();

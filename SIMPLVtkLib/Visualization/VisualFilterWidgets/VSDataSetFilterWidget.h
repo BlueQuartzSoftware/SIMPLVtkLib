@@ -35,36 +35,51 @@
 
 #pragma once
 
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
-#include "ui_VSMaskWidget.h"
+#include <QtWidgets/QWidget>
+
+#include "Visualization/VisualFilterWidgets/VSAbstractFilterWidget.h"
+#include "ui_VSDataSetFilterWidget.h"
 
 #include <vtkSmartPointer.h>
 
+#include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
+
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
-class vtkDataSet;
+class vtkTrivialProducer;
+class vtkAlgorithmOutput;
+class VSDataSetFilter;
 
-class SIMPLVtkLib_EXPORT VSMaskWidget : public VSAbstractWidget, private Ui::VSMaskWidget
+/**
+* @class VSDataSetFilterWidget VSDataSetFilterWidget.h
+* SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilterWidget.h
+* @brief This class stores a WrappedDataContainerPtr and provides an output port
+* for other filters to connect to for converting SIMPLib DataContainers to something 
+* VTK can render.
+*/
+class SIMPLVtkLib_EXPORT VSDataSetFilterWidget : public VSAbstractFilterWidget
 {
   Q_OBJECT
 
 public:
-  VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren);
-  ~VSMaskWidget();
+  /**
+  * @brief Constuctor
+  * @param parentWidget
+  * @param dataSetStruct
+  */
+  VSDataSetFilterWidget(VSDataSetFilter* filter);
 
-  int getMaskId();
-  QString getMaskName();
-  void setMaskName(QString mask);
-  void updateMaskNames(vtkDataSet* inputData);
+  /**
+  * @brief Deconstructor
+  */
+  ~VSDataSetFilterWidget();
 
-  void enable() override;
-  void disable() override;
+  /**
+  * @brief Sets the filter's bounds
+  * @param bounds
+  */
+  void setBounds(double* bounds);
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
-
-protected slots:
-  void currentMaskChanged(int index);
-
-private:
-
+private:  
+  VSDataSetFilter*              m_DataSetFilter;
 };

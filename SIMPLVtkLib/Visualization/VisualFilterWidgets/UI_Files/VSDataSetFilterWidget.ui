@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>VtkDataSetFilter</class>
- <widget class="QWidget" name="VtkDataSetFilter">
+ <class>VSDataSetFilterWidget</class>
+ <widget class="QWidget" name="VSDataSetFilterWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Data Set Filter</string>
+   <string>Data Set Filter Widget</string>
   </property>
  </widget>
  <resources/>

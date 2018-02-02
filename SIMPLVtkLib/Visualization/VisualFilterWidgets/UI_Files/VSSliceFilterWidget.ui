@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>VtkSliceFilter</class>
- <widget class="QWidget" name="VtkSliceFilter">
+ <class>VSSliceFilterWidget</class>
+ <widget class="QWidget" name="VSSliceFilterWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Slice Filter</string>
+   <string>Slice Filter Widget</string>
   </property>
   <widget class="QWidget" name="sliceFunctionWidget" native="true">
    <property name="geometry">

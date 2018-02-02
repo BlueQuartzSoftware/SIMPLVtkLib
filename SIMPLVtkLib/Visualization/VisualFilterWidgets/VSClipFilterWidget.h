@@ -35,36 +35,73 @@
 
 #pragma once
 
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
-#include "ui_VSMaskWidget.h"
+#include <QtWidgets/QWidget>
 
-#include <vtkSmartPointer.h>
+#include "Visualization/VisualFilters/VSClipFilter.h"
+#include "Visualization/VisualFilterWidgets/VSAbstractFilterWidget.h"
+
+#include <vtkPlane.h>
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
+#include "SIMPLVtkLib/SIMPLBridge/VtkMacros.h"
 
-class vtkDataSet;
+#include "ui_VSClipFilterWidget.h"
 
-class SIMPLVtkLib_EXPORT VSMaskWidget : public VSAbstractWidget, private Ui::VSMaskWidget
+class vtkClipDataSet;
+class vtkTableBasedClipDataSet;
+class vtkImplicitPlaneWidget2;
+class VSPlaneWidget;
+class VSBoxWidget;
+class VSMainWidget;
+
+/**
+ * @class VSClipFilterWidget VSClipFilterWidget.h
+ * SIMPLVtkLib/Visualization/VisualFilters/VSClipFilterWidget.h
+ * @brief This class is used to create a clip filter over a set of data.
+ * This class can be chained with itself or other classes inheriting from 
+ * VSAbstractFilter to be more specific about the data being visualized.
+ * VSClipFilterWidget can use both plan and box clip types as well as inverting
+ * the clip applied.
+ */
+class SIMPLVtkLib_EXPORT VSClipFilterWidget : public VSAbstractFilterWidget, public Ui::VSClipFilterWidget
 {
   Q_OBJECT
 
 public:
-  VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren);
-  ~VSMaskWidget();
+    /**
+   * @brief VSClipFilterWidget
+   * @param filter
+   * @param mainWidget
+   * @param widget
+   */
+  VSClipFilterWidget(VSClipFilter *filter, VSMainWidget *mainWidget, QWidget* widget = nullptr);
 
-  int getMaskId();
-  QString getMaskName();
-  void setMaskName(QString mask);
-  void updateMaskNames(vtkDataSet* inputData);
+  /**
+  * @brief Deconstructor
+  */
+  ~VSClipFilterWidget();
 
-  void enable() override;
-  void disable() override;
+  /**
+  * @brief Sets the visualization filter's bounds
+  * @param bounds
+  */
+  void setBounds(double* bounds);
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
+  /**
+  * @brief Applies changes to the filter and updates the output
+  */
+  void apply() override;
 
-protected slots:
-  void currentMaskChanged(int index);
+  /**
+   * @brief reset
+   */
+  void reset() override;
 
 private:
+  VSClipFilter*                       m_ClipFilter;
 
+  VSMainWidget*                       m_MainWidget;
+
+  VSPlaneWidget*                      m_PlaneWidget;
+  VSBoxWidget*                        m_BoxWidget;
 };

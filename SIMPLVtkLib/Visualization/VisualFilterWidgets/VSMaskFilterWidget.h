@@ -35,36 +35,59 @@
 
 #pragma once
 
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
-#include "ui_VSMaskWidget.h"
+#include <QtWidgets/QWidget>
 
-#include <vtkSmartPointer.h>
+#include "Visualization/VisualFilterWidgets/VSAbstractFilterWidget.h"
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
-class vtkDataSet;
+class vtkThreshold;
+class VSMaskFilter;
+class VSMaskWidget;
+class VSMainWidget;
 
-class SIMPLVtkLib_EXPORT VSMaskWidget : public VSAbstractWidget, private Ui::VSMaskWidget
+/**
+ * @class VSMaskFilterWidget VSMaskFilterWidget.h
+ * SIMPLVtkLib/Visualization/VisualFilters/VSMaskFilterWidget.h
+ * @brief This class handles the masking process for vtkDataSets based on any 
+ * numeric or boolean array.  Numeric values greater than or equal to 1 are 
+ * visible whereas values less than 1 are hidden.
+ */
+class SIMPLVtkLib_EXPORT VSMaskFilterWidget : public VSAbstractFilterWidget
 {
   Q_OBJECT
 
 public:
-  VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren);
-  ~VSMaskWidget();
+  /**
+  * @brief Constructor
+  * @param parentWidget
+  * @param parent
+  */
+  VSMaskFilterWidget(VSMaskFilter* filter, VSMainWidget *mainWidget, QWidget* parent);
 
-  int getMaskId();
-  QString getMaskName();
-  void setMaskName(QString mask);
-  void updateMaskNames(vtkDataSet* inputData);
+  /**
+  * @brief Deconstructor
+  */
+  ~VSMaskFilterWidget();
 
-  void enable() override;
-  void disable() override;
+  /**
+  * @brief Sets the filter's bounds
+  * @param bounds
+  */
+  void setBounds(double* bounds);
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
+  /**
+  * @brief Applies changes to the filter and updates the output
+  */
+  void apply() override;
 
-protected slots:
-  void currentMaskChanged(int index);
+  /**
+   * @brief reset
+   */
+  void reset() override;
 
 private:
-
+  VSMaskFilter*                                 m_MaskFilter = nullptr;
+  VSMaskWidget*                                 m_MaskWidget = nullptr;
+  VSMainWidget*                                 m_MainWidget = nullptr;
 };

@@ -35,36 +35,63 @@
 
 #pragma once
 
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
-#include "ui_VSMaskWidget.h"
+#include <QtWidgets/QWidget>
 
-#include <vtkSmartPointer.h>
+#include "Visualization/VisualFilterWidgets/VSAbstractFilterWidget.h"
+#include "ui_VSCropFilterWidget.h"
+
+#include <vtkBox.h>
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
-class vtkDataSet;
+class VSCropFilter;
+class VSCropWidget;
+class VSMainWidget;
 
-class SIMPLVtkLib_EXPORT VSMaskWidget : public VSAbstractWidget, private Ui::VSMaskWidget
+/**
+ * @class VSCropFilterWidget VSCropFilterWidget.h
+ * SIMPLVtkLib/Visualization/VisualFilters/VSCropFilterWidget.h
+ * @brief This class is a visibility filter that crops a vtkDataSet to X, Y, 
+ * and Z bounds. This class can be chained with other VSAbstractFilters to
+ * further specify the data allowed to be visualized. This filter requires 
+ * the incoming data type to be a vtkImageData, thus restricting it to following 
+ * VSDataSetFilters.
+ */
+class SIMPLVtkLib_EXPORT VSCropFilterWidget : public VSAbstractFilterWidget
 {
   Q_OBJECT
 
 public:
-  VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren);
-  ~VSMaskWidget();
+  /**
+  * @brief Constructor
+  * @param parentWidget
+  * @param parent
+  */
+  VSCropFilterWidget(VSCropFilter* filter, VSMainWidget *mainWidget, QWidget* widget = nullptr);
 
-  int getMaskId();
-  QString getMaskName();
-  void setMaskName(QString mask);
-  void updateMaskNames(vtkDataSet* inputData);
+  /**
+  * @brief Deconstructor
+  */
+  ~VSCropFilterWidget();
 
-  void enable() override;
-  void disable() override;
+  /**
+  * @brief Sets the visualization filter's bounds
+  * @param bounds
+  */
+  void setBounds(double* bounds);
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
+  /**
+  * @brief Applies changes to the filter and updates the output
+  */
+  void apply() override;
 
-protected slots:
-  void currentMaskChanged(int index);
+  /**
+   * @brief reset
+   */
+  void reset() override;
 
 private:
+  VSCropFilter*                   m_CropFilter;
 
+  VSCropWidget*                   m_CropWidget;
 };

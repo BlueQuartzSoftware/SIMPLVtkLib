@@ -56,9 +56,6 @@ VSThresholdWidget::VSThresholdWidget(QWidget* parent, double range[2], double bo
 
   // updateSpinBoxes();
 
-  lastMinValue = range[0];
-  lastMaxValue = range[1];
-
   // adjust the vtkWidget when values are changed
   connect(minSpinBox, SIGNAL(editingFinished()), this, SLOT(minSpinBoxValueChanged()));
   connect(maxSpinBox, SIGNAL(editingFinished()), this, SLOT(maxSpinBoxValueChanged()));
@@ -136,27 +133,6 @@ void VSThresholdWidget::enable()
 // -----------------------------------------------------------------------------
 void VSThresholdWidget::disable()
 {
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSThresholdWidget::apply()
-{
-  lastMinValue = getLowerBound();
-  lastMaxValue = getUpperBound();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSThresholdWidget::reset()
-{
-  minSpinBox->setValue(lastMinValue);
-  maxSpinBox->setValue(lastMaxValue);
-
-  minSpinBoxValueChanged();
-  maxSpinBoxValueChanged();
 }
 
 // -----------------------------------------------------------------------------

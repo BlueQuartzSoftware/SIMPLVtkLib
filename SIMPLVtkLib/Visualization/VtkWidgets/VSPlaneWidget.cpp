@@ -84,6 +84,7 @@ VSPlaneWidget::VSPlaneWidget(QWidget* parent, double bounds[6], vtkRenderWindowI
 {
   setupUi(this);
 
+  double normal[3];
   normal[0] = 1.0;
   normal[1] = 0.0;
   normal[2] = 0.0;
@@ -141,11 +142,10 @@ VSPlaneWidget::~VSPlaneWidget()
 //
 // -----------------------------------------------------------------------------
 void VSPlaneWidget::getNormals(double normals[3])
-{
-  for(int i = 0; i < 3; i++)
-  {
-    normals[i] = this->normal[i];
-  }
+{ 
+  normals[0] = normalXSpinBox->value();
+  normals[1] = normalYSpinBox->value();
+  normals[2] = normalZSpinBox->value();
 }
 
 // -----------------------------------------------------------------------------
@@ -153,16 +153,11 @@ void VSPlaneWidget::getNormals(double normals[3])
 // -----------------------------------------------------------------------------
 void VSPlaneWidget::setNormals(double normals[3])
 {
-  for(int i = 0; i < 3; i++)
-  {
-    this->normal[i] = normals[i];
-  }
+  viewPlane->SetNormal(normals);
 
-  viewPlane->SetNormal(this->normal);
-
-  normalXSpinBox->setValue(normal[0]);
-  normalYSpinBox->setValue(normal[1]);
-  normalZSpinBox->setValue(normal[2]);
+  normalXSpinBox->setValue(normals[0]);
+  normalYSpinBox->setValue(normals[1]);
+  normalZSpinBox->setValue(normals[2]);
 }
 
 // -----------------------------------------------------------------------------
@@ -170,15 +165,8 @@ void VSPlaneWidget::setNormals(double normals[3])
 // -----------------------------------------------------------------------------
 void VSPlaneWidget::setNormals(double x, double y, double z)
 {
-  normal[0] = x;
-  normal[1] = y;
-  normal[2] = z;
-
-  viewPlane->SetNormal(this->normal);
-
-  normalXSpinBox->setValue(normal[0]);
-  normalYSpinBox->setValue(normal[1]);
-  normalZSpinBox->setValue(normal[2]);
+  double normals[3] = {x, y, z};
+  setNormals(normals);
 }
 
 // -----------------------------------------------------------------------------
@@ -200,13 +188,8 @@ void VSPlaneWidget::setOrigin(double origin[3])
 // -----------------------------------------------------------------------------
 void VSPlaneWidget::setOrigin(double x, double y, double z)
 {
-  VSAbstractWidget::setOrigin(x, y, z);
-
-  viewPlane->SetOrigin(origin);
-
-  originXSpinBox->setValue(origin[0]);
-  originYSpinBox->setValue(origin[1]);
-  originZSpinBox->setValue(origin[2]);
+  double origin[3] = {x, y, z};
+  setOrigin(origin);
 }
 
 // -----------------------------------------------------------------------------
@@ -232,7 +215,10 @@ void VSPlaneWidget::updateOrigin()
 // -----------------------------------------------------------------------------
 vtkSmartPointer<vtkImplicitFunction> VSPlaneWidget::getImplicitFunction()
 {
-  usePlane->SetNormal(normal);
+  double normals[3];
+  getNormals(normals);
+
+  usePlane->SetNormal(normals);
   usePlane->SetOrigin(origin);
 
   return usePlane;
@@ -257,48 +243,15 @@ void VSPlaneWidget::disable()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSPlaneWidget::apply()
-{
-  origin[0] = originXSpinBox->value();
-  origin[1] = originYSpinBox->value();
-  origin[2] = originZSpinBox->value();
-
-  normal[0] = normalXSpinBox->value();
-  normal[1] = normalYSpinBox->value();
-  normal[2] = normalZSpinBox->value();
-
-  planeRep->DrawPlaneOff();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSPlaneWidget::reset()
-{
-  viewPlane->SetOrigin(usePlane->GetOrigin());
-  viewPlane->SetNormal(usePlane->GetNormal());
-
-  planeRep->DrawPlaneOff();
-  planeRep->SetPlane(viewPlane);
-
-  updateSpinBoxes();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void VSPlaneWidget::updateSpinBoxes()
 {
-  planeRep->GetNormal(normal);
+  double normals[3];
+  planeRep->GetNormal(normals);
   planeRep->GetOrigin(origin);
 
-  normalXSpinBox->setValue(normal[0]);
-  normalYSpinBox->setValue(normal[1]);
-  normalZSpinBox->setValue(normal[2]);
+  setNormals(normals);
 
-  originXSpinBox->setValue(origin[0]);
-  originYSpinBox->setValue(origin[1]);
-  originZSpinBox->setValue(origin[2]);
+  setOrigin(origin);
 }
 
 // -----------------------------------------------------------------------------
@@ -306,10 +259,6 @@ void VSPlaneWidget::updateSpinBoxes()
 // -----------------------------------------------------------------------------
 void VSPlaneWidget::spinBoxValueChanged()
 {
-  normal[0] = normalXSpinBox->value();
-  normal[1] = normalYSpinBox->value();
-  normal[2] = normalZSpinBox->value();
-
   origin[0] = originXSpinBox->value();
   origin[1] = originYSpinBox->value();
   origin[2] = originZSpinBox->value();
@@ -326,7 +275,10 @@ void VSPlaneWidget::updatePlaneWidget()
 {
   planeWidget->Off();
 
-  viewPlane->SetNormal(normal);
+  double normals[3];
+  getNormals(normals);
+
+  viewPlane->SetNormal(normals);
   viewPlane->SetOrigin(origin);
 
   planeRep->SetPlane(viewPlane);

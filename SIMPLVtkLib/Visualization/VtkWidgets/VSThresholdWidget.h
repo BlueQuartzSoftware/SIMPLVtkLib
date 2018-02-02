@@ -110,16 +110,6 @@ public:
   void disable() override;
 
   /**
-  * @brief Applies the values for thresholding over
-  */
-  void apply() override;
-
-  /**
-  * @brief Resets the widget to the last applied values
-  */
-  void reset() override;
-
-  /**
   * @brief Returns the vtkImplicitFunction for the widget
   * @return
   */
@@ -178,6 +168,5 @@ protected:
   bool checkMaxSpinBox();
 
 private:
-  double lastMinValue;
-  double lastMaxValue;
+
 };

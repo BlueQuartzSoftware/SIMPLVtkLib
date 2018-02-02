@@ -33,38 +33,35 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#pragma once
+#include "VSAbstractFilterWidget.h"
 
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
-#include "ui_VSMaskWidget.h"
-
-#include <vtkSmartPointer.h>
-
-#include "SIMPLVtkLib/SIMPLVtkLib.h"
-
-class vtkDataSet;
-
-class SIMPLVtkLib_EXPORT VSMaskWidget : public VSAbstractWidget, private Ui::VSMaskWidget
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSAbstractFilterWidget::VSAbstractFilterWidget(QWidget* parent)
+: QWidget()
 {
-  Q_OBJECT
 
-public:
-  VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren);
-  ~VSMaskWidget();
+}
 
-  int getMaskId();
-  QString getMaskName();
-  void setMaskName(QString mask);
-  void updateMaskNames(vtkDataSet* inputData);
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSAbstractFilterWidget::~VSAbstractFilterWidget()
+{
 
-  void enable() override;
-  void disable() override;
+}
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractFilterWidget::apply()
+{
+}
 
-protected slots:
-  void currentMaskChanged(int index);
-
-private:
-
-};
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractFilterWidget::reset()
+{
+}

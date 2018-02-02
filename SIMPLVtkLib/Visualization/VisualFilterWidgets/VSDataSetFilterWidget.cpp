@@ -33,38 +33,43 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#pragma once
+#include "VSDataSetFilterWidget.h"
 
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
-#include "ui_VSMaskWidget.h"
+#include <vtkAlgorithmOutput.h>
+#include <vtkCellData.h>
+#include <vtkDataArray.h>
+#include <vtkDataSet.h>
+#include <vtkDataSetMapper.h>
+#include <vtkLookupTable.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkScalarBarActor.h>
+#include <vtkTrivialProducer.h>
+#include <vtkUnstructuredGridAlgorithm.h>
 
-#include <vtkSmartPointer.h>
+#include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
+#include "SIMPLVtkLib/Visualization/Controllers/VSLookupTableController.h"
 
-#include "SIMPLVtkLib/SIMPLVtkLib.h"
-
-class vtkDataSet;
-
-class SIMPLVtkLib_EXPORT VSMaskWidget : public VSAbstractWidget, private Ui::VSMaskWidget
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSDataSetFilterWidget::VSDataSetFilterWidget(VSDataSetFilter *filter)
+: VSAbstractFilterWidget()
+, m_DataSetFilter(filter)
 {
-  Q_OBJECT
 
-public:
-  VSMaskWidget(QWidget* parent, QString mask, double bounds[6], vtkRenderWindowInteractor* iren);
-  ~VSMaskWidget();
+}
 
-  int getMaskId();
-  QString getMaskName();
-  void setMaskName(QString mask);
-  void updateMaskNames(vtkDataSet* inputData);
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSDataSetFilterWidget::~VSDataSetFilterWidget()
+{
+}
 
-  void enable() override;
-  void disable() override;
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSDataSetFilterWidget::setBounds(double* bounds)
+{
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
-
-protected slots:
-  void currentMaskChanged(int index);
-
-private:
-
-};
+}

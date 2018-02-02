@@ -128,7 +128,7 @@ protected:
   void updateAlgorithmInput(VSAbstractFilter* filter) override;
 
 private:
-  VTK_PTR(vtkCutter) m_SliceAlgorithm = nullptr;
+  VTK_PTR(vtkCutter) m_SliceAlgorithm;
 
   double m_LastOrigin[3];
   double m_LastNormal[3];

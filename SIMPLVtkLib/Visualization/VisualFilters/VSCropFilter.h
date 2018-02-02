@@ -130,7 +130,7 @@ protected:
   void updateAlgorithmInput(VSAbstractFilter* filter) override;
 
 private:
-  VTK_PTR(vtkExtractVOI) m_CropAlgorithm = nullptr;
+  VTK_PTR(vtkExtractVOI) m_CropAlgorithm;
 
   int m_LastVoi[6];
   int m_LastSampleRate[3];

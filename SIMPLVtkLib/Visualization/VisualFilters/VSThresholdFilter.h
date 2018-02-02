@@ -148,7 +148,7 @@ protected:
   void updateAlgorithmInput(VSAbstractFilter* filter) override;
 
 private:
-  VTK_PTR(vtkThreshold) m_ThresholdAlgorithm = nullptr;
+  VTK_PTR(vtkThreshold) m_ThresholdAlgorithm;
 
   QString m_LastArrayName;
   double m_LastMinValue = 0.0;

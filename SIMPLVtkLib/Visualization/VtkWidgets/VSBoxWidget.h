@@ -70,10 +70,10 @@ public:
   void enable() override;
   void disable() override;
 
-  void apply() override;
-  void reset() override;
-
   void updateSpinBoxes();
+
+  void getScale(double scale[3]);
+  void getRotation(double rotation[3]);
 
 public slots:
 
@@ -86,8 +86,6 @@ protected:
   void updateBoxWidget();
 
   void getPosition(double position[3]);
-  void getScale(double scale[3]);
-  void getRotation(double rotation[3]);
 
   void setMatrix(double position[3], double scale[3], double rotation[3]);
 

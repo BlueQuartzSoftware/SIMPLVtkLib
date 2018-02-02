@@ -1,0 +1,160 @@
+/* ============================================================================
+* Copyright (c) 2009-2016 BlueQuartz Software, LLC
+*
+* Redistribution and use in source and binary forms, with or without modification,
+* are permitted provided that the following conditions are met:
+*
+* Redistributions of source code must retain the above copyright notice, this
+* list of conditions and the following disclaimer.
+*
+* Redistributions in binary form must reproduce the above copyright notice, this
+* list of conditions and the following disclaimer in the documentation and/or
+* other materials provided with the distribution.
+*
+* Neither the name of BlueQuartz Software, the US Air Force, nor the names of its
+* contributors may be used to endorse or promote products derived from this software
+* without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+* CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+* USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+* The code contained herein was partially funded by the followig contracts:
+*    United States Air Force Prime Contract FA8650-07-D-5800
+*    United States Air Force Prime Contract FA8650-10-D-5210
+*    United States Prime Contract Navy N00173-07-C-2068
+*
+* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+#include "VSClipFilterWidget.h"
+
+#include <QApplication>
+#include <QString>
+
+#include <vtkAlgorithm.h>
+#include <vtkAlgorithmOutput.h>
+#include <vtkDataArray.h>
+#include <vtkDataSet.h>
+#include <vtkDataSetMapper.h>
+#include <vtkImplicitPlaneRepresentation.h>
+#include <vtkImplicitPlaneWidget2.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkTableBasedClipDataSet.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkUnstructuredGridAlgorithm.h>
+
+#include "SIMPLVtkLib/QtWidgets/VSMainWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
+#include "SIMPLVtkLib/Visualization/VtkWidgets/VSBoxWidget.h"
+#include "SIMPLVtkLib/Visualization/VtkWidgets/VSPlaneWidget.h"
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSClipFilterWidget::VSClipFilterWidget(VSClipFilter* filter, VSMainWidget* mainWidget, QWidget* widget)
+: VSAbstractFilterWidget(widget)
+, m_ClipFilter(filter)
+, m_MainWidget(mainWidget)
+{  
+  m_PlaneWidget = new VSPlaneWidget(this, m_ClipFilter->getBounds(), m_MainWidget->getActiveViewWidget()->getVisualizationWidget()->GetInteractor());
+  m_BoxWidget = new VSBoxWidget(this, m_ClipFilter->getBounds(), m_MainWidget->getActiveViewWidget()->getVisualizationWidget()->GetInteractor());
+
+  QStringList clipTypes = { VSClipFilter::PlaneClipTypeString, VSClipFilter::BoxClipTypeString };
+  clipTypeComboBox->insertItems(0, clipTypes);
+
+  connect(clipTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeClipType(int)));
+  connect(insideOutCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setInsideOut(int)));
+
+  connect(m_PlaneWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
+  connect(m_BoxWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSClipFilterWidget::~VSClipFilterWidget()
+{
+  delete m_PlaneWidget;
+  delete m_BoxWidget;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSClipFilterWidget::setBounds(double* bounds)
+{
+  if(nullptr == bounds)
+  {
+    return;
+  }
+
+  m_PlaneWidget->setBounds(bounds);
+  m_BoxWidget->setBounds(bounds);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSClipFilterWidget::apply()
+{
+  if (clipTypeComboBox->currentText() == VSClipFilter::PlaneClipTypeString)
+  {
+    double normals[3];
+    double origin[3];
+    m_PlaneWidget->getNormals(normals);
+    m_PlaneWidget->getOrigin(origin);
+
+    m_ClipFilter->apply(origin, normals, insideOutCheckBox->isChecked());
+  }
+  else if (clipTypeComboBox->currentText() == VSClipFilter::BoxClipTypeString)
+  {
+    double origin[3];
+    double scale[3];
+    double rotation[3];
+
+    m_BoxWidget->getOrigin(origin);
+    m_BoxWidget->getScale(scale);
+    m_BoxWidget->getRotation(rotation);
+
+    m_ClipFilter->apply(origin, scale, rotation, insideOutCheckBox->isChecked());
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSClipFilterWidget::reset()
+{
+  QString clipTypeString = m_ClipFilter->getLastClipTypeString();
+  clipTypeComboBox->setCurrentText(clipTypeString);
+
+  if (clipTypeComboBox->currentText() == VSClipFilter::PlaneClipTypeString)
+  {
+    double* origin = m_ClipFilter->getLastPlaneOrigin();
+    double* normals = m_ClipFilter->getLastPlaneNormal();
+    bool inverted = m_ClipFilter->getLastPlaneInverted();
+
+    m_PlaneWidget->setNormals(normals);
+    m_PlaneWidget->setOrigin(origin);
+    insideOutCheckBox->setChecked(inverted);
+  }
+  else if (clipTypeComboBox->currentText() == VSClipFilter::BoxClipTypeString)
+  {
+    double* origin = m_ClipFilter->getLastBoxOrigin();
+    double* scale = m_ClipFilter->getLastBoxScale();
+    double* rotation = m_ClipFilter->getLastBoxRotation();
+    bool inverted = m_ClipFilter->getLastBoxInverted();
+
+    m_BoxWidget->setScale(scale);
+    m_BoxWidget->setOrigin(origin);
+    m_BoxWidget->setRotation(rotation);
+    insideOutCheckBox->setChecked(inverted);
+  }
+}

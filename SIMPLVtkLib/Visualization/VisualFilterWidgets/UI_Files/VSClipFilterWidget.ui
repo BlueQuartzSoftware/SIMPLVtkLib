@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>VtkClipFilter</class>
- <widget class="QWidget" name="VtkClipFilter">
+ <class>VSClipFilterWidget</class>
+ <widget class="QWidget" name="VSClipFilterWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Clip Filter Widget</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -98,16 +98,6 @@
           <height>22</height>
          </size>
         </property>
-        <item>
-         <property name="text">
-          <string>Plane</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Box</string>
-         </property>
-        </item>
        </widget>
       </item>
      </layout>

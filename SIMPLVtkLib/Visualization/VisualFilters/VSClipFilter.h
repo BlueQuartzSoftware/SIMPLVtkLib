@@ -38,7 +38,6 @@
 #include <QtWidgets/QWidget>
 
 #include "VSAbstractFilter.h"
-#include "ui_VSClipFilter.h"
 
 #include <vtkPlane.h>
 #include <vtkPlanes.h>
@@ -65,11 +64,15 @@ class SIMPLVtkLib_EXPORT VSClipFilter : public VSAbstractFilter
   Q_OBJECT
 
 public:
-  enum clipType_t
+
+  enum class ClipType : unsigned int
   {
     PLANE = 0,
     BOX = 1
   };
+
+  static const QString PlaneClipTypeString;
+  static const QString BoxClipTypeString;
 
   /**
   * @brief Constructor
@@ -77,6 +80,8 @@ public:
   * @param parent
   */
   VSClipFilter(VSAbstractFilter* parent);
+
+  ~VSClipFilter();
 
   /**
   * @brief Returns the filter's name
@@ -166,6 +171,12 @@ public:
   */
   double* getLastBoxRotation();
 
+  /**
+   * @brief Returns the clip type string of the last applied box
+   * @return
+   */
+  QString getLastClipTypeString();
+
 protected:
   /**
   * @brief Initializes the algorithm and connects it to the vtkMapper
@@ -188,9 +199,9 @@ protected:
   void updateAlgorithmInput(VSAbstractFilter* filter) override;
 
 private:
-  VTK_PTR(vtkTableBasedClipDataSet) m_ClipAlgorithm = nullptr;
+  VTK_PTR(vtkTableBasedClipDataSet) m_ClipAlgorithm;
 
-  clipType_t m_LastClipType;
+  ClipType m_LastClipType;
   bool m_LastPlaneInverted = false;
   bool m_LastBoxInverted = false;
 

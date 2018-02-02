@@ -57,6 +57,9 @@
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSBoxWidget.h"
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSPlaneWidget.h"
 
+const QString VSClipFilter::PlaneClipTypeString = "Plane";
+const QString VSClipFilter::BoxClipTypeString = "Box";
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -79,11 +82,19 @@ VSClipFilter::VSClipFilter(VSAbstractFilter* parent)
   // Set the direction of the plane normal
   m_LastPlaneNormal[0] = 1.0;
   
-  m_LastClipType = clipType_t::PLANE;
+  m_LastClipType = VSClipFilter::ClipType::PLANE;
   m_LastPlaneInverted = false;
   m_LastBoxInverted = false;
 
   setText(getFilterName());
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSClipFilter::~VSClipFilter()
+{
+
 }
 
 // -----------------------------------------------------------------------------
@@ -139,7 +150,7 @@ void VSClipFilter::apply(double origin[3], double normal[3], bool inverted)
   }
 
   // Handle Plane-Type clips
-  m_LastClipType = clipType_t::PLANE;
+  m_LastClipType = ClipType::PLANE;
   m_LastPlaneInverted = inverted;
 
   // Save the applied values for resetting Plane-Type widgets
@@ -171,7 +182,7 @@ void VSClipFilter::apply(double origin[3], double scale[3], double rotation[3], 
   }
 
   // Handle Box-Type clips
-  m_LastClipType = clipType_t::BOX;
+  m_LastClipType = ClipType::BOX;
   m_LastBoxInverted = inverted;
 
   // Save the applied values for resetting Box-Type widgets
@@ -317,4 +328,22 @@ double* VSClipFilter::getLastBoxScale()
 double* VSClipFilter::getLastBoxRotation()
 {
   return m_LastBoxRotation;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QString VSClipFilter::getLastClipTypeString()
+{
+  QString clipTypeStr = "";
+  if (m_LastClipType == ClipType::PLANE)
+  {
+    clipTypeStr = PlaneClipTypeString;
+  }
+  else if (m_LastClipType == ClipType::BOX)
+  {
+    clipTypeStr = BoxClipTypeString;
+  }
+
+  return clipTypeStr;
 }
