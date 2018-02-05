@@ -185,11 +185,7 @@ void VSAbstractViewWidget::filterArrayIndexChanged(VSFilterViewSettings* viewSet
 // -----------------------------------------------------------------------------
 void VSAbstractViewWidget::filterComponentIndexChanged(VSFilterViewSettings* viewSettings, int index)
 {
-  VSVisualizationWidget* visualizationWidget = getVisualizationWidget();
-  if(visualizationWidget)
-  {
-    visualizationWidget->render();
-  }
+  renderView();
 }
 
 // -----------------------------------------------------------------------------
@@ -197,7 +193,7 @@ void VSAbstractViewWidget::filterComponentIndexChanged(VSFilterViewSettings* vie
 // -----------------------------------------------------------------------------
 void VSAbstractViewWidget::filterMapColorsChanged(VSFilterViewSettings* viewSettings, bool mapColors)
 {
-  // Handle in subclasses
+  renderView();
 }
 
 // -----------------------------------------------------------------------------
@@ -205,8 +201,6 @@ void VSAbstractViewWidget::filterMapColorsChanged(VSFilterViewSettings* viewSett
 // -----------------------------------------------------------------------------
 void VSAbstractViewWidget::filterShowScalarBarChanged(VSFilterViewSettings* viewSettings, bool showScalarBar)
 {
-  // Handle in subclasses
-
   if(viewSettings->getVisible())
   {
     if(viewSettings->isScalarBarVisible())

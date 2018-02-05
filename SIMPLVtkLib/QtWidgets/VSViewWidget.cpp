@@ -115,4 +115,6 @@ void VSViewWidget::filterShowScalarBarChanged(VSFilterViewSettings* viewSettings
 
   VTK_PTR(vtkScalarBarWidget) scalarBarWidget = viewSettings->getScalarBarWidget();
   scalarBarWidget->SetEnabled(showScalarBar);
+
+  renderView();
 }

@@ -74,6 +74,10 @@ void VSInfoWidget::setupGui()
     this, SLOT(updateActiveArrayIndex(int)));
   connect(m_Internals->activeComponentCombo, SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateActiveComponentIndex(int)));
+  connect(m_Internals->mapScalarsCheckBox, SIGNAL(stateChanged(int)),
+    this, SLOT(setScalarsMapped(int)));
+  connect(m_Internals->showScalarBarCheckBox, SIGNAL(stateChanged(int)),
+    this, SLOT(setScalarBarVisible(int)));
 }
 
 // -----------------------------------------------------------------------------
@@ -171,7 +175,15 @@ void VSInfoWidget::updateFilterInfo()
   if(m_Filter)
   {
     m_Internals->activeArrayCombo->addItems(m_Filter->getArrayNames());
-    m_Internals->activeArrayCombo->setCurrentIndex(0);
+
+    if(m_ViewSettings)
+    {
+      m_Internals->activeArrayCombo->setCurrentIndex(m_ViewSettings->getActiveArrayIndex());
+    }
+    else
+    {
+      m_Internals->activeArrayCombo->setCurrentIndex(0);
+    }
   }
 }
 
@@ -212,8 +224,14 @@ void VSInfoWidget::updateActiveArrayIndex(int index)
   m_Internals->activeComponentCombo->clear();
 
   QStringList componentList = m_Filter->getComponentList(index);
-  m_Internals->activeComponentCombo->addItems(componentList);
-  m_Internals->activeComponentCombo->setCurrentIndex(0);
+  bool multiComponents = componentList.size() > 1;
+  m_Internals->activeComponentCombo->setEnabled(multiComponents);
+  
+  if(multiComponents)
+  {
+    m_Internals->activeComponentCombo->addItems(componentList);
+    m_Internals->activeComponentCombo->setCurrentIndex(0);
+  }
 
   if(m_ViewSettings)
   {
@@ -235,4 +253,32 @@ void VSInfoWidget::updateActiveComponentIndex(int index)
 
     m_ViewSettings->setActiveComponentIndex(index);
   }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::setScalarsMapped(int checkState)
+{
+  if(nullptr == m_ViewSettings)
+  {
+    return;
+  }
+
+  bool checked = checkState == Qt::Checked;
+  m_ViewSettings->setMapColors(checked);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::setScalarBarVisible(int checkState)
+{
+  if(nullptr == m_ViewSettings)
+  {
+    return;
+  }
+
+  bool checked = checkState == Qt::Checked;
+  m_ViewSettings->setScalarBarVisible(checked);
 }

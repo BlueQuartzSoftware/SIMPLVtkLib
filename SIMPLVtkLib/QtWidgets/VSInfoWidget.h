@@ -102,6 +102,18 @@ protected slots:
   */
   void updateActiveComponentIndex(int index);
 
+  /**
+  * @brief Slot for handling user interaction with the mapScalarsCheckBox
+  * @param checkState
+  */
+  void setScalarsMapped(int checkState);
+
+  /**
+  * @brief Slot for handling user interaction with the showScalarBarCheckBox
+  * @param checkState
+  */
+  void setScalarBarVisible(int checkState);
+
 protected:
   /**
   * @brief Performs initial setup for the GUI

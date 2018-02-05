@@ -229,14 +229,15 @@ vtkDataArray* VSFilterViewSettings::getArrayAtIndex(int index)
 void VSFilterViewSettings::setActiveArrayIndex(int index)
 {
   VTK_PTR(vtkDataArray) dataArray = getArrayAtIndex(index);
-  if(dataArray)
+  if(nullptr == dataArray)
   {
-    m_ActiveArray = index;
-
-    emit activeArrayIndexChanged(this, m_ActiveArray);
-    setActiveComponentIndex(-1);
+    return;
   }
-  
+
+  m_ActiveArray = index;
+
+  emit activeArrayIndexChanged(this, m_ActiveArray);
+  setActiveComponentIndex(-1); 
 }
 
 // -----------------------------------------------------------------------------
@@ -252,10 +253,16 @@ void VSFilterViewSettings::setActiveComponentIndex(int index)
   {
     return;
   }
+  
+  // Clamp index with lower bound
+  if(index < -1)
+  {
+    index = -1;
+  }
 
   int numComponents = dataArray->GetNumberOfComponents();
   m_Mapper->ColorByArrayComponent(m_ActiveArray, index);
-  m_Mapper->SetScalarModeToDefault();
+  m_Mapper->SetScalarModeToUseCellFieldData();
   updateColorMode();
 
   if(numComponents == 1)
@@ -270,16 +277,8 @@ void VSFilterViewSettings::setActiveComponentIndex(int index)
     QString dataArrayName = QString(dataArray->GetName());
     QString componentName = dataArrayName + " Magnitude";
 
-    if(numComponents == 3)
-    {
-      //m_Mapper->SetColorModeToDirectScalars();
-      m_Mapper->SetColorModeToDefault();
-    }
-    else
-    {
-      lookupTable->SetVectorModeToMagnitude();
-    }
-
+    //lookupTable->SetVectorModeToMagnitude();
+  
     m_LookupTable->setRange(range);
     m_ScalarBarActor->SetTitle(qPrintable(componentName));
   }
