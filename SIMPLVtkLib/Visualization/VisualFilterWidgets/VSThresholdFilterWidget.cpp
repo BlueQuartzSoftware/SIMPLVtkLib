@@ -66,13 +66,29 @@
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSThresholdWidget.h"
 
+#include "ui_VSThresholdFilterWidget.h"
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSThresholdFilterWidget::VSThresholdFilterWidget(VSThresholdFilter* filter, QWidget* parent)
+class VSThresholdFilterWidget::vsInternals : public Ui::VSThresholdFilterWidget
+{
+public:
+  vsInternals()
+  {
+  }
+};
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSThresholdFilterWidget::VSThresholdFilterWidget(VSThresholdFilter* filter, QVTKInteractor *interactor, QWidget* parent)
 : VSAbstractFilterWidget(parent)
+, m_Internals(new vsInternals())
 , m_ThresholdFilter(filter)
 {
+  m_Internals->setupUi(this);
+
   //VTK_PTR(vtkDataArray) dataArray = getBaseDataArray(parent->getViewScalarId());
   //double range[2] = {dataArray->GetRange()[0], dataArray->GetRange()[1]};
 

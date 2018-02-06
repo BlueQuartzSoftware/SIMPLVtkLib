@@ -45,14 +45,12 @@
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 #include "SIMPLVtkLib/SIMPLBridge/VtkMacros.h"
 
-#include "ui_VSClipFilterWidget.h"
-
 class vtkClipDataSet;
 class vtkTableBasedClipDataSet;
 class vtkImplicitPlaneWidget2;
 class VSPlaneWidget;
 class VSBoxWidget;
-class VSMainWidget;
+class QVTKInteractor;
 
 /**
  * @class VSClipFilterWidget VSClipFilterWidget.h
@@ -63,7 +61,7 @@ class VSMainWidget;
  * VSClipFilterWidget can use both plan and box clip types as well as inverting
  * the clip applied.
  */
-class SIMPLVtkLib_EXPORT VSClipFilterWidget : public VSAbstractFilterWidget, public Ui::VSClipFilterWidget
+class SIMPLVtkLib_EXPORT VSClipFilterWidget : public VSAbstractFilterWidget
 {
   Q_OBJECT
 
@@ -71,10 +69,10 @@ public:
     /**
    * @brief VSClipFilterWidget
    * @param filter
-   * @param mainWidget
+   * @param interactor
    * @param widget
    */
-  VSClipFilterWidget(VSClipFilter *filter, VSMainWidget *mainWidget, QWidget* widget = nullptr);
+  VSClipFilterWidget(VSClipFilter *filter, QVTKInteractor* interactor, QWidget* widget = nullptr);
 
   /**
   * @brief Deconstructor
@@ -97,10 +95,18 @@ public:
    */
   void reset() override;
 
-private:
-  VSClipFilter*                       m_ClipFilter;
+protected slots:
+  /**
+   * @brief changeClipType
+   * @param clipType
+   */
+  void changeClipType(const QString &clipType);
 
-  VSMainWidget*                       m_MainWidget;
+private:
+  class vsInternals;
+  vsInternals*                        m_Internals;
+
+  VSClipFilter*                       m_ClipFilter;
 
   VSPlaneWidget*                      m_PlaneWidget;
   VSBoxWidget*                        m_BoxWidget;

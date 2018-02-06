@@ -56,15 +56,30 @@
 
 #include <vtkRenderWindowInteractor.h>
 
+#include "ui_VSMaskFilterWidget.h"
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSMaskFilterWidget::VSMaskFilterWidget(VSMaskFilter *filter, VSMainWidget* mainWidget, QWidget *parent)
-: VSAbstractFilterWidget(parent)
-, m_MaskFilter(filter)
-, m_MainWidget(mainWidget)
+class VSMaskFilterWidget::vsInternals : public Ui::VSMaskFilterWidget
 {
-  m_MaskWidget = new VSMaskWidget(this, "", m_MaskFilter->getBounds(), m_MainWidget->getActiveViewWidget()->getVisualizationWidget()->GetInteractor());
+public:
+  vsInternals()
+  {
+  }
+};
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSMaskFilterWidget::VSMaskFilterWidget(VSMaskFilter *filter, QVTKInteractor* interactor, QWidget *parent)
+: VSAbstractFilterWidget(parent)
+, m_Internals(new vsInternals())
+, m_MaskFilter(filter)
+{
+  m_Internals->setupUi(this);
+
+  m_MaskWidget = new VSMaskWidget(this, "", m_MaskFilter->getBounds(), interactor);
   m_MaskWidget->show();
 
   connect(m_MaskWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
@@ -75,7 +90,7 @@ VSMaskFilterWidget::VSMaskFilterWidget(VSMaskFilter *filter, VSMainWidget* mainW
 // -----------------------------------------------------------------------------
 VSMaskFilterWidget::~VSMaskFilterWidget()
 {
-
+  delete m_MaskWidget;
 }
 
 // -----------------------------------------------------------------------------

@@ -67,7 +67,7 @@ public:
   * @param parentWidget
   * @param dataSetStruct
   */
-  VSDataSetFilterWidget(VSDataSetFilter* filter);
+  VSDataSetFilterWidget(VSDataSetFilter* filter, QWidget *widget = nullptr);
 
   /**
   * @brief Deconstructor
@@ -80,6 +80,9 @@ public:
   */
   void setBounds(double* bounds);
 
-private:  
-  VSDataSetFilter*              m_DataSetFilter;
+private:
+  class vsInternals;
+  vsInternals*                        m_Internals;
+
+  VSDataSetFilter*                    m_DataSetFilter;
 };

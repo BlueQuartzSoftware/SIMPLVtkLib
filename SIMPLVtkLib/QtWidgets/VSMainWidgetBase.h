@@ -157,7 +157,7 @@ public slots:
 
 signals:
   void changedActiveView(VSViewController* viewController);
-  void changedActiveFilter(VSAbstractFilter* filter);
+  void changedActiveFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* filterWidget);
 
 protected:
   /**
@@ -196,10 +196,24 @@ protected slots:
   */
   virtual void changeCurrentFilter(VSAbstractFilter* filter);
 
+  /**
+   * @brief
+   * @param filter
+   */
+  void filterAdded(VSAbstractFilter* filter);
+
+  /**
+   * @brief Removes filter from the FilterToFilterWidget map
+   * @param filter
+   */
+  void filterRemoved(VSAbstractFilter* filter);
+
 private:
   VSController* m_Controller;
   VSAbstractFilter* m_CurrentFilter = nullptr;
   VSAbstractViewWidget* m_ActiveViewWidget = nullptr;
   VSFilterView* m_FilterView = nullptr;
   VSInfoWidget* m_InfoWidget = nullptr;
+
+  QMap<VSAbstractFilter*,VSAbstractFilterWidget*>  m_FilterToFilterWidgetMap;
 };

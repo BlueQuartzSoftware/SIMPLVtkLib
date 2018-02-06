@@ -35,6 +35,15 @@
 
 #include "VSInfoWidget.h"
 
+#include "SIMPLVtkLib/QtWidgets/VSMainWidget.h"
+
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSClipFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSCropFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSMaskFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSSliceFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSThresholdFilter.h"
+
 #include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSClipFilterWidget.h"
 #include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSCropFilterWidget.h"
 #include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSDataSetFilterWidget.h"
@@ -61,8 +70,6 @@ VSInfoWidget::VSInfoWidget(QWidget* parent)
 {
   m_Internals->setupUi(this);
   setupGui();
-
-  setFilter(nullptr);
 }
 
 // -----------------------------------------------------------------------------
@@ -88,6 +95,10 @@ void VSInfoWidget::setupGui()
     this, SLOT(selectPresetColors()));
   connect(m_presetsDialog, SIGNAL(applyPreset(const QJsonObject&, const QPixmap&)),
     this, SLOT(loadPresetColors(const QJsonObject&, const QPixmap&)));
+  connect(m_Internals->applyBtn, SIGNAL(pressed()),
+    this, SLOT(applyFilter()));
+  connect(m_Internals->resetBtn, SIGNAL(pressed()),
+    this, SLOT(resetFilter()));
 }
 
 // -----------------------------------------------------------------------------
@@ -99,6 +110,8 @@ void VSInfoWidget::applyFilter()
   {
     return;
   }
+
+  m_FilterWidget->apply();
 }
 
 // -----------------------------------------------------------------------------
@@ -110,6 +123,8 @@ void VSInfoWidget::resetFilter()
   {
     return;
   }
+
+  m_FilterWidget->reset();
 }
 
 // -----------------------------------------------------------------------------
@@ -126,9 +141,17 @@ void VSInfoWidget::deleteFilter()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSInfoWidget::setFilter(VSAbstractFilter* filter)
+void VSInfoWidget::setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* filterWidget)
 {
+  if (m_FilterWidget != nullptr)
+  {
+    m_Internals->gridLayout_4->removeWidget(m_FilterWidget);
+    m_FilterWidget = nullptr;
+    adjustSize();
+  }
+
   m_Filter = filter;
+  m_FilterWidget = filterWidget;
 
   bool filterExists = (nullptr != filter);
   m_Internals->applyBtn->setEnabled(filterExists);
@@ -144,10 +167,10 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter)
     m_ViewSettings = nullptr;
   }
 
-  if (static_cast<VSClipFilter*>(filter) != nullptr)
+  if (filterWidget != nullptr)
   {
-    VSClipFilter* clipFilter = static_cast<VSClipFilter*>(filter);
-    VSClipFilterWidget* fw = new VSClipFilterWidget(clipFilter, nullptr, this);
+    m_Internals->gridLayout_4->addWidget(filterWidget);
+    adjustSize();
   }
 
   updateFilterInfo();

@@ -56,6 +56,7 @@
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSBoxWidget.h"
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSPlaneWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSClipFilterWidget.h"
 
 const QString VSClipFilter::PlaneClipTypeString = "Plane";
 const QString VSClipFilter::BoxClipTypeString = "Box";

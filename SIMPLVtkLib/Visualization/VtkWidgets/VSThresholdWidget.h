@@ -109,12 +109,6 @@ public:
   */
   void disable() override;
 
-  /**
-  * @brief Returns the vtkImplicitFunction for the widget
-  * @return
-  */
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
-
 public slots:
   /**
   * @brief Handles any changes in the minimum spin box

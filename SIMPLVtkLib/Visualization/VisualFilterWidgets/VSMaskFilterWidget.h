@@ -44,7 +44,7 @@
 class vtkThreshold;
 class VSMaskFilter;
 class VSMaskWidget;
-class VSMainWidget;
+class QVTKInteractor;
 
 /**
  * @class VSMaskFilterWidget VSMaskFilterWidget.h
@@ -63,7 +63,7 @@ public:
   * @param parentWidget
   * @param parent
   */
-  VSMaskFilterWidget(VSMaskFilter* filter, VSMainWidget *mainWidget, QWidget* parent);
+  VSMaskFilterWidget(VSMaskFilter* filter, QVTKInteractor* interactor, QWidget* parent);
 
   /**
   * @brief Deconstructor
@@ -87,7 +87,9 @@ public:
   void reset() override;
 
 private:
+  class vsInternals;
+  vsInternals*                                  m_Internals;
+
   VSMaskFilter*                                 m_MaskFilter = nullptr;
   VSMaskWidget*                                 m_MaskWidget = nullptr;
-  VSMainWidget*                                 m_MainWidget = nullptr;
 };

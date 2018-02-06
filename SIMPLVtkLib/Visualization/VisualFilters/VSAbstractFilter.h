@@ -64,6 +64,7 @@ class vtkDataObject;
 class vtkDataSet;
 class vtkDataArray;
 
+class VSAbstractFilterWidget;
 class VSAbstractWidget;
 class VSDataSetFilter;
 

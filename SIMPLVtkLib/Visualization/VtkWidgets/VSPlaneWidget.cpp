@@ -213,20 +213,6 @@ void VSPlaneWidget::updateOrigin()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-vtkSmartPointer<vtkImplicitFunction> VSPlaneWidget::getImplicitFunction()
-{
-  double normals[3];
-  getNormals(normals);
-
-  usePlane->SetNormal(normals);
-  usePlane->SetOrigin(origin);
-
-  return usePlane;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void VSPlaneWidget::enable()
 {
   planeWidget->EnabledOn();

@@ -250,11 +250,3 @@ bool VSThresholdWidget::checkMaxSpinBox()
 
   return false;
 }
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-vtkSmartPointer<vtkImplicitFunction> VSThresholdWidget::getImplicitFunction()
-{
-  return nullptr;
-}

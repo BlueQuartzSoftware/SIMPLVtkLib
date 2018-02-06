@@ -37,9 +37,16 @@
 
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSClipFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSCropFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSSliceFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSMaskFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSThresholdFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSClipFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSCropFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSDataSetFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSSliceFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSMaskFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSThresholdFilterWidget.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -59,8 +66,9 @@ void VSMainWidgetBase::connectSlots()
   connect(m_Controller, SIGNAL(activeViewChanged(VSViewController*)), 
     this, SLOT(activeViewChanged(VSViewController*)));
 
-  connect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*)),
-    this, SLOT(changeCurrentFilter(VSAbstractFilter*)));
+  connect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*)), this, SLOT(filterAdded(VSAbstractFilter*)));
+
+  connect(m_Controller, SIGNAL(filterRemoved(VSAbstractFilter*)), this, SLOT(filterRemoved(VSAbstractFilter*)));
 }
 
 // -----------------------------------------------------------------------------
@@ -150,8 +158,8 @@ void VSMainWidgetBase::setInfoWidget(VSInfoWidget* infoWidget)
 {
   if(m_InfoWidget)
   {
-    disconnect(this, SIGNAL(changedActiveFilter(VSAbstractFilter*)),
-      m_InfoWidget, SLOT(setFilter(VSAbstractFilter*)));
+    disconnect(this, SIGNAL(changedActiveFilter(VSAbstractFilter*, VSAbstractFilterWidget*)),
+      m_InfoWidget, SLOT(setFilter(VSAbstractFilter*, VSAbstractFilterWidget*)));
     disconnect(this, SIGNAL(changedActiveView(VSViewController*)),
       m_InfoWidget, SLOT(setViewController(VSViewController*)));
   }
@@ -159,13 +167,14 @@ void VSMainWidgetBase::setInfoWidget(VSInfoWidget* infoWidget)
   m_InfoWidget = infoWidget;
 
   if(m_InfoWidget)
-  {
-    connect(this, SIGNAL(changedActiveFilter(VSAbstractFilter*)),
-      infoWidget, SLOT(setFilter(VSAbstractFilter*)));
+  {    
+    connect(this, SIGNAL(changedActiveFilter(VSAbstractFilter*, VSAbstractFilterWidget*)),
+      infoWidget, SLOT(setFilter(VSAbstractFilter*, VSAbstractFilterWidget*)));
     connect(this, SIGNAL(changedActiveView(VSViewController*)),
       infoWidget, SLOT(setViewController(VSViewController*)));
 
-    m_InfoWidget->setFilter(m_CurrentFilter);
+    VSAbstractFilterWidget* filterWidget = m_FilterToFilterWidgetMap.value(m_CurrentFilter);
+    m_InfoWidget->setFilter(m_CurrentFilter, filterWidget);
     m_InfoWidget->setViewController(m_Controller->getActiveViewController());
   }
 }
@@ -176,6 +185,62 @@ void VSMainWidgetBase::setInfoWidget(VSInfoWidget* infoWidget)
 VSAbstractFilter* VSMainWidgetBase::getCurrentFilter()
 {
   return m_CurrentFilter;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter)
+{
+  VSAbstractFilterWidget* fw = nullptr;
+  if (dynamic_cast<VSClipFilter*>(filter) != nullptr)
+  {
+    VSClipFilter* vsFilter = dynamic_cast<VSClipFilter*>(filter);
+    fw = new VSClipFilterWidget(vsFilter, getActiveViewWidget()->getVisualizationWidget()->GetInteractor(), this);
+  }
+  else if (dynamic_cast<VSCropFilter*>(filter) != nullptr)
+  {
+    VSCropFilter* vsFilter = dynamic_cast<VSCropFilter*>(filter);
+    fw = new VSCropFilterWidget(vsFilter, getActiveViewWidget()->getVisualizationWidget()->GetInteractor(), this);
+  }
+  else if (dynamic_cast<VSMaskFilter*>(filter) != nullptr)
+  {
+    VSMaskFilter* vsFilter = dynamic_cast<VSMaskFilter*>(filter);
+    fw = new VSMaskFilterWidget(vsFilter, getActiveViewWidget()->getVisualizationWidget()->GetInteractor(), this);
+  }
+  else if (dynamic_cast<VSDataSetFilter*>(filter) != nullptr)
+  {
+    VSDataSetFilter* vsFilter = dynamic_cast<VSDataSetFilter*>(filter);
+    fw = new VSDataSetFilterWidget(vsFilter, this);
+  }
+  else if (dynamic_cast<VSSliceFilter*>(filter) != nullptr)
+  {
+    VSSliceFilter* vsFilter = dynamic_cast<VSSliceFilter*>(filter);
+    fw = new VSSliceFilterWidget(vsFilter, getActiveViewWidget()->getVisualizationWidget()->GetInteractor(), this);
+  }
+  else if (dynamic_cast<VSThresholdFilter*>(filter) != nullptr)
+  {
+    VSThresholdFilter* vsFilter = dynamic_cast<VSThresholdFilter*>(filter);
+    fw = new VSThresholdFilterWidget(vsFilter, getActiveViewWidget()->getVisualizationWidget()->GetInteractor(), this);
+  }
+
+  if (fw != nullptr)
+  {
+    m_FilterToFilterWidgetMap.insert(filter, fw);
+  }
+
+  changeCurrentFilter(filter);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidgetBase::filterRemoved(VSAbstractFilter* filter)
+{
+  VSAbstractFilterWidget* fw = m_FilterToFilterWidgetMap.value(filter);
+  delete fw;
+
+  m_FilterToFilterWidgetMap.remove(filter);
 }
 
 // -----------------------------------------------------------------------------
@@ -207,8 +272,9 @@ void VSMainWidgetBase::activeViewClosed()
 void VSMainWidgetBase::changeCurrentFilter(VSAbstractFilter* filter)
 {
   m_CurrentFilter = filter;
+  VSAbstractFilterWidget* filterWidget = m_FilterToFilterWidgetMap.value(filter);
 
-  emit changedActiveFilter(m_CurrentFilter);
+  emit changedActiveFilter(m_CurrentFilter, filterWidget);
 }
 
 // -----------------------------------------------------------------------------

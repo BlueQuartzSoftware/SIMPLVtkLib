@@ -46,7 +46,7 @@
 
 class VSCropFilter;
 class VSCropWidget;
-class VSMainWidget;
+class QVTKInteractor;
 
 /**
  * @class VSCropFilterWidget VSCropFilterWidget.h
@@ -67,7 +67,7 @@ public:
   * @param parentWidget
   * @param parent
   */
-  VSCropFilterWidget(VSCropFilter* filter, VSMainWidget *mainWidget, QWidget* widget = nullptr);
+  VSCropFilterWidget(VSCropFilter* filter, QVTKInteractor* interactor, QWidget* widget = nullptr);
 
   /**
   * @brief Deconstructor
@@ -91,6 +91,9 @@ public:
   void reset() override;
 
 private:
+  class vsInternals;
+  vsInternals*                    m_Internals;
+
   VSCropFilter*                   m_CropFilter;
 
   VSCropWidget*                   m_CropWidget;

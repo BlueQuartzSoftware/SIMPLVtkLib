@@ -58,6 +58,7 @@ class vtkPointData;
 class vtkCelldata;
 class vtkMergeFilter;
 class VSThresholdFilter;
+class QVTKInteractor;
 
 /**
  * @class VSThresholdFilterWidget VSThresholdFilterWidget.h
@@ -78,7 +79,7 @@ public:
   * @param parentWidget
   * @param parent
   */
-  VSThresholdFilterWidget(VSThresholdFilter* filter, QWidget* parent = nullptr);
+  VSThresholdFilterWidget(VSThresholdFilter* filter, QVTKInteractor* interactor, QWidget* parent = nullptr);
 
   /**
   * @brief Deconstructor
@@ -102,5 +103,8 @@ public:
   void reset() override;
 
 private:
+  class vsInternals;
+  vsInternals*                            m_Internals;
+
   VSThresholdFilter*                      m_ThresholdFilter;
 };

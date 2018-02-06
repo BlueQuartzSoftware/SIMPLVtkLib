@@ -53,14 +53,30 @@
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSSliceFilter.h"
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSPlaneWidget.h"
 
+#include "ui_VSSliceFilterWidget.h"
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSSliceFilterWidget::VSSliceFilterWidget(VSSliceFilter* filter, VSMainWidget* mainWidget, QWidget* parent)
+class VSSliceFilterWidget::vsInternals : public Ui::VSSliceFilterWidget
+{
+public:
+  vsInternals()
+  {
+  }
+};
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSSliceFilterWidget::VSSliceFilterWidget(VSSliceFilter* filter, QVTKInteractor *interactor, QWidget* parent)
 : VSAbstractFilterWidget(parent)
+, m_Internals(new vsInternals())
 , m_SliceFilter(filter)
 {
-  m_SliceWidget = new VSPlaneWidget(this, m_SliceFilter->getBounds(), mainWidget->getActiveViewWidget()->getVisualizationWidget()->GetInteractor());
+  m_Internals->setupUi(this);
+
+  m_SliceWidget = new VSPlaneWidget(this, m_SliceFilter->getBounds(), interactor);
   m_SliceWidget->show();
 
   connect(m_SliceWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));

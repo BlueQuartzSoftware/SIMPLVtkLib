@@ -65,8 +65,6 @@ public:
   void setOrigin(double origin[3]) override;
   void setOrigin(double x, double y, double z) override;
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
-
   void enable() override;
   void disable() override;
 
@@ -74,6 +72,9 @@ public:
 
   void getScale(double scale[3]);
   void getRotation(double rotation[3]);
+  void getTranslation(double translation[3]);
+
+  void updateBoxWidget();
 
 public slots:
 
@@ -82,10 +83,6 @@ public slots:
 protected:
   void updateBounds() override;
   void updateOrigin() override;
-
-  void updateBoxWidget();
-
-  void getPosition(double position[3]);
 
   void setMatrix(double position[3], double scale[3], double rotation[3]);
 

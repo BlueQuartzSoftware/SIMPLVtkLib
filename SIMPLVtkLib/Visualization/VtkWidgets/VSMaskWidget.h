@@ -60,8 +60,6 @@ public:
   void enable() override;
   void disable() override;
 
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
-
 protected slots:
   void currentMaskChanged(int index);
 

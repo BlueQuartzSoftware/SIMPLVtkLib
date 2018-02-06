@@ -66,8 +66,6 @@ public:
   virtual void enable() = 0;
   virtual void disable() = 0;
 
-  virtual vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() = 0;
-
 signals:
   void modified();
 

@@ -55,25 +55,41 @@
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSBoxWidget.h"
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSPlaneWidget.h"
 
+#include "ui_VSClipFilterWidget.h"
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSClipFilterWidget::VSClipFilterWidget(VSClipFilter* filter, VSMainWidget* mainWidget, QWidget* widget)
+class VSClipFilterWidget::vsInternals : public Ui::VSClipFilterWidget
+{
+public:
+  vsInternals()
+  {
+  }
+};
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSClipFilterWidget::VSClipFilterWidget(VSClipFilter* filter, QVTKInteractor* interactor, QWidget* widget)
 : VSAbstractFilterWidget(widget)
+, m_Internals(new vsInternals())
 , m_ClipFilter(filter)
-, m_MainWidget(mainWidget)
-{  
-  m_PlaneWidget = new VSPlaneWidget(this, m_ClipFilter->getBounds(), m_MainWidget->getActiveViewWidget()->getVisualizationWidget()->GetInteractor());
-  m_BoxWidget = new VSBoxWidget(this, m_ClipFilter->getBounds(), m_MainWidget->getActiveViewWidget()->getVisualizationWidget()->GetInteractor());
+{
+  m_Internals->setupUi(this);
+
+  m_PlaneWidget = new VSPlaneWidget(nullptr, m_ClipFilter->getBounds(), interactor);
+  m_BoxWidget = new VSBoxWidget(nullptr, m_ClipFilter->getBounds(), interactor);
 
   QStringList clipTypes = { VSClipFilter::PlaneClipTypeString, VSClipFilter::BoxClipTypeString };
-  clipTypeComboBox->insertItems(0, clipTypes);
+  m_Internals->clipTypeComboBox->insertItems(0, clipTypes);
 
-  connect(clipTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeClipType(int)));
-  connect(insideOutCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setInsideOut(int)));
+  changeClipType(VSClipFilter::PlaneClipTypeString);
 
-  connect(m_PlaneWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
-  connect(m_BoxWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
+  connect(m_Internals->clipTypeComboBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(changeClipType(const QString &)));
+
+//  connect(m_PlaneWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
+//  connect(m_BoxWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
 }
 
 // -----------------------------------------------------------------------------
@@ -102,18 +118,45 @@ void VSClipFilterWidget::setBounds(double* bounds)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSClipFilterWidget::changeClipType(const QString &clipType)
+{
+  if (clipType == VSClipFilter::PlaneClipTypeString)
+  {
+    m_Internals->gridLayout->removeWidget(m_BoxWidget);
+    m_BoxWidget->disable();
+    m_BoxWidget->setParent(nullptr);
+
+    m_PlaneWidget->enable();
+    m_Internals->gridLayout->addWidget(m_PlaneWidget);
+    m_PlaneWidget->updatePlaneWidget();
+  }
+  else
+  {
+    m_Internals->gridLayout->removeWidget(m_PlaneWidget);
+    m_PlaneWidget->disable();
+    m_PlaneWidget->setParent(nullptr);
+
+    m_BoxWidget->enable();
+    m_Internals->gridLayout->addWidget(m_BoxWidget);
+    m_BoxWidget->updateBoxWidget();
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSClipFilterWidget::apply()
 {
-  if (clipTypeComboBox->currentText() == VSClipFilter::PlaneClipTypeString)
+  if (m_Internals->clipTypeComboBox->currentText() == VSClipFilter::PlaneClipTypeString)
   {
     double normals[3];
     double origin[3];
     m_PlaneWidget->getNormals(normals);
     m_PlaneWidget->getOrigin(origin);
 
-    m_ClipFilter->apply(origin, normals, insideOutCheckBox->isChecked());
+    m_ClipFilter->apply(origin, normals, m_Internals->insideOutCheckBox->isChecked());
   }
-  else if (clipTypeComboBox->currentText() == VSClipFilter::BoxClipTypeString)
+  else if (m_Internals->clipTypeComboBox->currentText() == VSClipFilter::BoxClipTypeString)
   {
     double origin[3];
     double scale[3];
@@ -123,7 +166,7 @@ void VSClipFilterWidget::apply()
     m_BoxWidget->getScale(scale);
     m_BoxWidget->getRotation(rotation);
 
-    m_ClipFilter->apply(origin, scale, rotation, insideOutCheckBox->isChecked());
+    m_ClipFilter->apply(origin, scale, rotation, m_Internals->insideOutCheckBox->isChecked());
   }
 }
 
@@ -133,9 +176,9 @@ void VSClipFilterWidget::apply()
 void VSClipFilterWidget::reset()
 {
   QString clipTypeString = m_ClipFilter->getLastClipTypeString();
-  clipTypeComboBox->setCurrentText(clipTypeString);
+  m_Internals->clipTypeComboBox->setCurrentText(clipTypeString);
 
-  if (clipTypeComboBox->currentText() == VSClipFilter::PlaneClipTypeString)
+  if (m_Internals->clipTypeComboBox->currentText() == VSClipFilter::PlaneClipTypeString)
   {
     double* origin = m_ClipFilter->getLastPlaneOrigin();
     double* normals = m_ClipFilter->getLastPlaneNormal();
@@ -143,9 +186,10 @@ void VSClipFilterWidget::reset()
 
     m_PlaneWidget->setNormals(normals);
     m_PlaneWidget->setOrigin(origin);
-    insideOutCheckBox->setChecked(inverted);
+    m_Internals->insideOutCheckBox->setChecked(inverted);
+    m_PlaneWidget->updatePlaneWidget();
   }
-  else if (clipTypeComboBox->currentText() == VSClipFilter::BoxClipTypeString)
+  else if (m_Internals->clipTypeComboBox->currentText() == VSClipFilter::BoxClipTypeString)
   {
     double* origin = m_ClipFilter->getLastBoxOrigin();
     double* scale = m_ClipFilter->getLastBoxScale();
@@ -155,6 +199,7 @@ void VSClipFilterWidget::reset()
     m_BoxWidget->setScale(scale);
     m_BoxWidget->setOrigin(origin);
     m_BoxWidget->setRotation(rotation);
-    insideOutCheckBox->setChecked(inverted);
+    m_Internals->insideOutCheckBox->setChecked(inverted);
+    m_BoxWidget->updateBoxWidget();
   }
 }

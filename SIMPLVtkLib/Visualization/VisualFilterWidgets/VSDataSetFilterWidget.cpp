@@ -49,14 +49,28 @@
 #include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
 #include "SIMPLVtkLib/Visualization/Controllers/VSLookupTableController.h"
 
+#include "ui_VSDataSetFilterWidget.h"
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSDataSetFilterWidget::VSDataSetFilterWidget(VSDataSetFilter *filter)
-: VSAbstractFilterWidget()
+class VSDataSetFilterWidget::vsInternals : public Ui::VSDataSetFilterWidget
+{
+public:
+  vsInternals()
+  {
+  }
+};
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSDataSetFilterWidget::VSDataSetFilterWidget(VSDataSetFilter *filter, QWidget* widget)
+: VSAbstractFilterWidget(widget)
+, m_Internals(new vsInternals())
 , m_DataSetFilter(filter)
 {
-
+  m_Internals->setupUi(this);
 }
 
 // -----------------------------------------------------------------------------

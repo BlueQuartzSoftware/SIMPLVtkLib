@@ -89,8 +89,11 @@
          </property>
          <item>
           <widget class="QPushButton" name="clipBtn">
+           <property name="toolTip">
+            <string>Clip</string>
+           </property>
            <property name="statusTip">
-            <string>Clip Filter</string>
+            <string>Clip</string>
            </property>
            <property name="text">
             <string/>
@@ -112,8 +115,11 @@
          </item>
          <item>
           <widget class="QPushButton" name="sliceBtn">
+           <property name="toolTip">
+            <string>Slice</string>
+           </property>
            <property name="statusTip">
-            <string>Slice Filter</string>
+            <string>Slice</string>
            </property>
            <property name="text">
             <string/>
@@ -135,8 +141,11 @@
          </item>
          <item>
           <widget class="QPushButton" name="maskBtn">
+           <property name="toolTip">
+            <string>Mask</string>
+           </property>
            <property name="statusTip">
-            <string>Mask Filter</string>
+            <string>Mask</string>
            </property>
            <property name="text">
             <string/>
@@ -199,10 +208,10 @@
          <item>
           <widget class="QPushButton" name="cameraXpBtn">
            <property name="toolTip">
-            <string extracomment="X+"/>
+            <string extracomment="X+">Set view direction to +X</string>
            </property>
            <property name="statusTip">
-            <string/>
+            <string>Set view direction to +X</string>
            </property>
            <property name="text">
             <string/>
@@ -225,10 +234,10 @@
          <item>
           <widget class="QPushButton" name="cameraXmBtn">
            <property name="toolTip">
-            <string extracomment="X-"/>
+            <string extracomment="X-">Set view direction to -X</string>
            </property>
            <property name="statusTip">
-            <string/>
+            <string>Set view direction to -X</string>
            </property>
            <property name="text">
             <string/>
@@ -251,10 +260,10 @@
          <item>
           <widget class="QPushButton" name="cameraYpBtn">
            <property name="toolTip">
-            <string extracomment="Y+"/>
+            <string extracomment="Y+">Set view direction to +Y</string>
            </property>
            <property name="statusTip">
-            <string/>
+            <string>Set view direction to +Y</string>
            </property>
            <property name="text">
             <string/>
@@ -277,10 +286,10 @@
          <item>
           <widget class="QPushButton" name="cameraYmBtn">
            <property name="toolTip">
-            <string extracomment="Y-"/>
+            <string extracomment="Y-">Set view direction to -Y</string>
            </property>
            <property name="statusTip">
-            <string/>
+            <string>Set view direction to -Y</string>
            </property>
            <property name="text">
             <string/>
@@ -303,10 +312,10 @@
          <item>
           <widget class="QPushButton" name="cameraZpBtn">
            <property name="toolTip">
-            <string extracomment="Z+"/>
+            <string extracomment="Z+">Set view direction to +Z</string>
            </property>
            <property name="statusTip">
-            <string/>
+            <string>Set view direction to +Z</string>
            </property>
            <property name="text">
             <string/>
@@ -329,10 +338,10 @@
          <item>
           <widget class="QPushButton" name="cameraZmBtn">
            <property name="toolTip">
-            <string extracomment="Z-"/>
+            <string extracomment="Z-">Set view direction to -Z</string>
            </property>
            <property name="statusTip">
-            <string/>
+            <string>Set view direction to -Z</string>
            </property>
            <property name="text">
             <string/>

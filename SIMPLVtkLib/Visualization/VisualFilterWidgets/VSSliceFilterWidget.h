@@ -47,7 +47,7 @@ class vtkCutter;
 class vtkImplicitPlaneWidget2;
 class VSPlaneWidget;
 class VSSliceFilter;
-class VSMainWidget;
+class QVTKInteractor;
 
 /**
  * @class VSSliceFilterWidget VSSliceFilterWidget.h
@@ -66,7 +66,7 @@ public:
   * @param parentWidget
   * @param parent
   */
-  VSSliceFilterWidget(VSSliceFilter* filter, VSMainWidget *mainWidget, QWidget* parent = nullptr);
+  VSSliceFilterWidget(VSSliceFilter* filter, QVTKInteractor* interactor, QWidget* parent = nullptr);
 
   /**
   * @brief Deconstructor
@@ -90,6 +90,9 @@ public:
   void reset() override;
 
 private:
+  class vsInternals;
+  vsInternals*                    m_Internals;
+
   VSSliceFilter*                  m_SliceFilter;
   VSPlaneWidget*                  m_SliceWidget;
 };

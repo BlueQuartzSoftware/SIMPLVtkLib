@@ -134,11 +134,3 @@ void VSMaskWidget::currentMaskChanged(int index)
 {
   emit modified();
 }
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-vtkSmartPointer<vtkImplicitFunction> VSMaskWidget::getImplicitFunction()
-{
-  return nullptr;
-}

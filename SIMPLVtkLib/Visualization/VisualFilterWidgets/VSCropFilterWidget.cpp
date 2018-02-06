@@ -54,14 +54,31 @@
 #include <vtkExtractVOI.h>
 
 #include <vtkRenderWindowInteractor.h>
+
+#include "ui_VSCropFilterWidget.h"
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSCropFilterWidget::VSCropFilterWidget(VSCropFilter *filter, VSMainWidget* mainWidget, QWidget *widget)
+class VSCropFilterWidget::vsInternals : public Ui::VSCropFilterWidget
+{
+public:
+  vsInternals()
+  {
+  }
+};
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSCropFilterWidget::VSCropFilterWidget(VSCropFilter *filter, QVTKInteractor *interactor, QWidget *widget)
 : VSAbstractFilterWidget(widget)
+, m_Internals(new vsInternals())
 , m_CropFilter(filter)
 {
-//  m_CropWidget = new VSCropWidget(this, filter->getOutput(), mainWidget->getActiveViewWidget()->getVisualizationWidget()->GetInteractor());
+  m_Internals->setupUi(this);
+
+//  m_CropWidget = new VSCropWidget(this, filter->getOutput(), interactor);
 }
 
 // -----------------------------------------------------------------------------

@@ -91,12 +91,6 @@ public:
   void setSampleRate(int* sampleRate);
 
   /**
-  * @brief Returns the vtkImplicitFunction used
-  * @return
-  */
-  vtkSmartPointer<vtkImplicitFunction> getImplicitFunction() override;
-
-  /**
   * @brief enable
   */
   void enable() override;

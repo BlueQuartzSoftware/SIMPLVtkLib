@@ -44,6 +44,9 @@
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
+class QVTKInteractor;
+class VSAbstractFilterWidget;
+
 /**
 * @class VSInfoWidget VSInfoWidget.h SIMPLVtkLib/QtWidgets/VSInfoWidget.h
 * @brief This class handles displaying information about a visual filter and 
@@ -65,10 +68,11 @@ signals:
 
 public slots:
   /**
-  * @brief Changes the filter being displayed
-  * @param filter
-  */
-  void setFilter(VSAbstractFilter* filter);
+   * @brief Changes the filter being displayed
+   * @param filter
+   * @param filterWidget
+   */
+  void setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget *filterWidget);
 
   /**
   * @brief Changes the VSViewController used for fetching VSFilterViewSettings
@@ -159,6 +163,7 @@ private:
   VSInternals* m_Internals;
 
   VSAbstractFilter* m_Filter = nullptr;
+  VSAbstractFilterWidget* m_FilterWidget = nullptr;
   VSViewController* m_ViewController = nullptr;
   VSFilterViewSettings* m_ViewSettings = nullptr;
   ColorPresetsDialog* m_presetsDialog = nullptr;

@@ -49,6 +49,7 @@ class vtkTableBasedClipDataSet;
 class vtkImplicitPlaneWidget2;
 class VSPlaneWidget;
 class VSBoxWidget;
+class VSClipFilterWidget;
 
 /**
  * @class VSClipFilter VSClipFilter.h 
