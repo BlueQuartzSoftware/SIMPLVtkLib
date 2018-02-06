@@ -70,6 +70,8 @@ void VSController::importData(DataContainerArray::Pointer dca)
     VSDataSetFilter* filter = new VSDataSetFilter(wrappedData[i]);
     m_FilterModel->addFilter(filter);
   }
+
+  emit dataImported();
 }
 
 // -----------------------------------------------------------------------------
@@ -85,6 +87,8 @@ void VSController::importData(DataContainer::Pointer dc)
     VSDataSetFilter* filter = new VSDataSetFilter(wrappedData);
     m_FilterModel->addFilter(filter);
   }
+
+  emit dataImported();
 }
 
 // -----------------------------------------------------------------------------

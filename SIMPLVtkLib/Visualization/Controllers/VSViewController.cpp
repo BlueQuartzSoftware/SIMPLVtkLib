@@ -126,6 +126,8 @@ void VSViewController::copyFilterSettings(const VSViewController& copy)
       this, SIGNAL(activeComponentIndexChanged(VSFilterViewSettings*, int)));
     connect(viewSettings, SIGNAL(mapColorsChanged(VSFilterViewSettings*, bool)),
       this, SIGNAL(mapColorsChanged(VSFilterViewSettings*, bool)));
+    connect(viewSettings, SIGNAL(alphaChanged(VSFilterViewSettings*, double)),
+      this, SIGNAL(alphaChanged(VSFilterViewSettings*, double)));
     connect(viewSettings, SIGNAL(showScalarBarChanged(VSFilterViewSettings*, bool)),
       this, SIGNAL(showScalarBarChanged(VSFilterViewSettings*, bool)));
     connect(viewSettings, SIGNAL(requiresRender()),
@@ -197,12 +199,23 @@ void VSViewController::addFilter(VSAbstractFilter* filter)
     this, SIGNAL(activeComponentIndexChanged(VSFilterViewSettings*, int)));
   connect(viewSettings, SIGNAL(mapColorsChanged(VSFilterViewSettings*, bool)),
     this, SIGNAL(mapColorsChanged(VSFilterViewSettings*, bool)));
+  connect(viewSettings, SIGNAL(alphaChanged(VSFilterViewSettings*, double)),
+    this, SIGNAL(alphaChanged(VSFilterViewSettings*, double)));
   connect(viewSettings, SIGNAL(showScalarBarChanged(VSFilterViewSettings*, bool)),
     this, SIGNAL(showScalarBarChanged(VSFilterViewSettings*, bool)));
   connect(viewSettings, SIGNAL(requiresRender()),
     this, SIGNAL(requiresRender()));
 
   m_FilterViewSettings.push_back(viewSettings);
+
+  if(filter->getParentFilter())
+  {
+    VSFilterViewSettings* parentSettings = getViewSettings(filter->getParentFilter());
+    if(parentSettings)
+    {
+      viewSettings->copySettings(parentSettings);
+    }
+  }
 
   emit filterAdded(filter);
 }

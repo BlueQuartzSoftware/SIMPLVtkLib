@@ -39,6 +39,7 @@
 #include <vtkCellData.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkDataSetMapper.h>
+#include <vtkProperty.h>
 #include <vtkTextProperty.h>
 
 // -----------------------------------------------------------------------------
@@ -63,9 +64,11 @@ VSFilterViewSettings::VSFilterViewSettings(const VSFilterViewSettings& copy)
   , m_ActiveComponent(copy.m_ActiveComponent)
   , m_MapColors(copy.m_MapColors)
   , m_ShowScalarBar(copy.m_ShowScalarBar)
+  , m_Alpha(copy.m_Alpha)
 {
   connectFilter(copy.m_Filter);
   setupActors();
+  m_LookupTable->copy(*(copy.m_LookupTable));
 }
 
 // -----------------------------------------------------------------------------
@@ -157,6 +160,14 @@ int VSFilterViewSettings::getNumberOfComponents(QString arrayName)
 bool VSFilterViewSettings::getMapColors()
 {
   return m_MapColors;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+double VSFilterViewSettings::getAlpha()
+{
+  return m_Alpha;
 }
 
 // -----------------------------------------------------------------------------
@@ -330,6 +341,48 @@ void VSFilterViewSettings::setMapColors(bool mapColors)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSFilterViewSettings::setAlpha(double alpha)
+{
+  if(alpha < 0.0)
+  {
+    alpha = 0.0;
+  }
+  else if(alpha > 1.0)
+  {
+    alpha = 1.0;
+  }
+
+  m_Alpha = alpha;
+
+  vtkProperty* property = m_Actor->GetProperty();
+  property->SetOpacity(m_Alpha);
+  m_Actor->SetProperty(property);
+
+  emit alphaChanged(this, m_Alpha);
+  emit requiresRender();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::invertScalarBar()
+{
+  m_LookupTable->invert();
+  emit requiresRender();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::loadPresetColors(const QJsonObject& colors)
+{
+  m_LookupTable->parseRgbJson(colors);
+  emit requiresRender();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSFilterViewSettings::setScalarBarVisible(bool visible)
 {
   m_ShowScalarBar = visible;
@@ -397,5 +450,28 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
   if(filter)
   {
     connect(filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
+
+    if(filter->getArrayNames().size() < 1)
+    {
+      setScalarBarVisible(false);
+      setMapColors(false);
+    }
   }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::copySettings(VSFilterViewSettings* copy)
+{
+  m_ShowFilter = copy->m_ShowFilter;
+  m_ActiveArray = copy->m_ActiveArray;
+  m_ActiveComponent = copy->m_ActiveComponent;
+  m_MapColors = copy->m_MapColors;
+  m_ShowScalarBar = copy->m_ShowScalarBar;
+  m_Alpha = copy->m_Alpha;
+
+  m_LookupTable->copy(*(copy->m_LookupTable));
+
+  emit requiresRender();
 }

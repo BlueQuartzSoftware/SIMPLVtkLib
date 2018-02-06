@@ -97,6 +97,7 @@ signals:
   void activeArrayIndexChanged(VSFilterViewSettings*, int);
   void activeComponentIndexChanged(VSFilterViewSettings*, int);
   void mapColorsChanged(VSFilterViewSettings*, bool);
+  void alphaChanged(VSFilterViewSettings*, double);
   void showScalarBarChanged(VSFilterViewSettings*, bool);
   void requiresRender();
 

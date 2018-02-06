@@ -110,12 +110,49 @@ public:
   void setInfoWidget(VSInfoWidget* infoWidget);
 
 public slots:
+  /**
+  * @brief Create a clip filter and set the given filter as its parent.  If no filter is provided,
+  * the current filter is used instead.
+  * @param parent
+  */
   void createClipFilter(VSAbstractFilter* parent = nullptr);
+
+  /**
+  * @brief Create a crop filter and set the given filter as its parent.  If no filter is provided,
+  * the current filter is used instead.
+  * @param parent
+  */
   void createCropFilter(VSAbstractFilter* parent = nullptr);
+
+  /**
+  * @brief Create a slice filter and set the given filter as its parent.  If no filter is provided,
+  * the current filter is used instead.
+  * @param parent
+  */
   void createSliceFilter(VSAbstractFilter* parent = nullptr);
+
+  /**
+  * @brief Create a mask filter and set the given filter as its parent.  If no filter is provided,
+  * the current filter is used instead.
+  * @param parent
+  */
   void createMaskFilter(VSAbstractFilter* parent = nullptr);
+
+  /**
+  * @brief Create a threshold filter and set the given filter as its parent.  If no filter is provided,
+  * the current filter is used instead.
+  * @param parent
+  */
   void createThresholdFilter(VSAbstractFilter* parent = nullptr);
+
+  /**
+  * @brief Renders the active view widget
+  */
   void renderActiveView();
+
+  /**
+  * @brief Renders all view widgets contained in the main widget
+  */
   void renderAllViews();
 
 signals:

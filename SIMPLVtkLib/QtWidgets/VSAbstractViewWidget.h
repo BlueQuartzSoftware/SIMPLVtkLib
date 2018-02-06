@@ -118,6 +118,11 @@ public slots:
   */
   void renderView();
 
+  /**
+  * @brief Resets the visualization widget's camera
+  */
+  void resetCamera();
+
 protected slots:
   /**
   * @brief Connect a new visual filter's VSFilterViewSettings

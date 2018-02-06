@@ -37,6 +37,8 @@
 
 #include <QtWidgets/QWidget>
 
+#include "SVWidgetsLib/Dialogs/ColorPresetsDialog.h"
+
 #include "SIMPLVtkLib/Visualization/Controllers/VSViewController.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilter.h"
 
@@ -114,6 +116,29 @@ protected slots:
   */
   void setScalarBarVisible(int checkState);
 
+  /**
+  * @brief Slot for creating color preset dialog
+  */
+  void selectPresetColors();
+
+  /**
+  * @brief Slot for handling color preset data
+  * @param preset
+  * @param pixmap
+  */
+  void loadPresetColors(const QJsonObject& preset, const QPixmap& pixmap);
+
+  /**
+  * @brief Slot for inverting the current scalar bar
+  */
+  void invertScalarBar();
+
+  /**
+  * @brief Slot for handling user interaction with the alphaSlider for object transparency
+  * @param value
+  */
+  void alphaSliderMoved(int value);
+
 protected:
   /**
   * @brief Performs initial setup for the GUI
@@ -136,4 +161,5 @@ private:
   VSAbstractFilter* m_Filter = nullptr;
   VSViewController* m_ViewController = nullptr;
   VSFilterViewSettings* m_ViewSettings = nullptr;
+  ColorPresetsDialog* m_presetsDialog = nullptr;
 };

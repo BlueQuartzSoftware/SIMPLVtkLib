@@ -153,6 +153,7 @@ CMP_FindVtkComponents(QT5_REQUIRED TRUE
 set(SIMPLVtkLib_LINK_LIBRARIES
   Qt5::Core
   SIMPLib
+  SVWidgetsLib
   Qt5::Gui
   Qt5::Widgets
   ${VtkComponents}

@@ -439,3 +439,16 @@ void VSAbstractViewWidget::renderView()
     visualizationWidget->render();
   }
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractViewWidget::resetCamera()
+{
+  VSVisualizationWidget* visualizationWidget = getVisualizationWidget();
+  if(visualizationWidget && visualizationWidget->getRenderer())
+  {
+    visualizationWidget->getRenderer()->ResetCamera();
+    visualizationWidget->render();
+  }
+}

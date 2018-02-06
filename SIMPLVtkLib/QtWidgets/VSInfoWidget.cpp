@@ -70,6 +70,8 @@ VSInfoWidget::VSInfoWidget(QWidget* parent)
 // -----------------------------------------------------------------------------
 void VSInfoWidget::setupGui()
 {
+  m_presetsDialog = new ColorPresetsDialog();
+
   connect(m_Internals->activeArrayCombo, SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateActiveArrayIndex(int)));
   connect(m_Internals->activeComponentCombo, SIGNAL(currentIndexChanged(int)),
@@ -78,6 +80,14 @@ void VSInfoWidget::setupGui()
     this, SLOT(setScalarsMapped(int)));
   connect(m_Internals->showScalarBarCheckBox, SIGNAL(stateChanged(int)),
     this, SLOT(setScalarBarVisible(int)));
+  connect(m_Internals->invertColorScaleBtn, SIGNAL(clicked()),
+    this, SLOT(invertScalarBar()));
+  connect(m_Internals->alphaSlider, SIGNAL(valueChanged(int)),
+    this, SLOT(alphaSliderMoved(int)));
+  connect(m_Internals->selectPresetColorsBtn, SIGNAL(clicked()),
+    this, SLOT(selectPresetColors()));
+  connect(m_presetsDialog, SIGNAL(applyPreset(const QJsonObject&, const QPixmap&)),
+    this, SLOT(loadPresetColors(const QJsonObject&, const QPixmap&)));
 }
 
 // -----------------------------------------------------------------------------
@@ -171,20 +181,25 @@ void VSInfoWidget::updateFilterInfo()
   // TODO: display information both about the filter
 
   // Add and set the array / component combo box values
+  m_Internals->activeArrayCombo->blockSignals(true);
   m_Internals->activeArrayCombo->clear();
+
   if(m_Filter)
   {
     m_Internals->activeArrayCombo->addItems(m_Filter->getArrayNames());
 
     if(m_ViewSettings)
     {
-      m_Internals->activeArrayCombo->setCurrentIndex(m_ViewSettings->getActiveArrayIndex());
+      int activeIndex = m_ViewSettings->getActiveArrayIndex();
+      m_Internals->activeArrayCombo->setCurrentIndex(activeIndex);
     }
     else
     {
       m_Internals->activeArrayCombo->setCurrentIndex(0);
     }
   }
+
+  m_Internals->activeArrayCombo->blockSignals(false);
 }
 
 // -----------------------------------------------------------------------------
@@ -213,6 +228,7 @@ void VSInfoWidget::updateViewSettingInfo()
 
   m_Internals->showScalarBarCheckBox->setChecked(m_ViewSettings->isScalarBarVisible() ? Qt::Checked : Qt::Unchecked);
   m_Internals->mapScalarsCheckBox->setChecked(m_ViewSettings->getMapColors() ? Qt::Checked : Qt::Unchecked);
+  m_Internals->alphaSlider->setValue(m_ViewSettings->getAlpha() * 100);
 }
 
 // -----------------------------------------------------------------------------
@@ -281,4 +297,56 @@ void VSInfoWidget::setScalarBarVisible(int checkState)
 
   bool checked = checkState == Qt::Checked;
   m_ViewSettings->setScalarBarVisible(checked);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::selectPresetColors()
+{
+  if(nullptr == m_ViewSettings)
+  {
+    return;
+  }
+
+  m_presetsDialog->show();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::loadPresetColors(const QJsonObject& preset, const QPixmap& pixmap)
+{
+  if(nullptr == m_ViewSettings)
+  {
+    return;
+  }
+
+  m_ViewSettings->loadPresetColors(preset);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::invertScalarBar()
+{
+  if(nullptr == m_ViewSettings)
+  {
+    return;
+  }
+
+  m_ViewSettings->invertScalarBar();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::alphaSliderMoved(int value)
+{
+  if(nullptr == m_ViewSettings)
+  {
+    return;
+  }
+
+  m_ViewSettings->setAlpha(value / 100.0);
 }

@@ -117,6 +117,7 @@ signals:
   void activeViewChanged(VSViewController* activeView);
   void filterAdded(VSAbstractFilter*);
   void filterRemoved(VSAbstractFilter*);
+  void dataImported();
 
 private:
   VSViewController* m_ActiveViewController = nullptr;

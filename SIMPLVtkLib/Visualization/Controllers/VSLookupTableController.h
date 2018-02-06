@@ -44,6 +44,14 @@
 class vtkColorTransferFunction;
 class QJsonObject;
 
+/**
+* @class VSLookupTableController VSLookupTableController.h
+* @brief This class handles the loading and manipulation of color data for use
+* in the vtkMapper and vtkScalarBarActor classes.  The main functionality is
+* loading json presets to be applied to vtkMappers through the color transfer 
+* function.  Secondarily, the color scale can be inverted or adjusted to a given
+* scale to match a given data array.
+*/
 class SIMPLVtkLib_EXPORT VSLookupTableController
 {
 public:
@@ -60,6 +68,7 @@ public:
   void setColorTransferFunction(vtkColorTransferFunction* colorTransferFunction);
 
   void parseRgbJson(const QJsonObject& json);
+  void copy(const VSLookupTableController& other);
 
   void invert();
 

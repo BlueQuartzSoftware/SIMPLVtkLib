@@ -99,8 +99,12 @@ protected slots:
   */
   void renderAll();
 
+  /**
+  * @brief Resets all render view cameras
+  */
+  void resetCamera();
+
 private:
   class vsInternals;
   vsInternals* m_Internals;
-  bool m_HasRendered = false;
 };

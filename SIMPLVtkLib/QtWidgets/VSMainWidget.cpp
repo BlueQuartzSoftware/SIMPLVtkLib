@@ -83,6 +83,7 @@ void VSMainWidget::connectSlots()
   connect(m_Internals->cameraZmBtn, SIGNAL(clicked()), this, SLOT(activeCameraZMinus()));
 
   connect(getController(), &VSController::filterAdded, this, [=] { renderAll(); });
+  connect(getController(), &VSController::dataImported, this, [=] { resetCamera(); });
 }
 
 // -----------------------------------------------------------------------------
@@ -96,19 +97,22 @@ void VSMainWidget::renderAll()
     VSVisualizationWidget* visualizationWidget = (*iter)->getVisualizationWidget();
     if(visualizationWidget)
     {
-      // Check if this is the first time rendering an object
-      // Reset the camera if it is
-      if(false == m_HasRendered)
-      {
-        visualizationWidget->getRenderer()->ResetCamera();
-      }
-
       // Render the VTK widget
       visualizationWidget->render();
     }
   }
+}
 
-  m_HasRendered = true;
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidget::resetCamera()
+{
+  QVector<VSAbstractViewWidget*> viewWidgets = getAllViewWidgets();
+  for(VSAbstractViewWidget* viewWidget : viewWidgets)
+  {
+    viewWidget->resetCamera();
+  }
 }
 
 // -----------------------------------------------------------------------------

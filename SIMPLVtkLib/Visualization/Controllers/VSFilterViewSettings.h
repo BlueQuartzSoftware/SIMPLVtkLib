@@ -101,7 +101,18 @@ public:
   */
   int getActiveComponentIndex();
 
+  /**
+  * @brief Returns the number of components for the given array
+  * @param arrayIndex
+  * @return
+  */
   int getNumberOfComponents(int arrayIndex);
+
+  /**
+  * @brief Returns the number of components for the given array
+  * @param arrayIndex
+  * @return
+  */
   int getNumberOfComponents(QString name);
 
   /**
@@ -109,6 +120,11 @@ public:
   * @return
   */
   bool getMapColors();
+
+  /**
+  * @brief Returns tha alpha transparency used for the displaying the actor
+  */
+  double getAlpha();
 
   /**
   * @brief Returns true if the ScalarBarWidget is visible.  Returns false otherwise
@@ -127,6 +143,12 @@ public:
   * @return
   */
   VTK_PTR(vtkScalarBarWidget) getScalarBarWidget();
+
+  /**
+  * @brief Copies another VSFilterViewSettings for everything but the active filter
+  * @param filter
+  */
+  void copySettings(VSFilterViewSettings* other);
 
 public slots:
   /**
@@ -164,6 +186,24 @@ public slots:
   void setMapColors(bool mapColors);
 
   /**
+  * @brief Sets the object's alpha transparency
+  * @param alpha
+  */
+  void setAlpha(double alpha);
+
+  /**
+  * @brief Inverts the scalar bar so that colors at the higher end of the scale
+  * are moved to the bottom and colors at the bottom are moved to the top.
+  */
+  void invertScalarBar();
+
+  /**
+  * @brief Set the preset colors for the VSLookupTableController
+  * @param json
+  */
+  void loadPresetColors(const QJsonObject& json);
+
+  /**
   * @brief Updates whether or not the vtkScalarBarWidget is visible for this view
   * @param visible
   */
@@ -180,6 +220,7 @@ signals:
   void activeArrayIndexChanged(VSFilterViewSettings*, int);
   void activeComponentIndexChanged(VSFilterViewSettings*, int);
   void mapColorsChanged(VSFilterViewSettings*, bool);
+  void alphaChanged(VSFilterViewSettings*, double);
   void showScalarBarChanged(VSFilterViewSettings*, bool);
   void requiresRender();
 
@@ -217,6 +258,7 @@ private:
   VTK_PTR(vtkActor) m_Actor = nullptr;
   bool m_ShowScalarBar = true;
   VSLookupTableController* m_LookupTable = nullptr;
+  double m_Alpha = 1.0;
   VTK_PTR(vtkScalarBarActor) m_ScalarBarActor = nullptr;
   VTK_PTR(vtkScalarBarWidget) m_ScalarBarWidget = nullptr;
 };

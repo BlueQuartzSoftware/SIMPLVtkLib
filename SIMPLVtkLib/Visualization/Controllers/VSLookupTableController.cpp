@@ -157,6 +157,45 @@ void VSLookupTableController::parseRgbJson(const QJsonObject& presetObj)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSLookupTableController::copy(const VSLookupTableController& other)
+{
+  m_rgbPosVector.clear();
+  m_baseRgbPosVector.clear();
+
+  m_colorTransferFunction->RemoveAllPoints();
+
+  size_t count = other.m_rgbPosVector.size();
+  m_rgbPosVector.resize(count);
+  for(size_t i = 0; i < count; i++)
+  {
+    m_rgbPosVector[i] = other.m_rgbPosVector[i];
+    RgbPos_t pos = m_rgbPosVector[i];
+
+    m_colorTransferFunction->AddRGBPoint(pos.x, pos.r, pos.g, pos.b);
+  }
+
+  count = other.m_baseRgbPosVector.size();
+  m_baseRgbPosVector.resize(count);
+  for(size_t i = 0; i < count; i++)
+  {
+    m_baseRgbPosVector[i] = other.m_baseRgbPosVector[i];
+  }
+
+  int colorSpace = other.m_colorTransferFunction->GetColorSpace();
+  m_colorTransferFunction->SetColorSpace(colorSpace);
+
+  m_range[0] = other.m_range[0];
+  m_range[1] = other.m_range[1];
+
+  m_baseRange[0] = other.m_baseRange[0];
+  m_baseRange[1] = other.m_baseRange[1];
+
+  setRange(m_range[0], m_range[1]);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSLookupTableController::invert()
 {
   double minRange = m_range[0];
