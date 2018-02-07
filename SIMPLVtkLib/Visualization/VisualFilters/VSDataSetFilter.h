@@ -38,7 +38,6 @@
 #include <QtWidgets/QWidget>
 
 #include "VSAbstractFilter.h"
-#include "ui_VSDataSetFilter.h"
 
 #include <vtkSmartPointer.h>
 

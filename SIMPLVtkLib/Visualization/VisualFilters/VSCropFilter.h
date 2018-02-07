@@ -38,7 +38,6 @@
 #include <QtWidgets/QWidget>
 
 #include "VSAbstractFilter.h"
-#include "ui_VSCropFilter.h"
 
 #include <vtkBox.h>
 
