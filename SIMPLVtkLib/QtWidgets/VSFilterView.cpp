@@ -60,8 +60,11 @@ void VSFilterView::setupGui()
 // -----------------------------------------------------------------------------
 void VSFilterView::setController(VSController* controller)
 {
-  disconnect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*)),
-    this, SLOT(insertFilter(VSAbstractFilter*)));
+  if (m_Controller)
+  {
+    disconnect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*)),
+      this, SLOT(insertFilter(VSAbstractFilter*)));
+  }
 
   m_Controller = controller;
   setModel(controller->getFilterModel());
@@ -87,8 +90,11 @@ void VSFilterView::insertFilter(VSAbstractFilter* filter)
 void VSFilterView::setViewWidget(VSAbstractViewWidget* viewWidget)
 {
   // Disconnect from the old view controller
-  disconnect(m_ViewWidget, SIGNAL(visibilityChanged(VSFilterViewSettings*, bool)),
-    this, SLOT(setFilterVisibility(VSFilterViewSettings*, bool)));
+  if (m_ViewWidget)
+  {
+    disconnect(m_ViewWidget, SIGNAL(visibilityChanged(VSFilterViewSettings*, bool)),
+      this, SLOT(setFilterVisibility(VSFilterViewSettings*, bool)));
+  }
 
   m_ViewWidget = viewWidget;
   if(nullptr == m_Controller || nullptr == m_ViewWidget)
