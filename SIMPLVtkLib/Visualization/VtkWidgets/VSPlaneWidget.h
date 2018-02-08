@@ -108,6 +108,12 @@ public:
   void setOrigin(double x, double y, double z) override;
 
   /**
+   * @brief setInteractor
+   * @param interactor
+   */
+  void setInteractor(vtkRenderWindowInteractor* interactor) override;
+
+  /**
   * @brief Enables the plane widget
   */
   void enable() override;

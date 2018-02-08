@@ -39,7 +39,7 @@
 //
 // -----------------------------------------------------------------------------
 VSAbstractFilterWidget::VSAbstractFilterWidget(QWidget* parent)
-: QWidget()
+: QWidget(parent)
 {
 
 }
@@ -64,4 +64,20 @@ void VSAbstractFilterWidget::apply()
 // -----------------------------------------------------------------------------
 void VSAbstractFilterWidget::reset()
 {
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractFilterWidget::setInteractor(QVTKInteractor* interactor)
+{
+  Q_UNUSED(interactor)
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractFilterWidget::setDrawingEnabled(bool enabled)
+{
+  Q_UNUSED(enabled)
 }

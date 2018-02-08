@@ -37,7 +37,7 @@
 
 #include <vector>
 
-#include <QtWidgets/QWidget>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QSplitter>
 
 #include "SIMPLVtkLib/QtWidgets/VSVisualizationWidget.h"
@@ -51,7 +51,7 @@
 * @brief This abstract class applies the VSViewController and VSFilterViewSettings to
 * a VSVisualizationWidget.
 */
-class SIMPLVtkLib_EXPORT VSAbstractViewWidget : public QWidget
+class SIMPLVtkLib_EXPORT VSAbstractViewWidget : public QFrame
 {
   Q_OBJECT
 
@@ -60,7 +60,7 @@ public:
   * @brief Constructor
   * @param parent
   */
-  VSAbstractViewWidget(QWidget* parent = nullptr);
+  VSAbstractViewWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
   /**
   * @brief Copy constructor
@@ -103,6 +103,12 @@ public:
   * @param controller
   */
   void setController(VSController* controller);
+
+  /**
+   * @brief setActive
+   * @param active
+   */
+  virtual void setActive(bool active);
 
   /**
   * @brief Clones the widget and its view controller

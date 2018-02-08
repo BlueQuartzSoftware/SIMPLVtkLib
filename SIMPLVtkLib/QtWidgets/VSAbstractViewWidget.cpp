@@ -40,8 +40,8 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSAbstractViewWidget::VSAbstractViewWidget(QWidget* parent)
-  : QWidget(parent)
+VSAbstractViewWidget::VSAbstractViewWidget(QWidget* parent, Qt::WindowFlags f)
+  : QFrame(parent, f)
 {
 }
 
@@ -49,7 +49,7 @@ VSAbstractViewWidget::VSAbstractViewWidget(QWidget* parent)
 //
 // -----------------------------------------------------------------------------
 VSAbstractViewWidget::VSAbstractViewWidget(const VSAbstractViewWidget& other)
-  : QWidget(nullptr)
+  : QFrame(nullptr)
 {
   
 }
@@ -563,6 +563,14 @@ void VSAbstractViewWidget::resetCamera()
 VSController* VSAbstractViewWidget::getController() const
 {
   return m_Controller;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractViewWidget::setActive(bool active)
+{
+  Q_UNUSED(active)
 }
 
 // -----------------------------------------------------------------------------

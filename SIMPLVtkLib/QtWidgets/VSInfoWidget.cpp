@@ -151,6 +151,7 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* f
 {
   if (m_FilterWidget != nullptr)
   {
+    m_FilterWidget->setDrawingEnabled(false);
     m_Internals->gridLayout_4->removeWidget(m_FilterWidget);
     m_FilterWidget = nullptr;
   }
@@ -172,9 +173,10 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* f
     m_ViewSettings = nullptr;
   }
 
-  if (filterWidget != nullptr)
+  if (m_FilterWidget != nullptr)
   {
-    m_Internals->gridLayout_4->addWidget(filterWidget);
+    m_Internals->gridLayout_4->addWidget(m_FilterWidget);
+    m_FilterWidget->setDrawingEnabled(true);
   }
 
   updateFilterInfo();
@@ -196,6 +198,11 @@ void VSInfoWidget::setViewWidget(VSAbstractViewWidget* viewWidget)
   else
   {
     m_ViewSettings = nullptr;
+  }
+
+  if (m_FilterWidget)
+  {
+    m_FilterWidget->setDrawingEnabled(true);
   }
 
   updateViewSettingInfo();

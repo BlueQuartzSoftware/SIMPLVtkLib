@@ -66,6 +66,8 @@ public:
   virtual void enable() = 0;
   virtual void disable() = 0;
 
+  virtual void setInteractor(vtkRenderWindowInteractor* interactor);
+
 signals:
   void modified();
 

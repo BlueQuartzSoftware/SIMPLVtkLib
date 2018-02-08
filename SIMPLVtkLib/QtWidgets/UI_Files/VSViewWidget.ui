@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>VSViewWidget</class>
- <widget class="QWidget" name="VSViewWidget">
+ <widget class="QFrame" name="VSViewWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -36,6 +36,9 @@
        <horstretch>1</horstretch>
        <verstretch>1</verstretch>
       </sizepolicy>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
      </property>
     </widget>
    </item>

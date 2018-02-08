@@ -219,6 +219,7 @@ void VSBoxWidget::updateOrigin()
 void VSBoxWidget::enable()
 {
   boxWidget->EnabledOn();
+  m_renderWindowInteractor->Render();
 }
 
 // -----------------------------------------------------------------------------
@@ -227,6 +228,7 @@ void VSBoxWidget::enable()
 void VSBoxWidget::disable()
 {
   boxWidget->EnabledOff();
+  m_renderWindowInteractor->Render();
 }
 
 // -----------------------------------------------------------------------------
@@ -374,4 +376,13 @@ void VSBoxWidget::setMatrix(double position[3], double scale[3], double rotation
 
   viewTransform->Translate(position);
   viewTransform->Scale(scale);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSBoxWidget::setInteractor(vtkRenderWindowInteractor* interactor)
+{
+  m_renderWindowInteractor = interactor;
+  boxWidget->SetInteractor(interactor);
 }

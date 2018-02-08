@@ -76,6 +76,8 @@ public:
 
   void updateBoxWidget();
 
+  void setInteractor(vtkRenderWindowInteractor* interactor) override;
+
 public slots:
 
   void spinBoxValueChanged();

@@ -127,6 +127,14 @@ void VSAbstractWidget::setOrigin(double x, double y, double z)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSAbstractWidget::setInteractor(vtkRenderWindowInteractor* interactor)
+{
+  m_renderWindowInteractor = interactor;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSAbstractWidget::updateBounds()
 {
 }

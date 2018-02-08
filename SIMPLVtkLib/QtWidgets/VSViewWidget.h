@@ -53,7 +53,7 @@ public:
   * @brief Constructor
   * @param parent
   */
-  VSViewWidget(QWidget* parent = nullptr);
+  VSViewWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
   /**
   * @brief Copy constructor
@@ -70,6 +70,12 @@ public:
   * @brief Returns the VSVisualizationWidget used
   */
   virtual VSVisualizationWidget* getVisualizationWidget() const override;
+
+  /**
+   * @brief setActive
+   * @param active
+   */
+  void setActive(bool active) override;
 
 protected:
   /**
@@ -88,4 +94,14 @@ protected slots:
 private:
   class VSInternals;
   VSInternals* m_Internals;
+
+  /**
+   * @brief toActiveState
+   */
+  void toActiveState();
+
+  /**
+   * @brief toInactiveState
+   */
+  void toInactiveState();
 };

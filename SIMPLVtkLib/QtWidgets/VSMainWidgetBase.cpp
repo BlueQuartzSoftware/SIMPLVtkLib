@@ -130,7 +130,7 @@ void VSMainWidgetBase::setFilterView(VSFilterView* view)
 
   m_FilterView = view;
   connect(view, SIGNAL(filterClicked(VSAbstractFilter*)), this, SLOT(setCurrentFilter(VSAbstractFilter*)));
-  connect(this, SIGNAL(changedActiveView(VSAbstractViewWidget*)), view, SLOT(changeViewWidget(VSAbstractViewWidget*)));
+  connect(this, SIGNAL(changedActiveView(VSAbstractViewWidget*)), view, SLOT(setViewWidget(VSAbstractViewWidget*)));
   
   view->setViewWidget(m_ActiveViewWidget);
 }
@@ -247,6 +247,8 @@ void VSMainWidgetBase::setActiveView(VSAbstractViewWidget* viewWidget)
   // Disconnect the old active view widget
   if(m_ActiveViewWidget)
   {
+    m_ActiveViewWidget->setActive(false);
+
     disconnect(m_ActiveViewWidget, SIGNAL(viewWidgetClosed()), this, SLOT(activeViewClosed()));
     disconnect(m_ActiveViewWidget, SIGNAL(visibilityChanged(VSFilterViewSettings*, bool)),
       this, SLOT(setFilterVisibility(VSFilterViewSettings*, bool)));
@@ -257,12 +259,21 @@ void VSMainWidgetBase::setActiveView(VSAbstractViewWidget* viewWidget)
   // Connect the new active view widget
   if(m_ActiveViewWidget)
   {
+    m_ActiveViewWidget->setActive(true);
+
     connect(m_ActiveViewWidget, SIGNAL(viewWidgetClosed()), this, SLOT(activeViewClosed()));
     connect(m_ActiveViewWidget, SIGNAL(visibilityChanged(VSFilterViewSettings*, bool)),
       this, SLOT(setFilterVisibility(VSFilterViewSettings*, bool)));
 
     // Update filter check states to match the current view widget
     getController()->getFilterModel()->updateModelForView(viewWidget->getAllFilterViewSettings());
+
+    VSAbstractFilterWidget* fw;
+    foreach(fw, m_FilterToFilterWidgetMap.values())
+    {
+      fw->setDrawingEnabled(false);
+      fw->setInteractor(getActiveViewWidget()->getVisualizationWidget()->GetInteractor());
+    }
   }
 
   emit changedActiveView(viewWidget);

@@ -35,6 +35,8 @@
 
 #include "VSViewWidget.h"
 
+#include <QtGui/QPainter>
+
 #include "ui_VSViewWidget.h"
 
 // -----------------------------------------------------------------------------
@@ -51,8 +53,8 @@ public:
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSViewWidget::VSViewWidget(QWidget* parent)
-  : VSAbstractViewWidget(parent)
+VSViewWidget::VSViewWidget(QWidget* parent, Qt::WindowFlags f)
+  : VSAbstractViewWidget(parent, f)
   , m_Internals(new VSInternals())
 {
   m_Internals->setupUi(this);
@@ -111,6 +113,40 @@ VSVisualizationWidget* VSViewWidget::getVisualizationWidget() const
   }
 
   return m_Internals->visualizationWidget;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSViewWidget::setActive(bool active)
+{
+  (active) ? toActiveState() : toInactiveState();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSViewWidget::toActiveState()
+{
+  QString styleString;
+  QTextStream ss(&styleString);
+
+  ss << "VSViewWidget {";
+
+  ss << "border: 1px solid #0500ff;";
+  ss << "padding: 1px;";
+
+  ss << "}";
+
+  setStyleSheet(styleString);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSViewWidget::toInactiveState()
+{
+  setStyleSheet("");
 }
 
 // -----------------------------------------------------------------------------

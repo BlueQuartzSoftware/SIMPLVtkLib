@@ -43,6 +43,8 @@
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
+class QVTKInteractor;
+
 /**
 * @class VSAbstractFilterWidget VSAbstractFilterWidget.h
 * SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilterWidget.h
@@ -73,6 +75,18 @@ public:
   * @brief Resets the filter
   */
   virtual void reset();
+
+  /**
+   * @brief Sets whether the filter widget should render drawings in the visualization window
+   * @param enabled
+   */
+  virtual void setDrawingEnabled(bool enabled);
+
+  /**
+   * @brief setInteractor
+   * @param interactor
+   */
+  virtual void setInteractor(QVTKInteractor* interactor);
 
 protected:
   /**
