@@ -103,6 +103,10 @@ void VSInfoWidget::setupGui()
     this, SLOT(resetFilter()));
   connect(m_Internals->deleteBtn, SIGNAL(clicked()),
     this, SLOT(deleteFilter()));
+
+  m_Internals->applyBtn->setDisabled(true);
+  m_Internals->resetBtn->setDisabled(true);
+  m_Internals->deleteBtn->setDisabled(true);
 }
 
 // -----------------------------------------------------------------------------
