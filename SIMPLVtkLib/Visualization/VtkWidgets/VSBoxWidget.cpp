@@ -219,7 +219,11 @@ void VSBoxWidget::updateOrigin()
 void VSBoxWidget::enable()
 {
   boxWidget->EnabledOn();
-  m_renderWindowInteractor->Render();
+
+  if (m_renderWindowInteractor)
+  {
+    m_renderWindowInteractor->Render();
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -228,7 +232,11 @@ void VSBoxWidget::enable()
 void VSBoxWidget::disable()
 {
   boxWidget->EnabledOff();
-  m_renderWindowInteractor->Render();
+
+  if (m_renderWindowInteractor)
+  {
+    m_renderWindowInteractor->Render();
+  }
 }
 
 // -----------------------------------------------------------------------------

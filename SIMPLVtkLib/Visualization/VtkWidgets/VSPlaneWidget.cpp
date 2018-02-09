@@ -216,7 +216,11 @@ void VSPlaneWidget::updateOrigin()
 void VSPlaneWidget::enable()
 {
   planeWidget->EnabledOn();
-  m_renderWindowInteractor->Render();
+
+  if (m_renderWindowInteractor)
+  {
+    m_renderWindowInteractor->Render();
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -225,7 +229,11 @@ void VSPlaneWidget::enable()
 void VSPlaneWidget::disable()
 {
   planeWidget->EnabledOff();
-  m_renderWindowInteractor->Render();
+
+  if (m_renderWindowInteractor)
+  {
+    m_renderWindowInteractor->Render();
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -273,7 +281,10 @@ void VSPlaneWidget::updatePlaneWidget()
 
   planeWidget->On();
 
-  m_renderWindowInteractor->Render();
+  if (m_renderWindowInteractor)
+  {
+    m_renderWindowInteractor->Render();
+  }
 }
 
 // -----------------------------------------------------------------------------

@@ -120,7 +120,16 @@ int VSFilterViewSettings::getActiveComponentIndex()
 int VSFilterViewSettings::getNumberOfComponents(int arrayIndex)
 {
   vtkCellData* cellData = m_Filter->getOutput()->GetCellData();
-  return cellData->GetAbstractArray(arrayIndex)->GetNumberOfComponents();
+
+  vtkAbstractArray* abstractArray = cellData->GetAbstractArray(arrayIndex);
+  if (abstractArray != nullptr)
+  {
+    return cellData->GetAbstractArray(arrayIndex)->GetNumberOfComponents();
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 // -----------------------------------------------------------------------------

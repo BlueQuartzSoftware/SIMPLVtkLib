@@ -188,21 +188,33 @@ VSAbstractFilter* VSMainWidgetBase::getCurrentFilter()
 // -----------------------------------------------------------------------------
 void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter)
 {
+  QVTKInteractor* interactor = nullptr;
+  VSAbstractViewWidget* activeViewWidget = getActiveViewWidget();
+  if (activeViewWidget != nullptr)
+  {
+    VSVisualizationWidget* vizWidget = activeViewWidget->getVisualizationWidget();
+    if (vizWidget != nullptr)
+    {
+      interactor = vizWidget->GetInteractor();
+    }
+  }
+
+
   VSAbstractFilterWidget* fw = nullptr;
   if (dynamic_cast<VSClipFilter*>(filter) != nullptr)
   {
     VSClipFilter* vsFilter = dynamic_cast<VSClipFilter*>(filter);
-    fw = new VSClipFilterWidget(vsFilter, getActiveViewWidget()->getVisualizationWidget()->GetInteractor(), this);
+    fw = new VSClipFilterWidget(vsFilter, interactor, this);
   }
   else if (dynamic_cast<VSCropFilter*>(filter) != nullptr)
   {
     VSCropFilter* vsFilter = dynamic_cast<VSCropFilter*>(filter);
-    fw = new VSCropFilterWidget(vsFilter, getActiveViewWidget()->getVisualizationWidget()->GetInteractor(), this);
+    fw = new VSCropFilterWidget(vsFilter, interactor, this);
   }
   else if (dynamic_cast<VSMaskFilter*>(filter) != nullptr)
   {
     VSMaskFilter* vsFilter = dynamic_cast<VSMaskFilter*>(filter);
-    fw = new VSMaskFilterWidget(vsFilter, getActiveViewWidget()->getVisualizationWidget()->GetInteractor(), this);
+    fw = new VSMaskFilterWidget(vsFilter, interactor, this);
   }
   else if (dynamic_cast<VSDataSetFilter*>(filter) != nullptr)
   {
@@ -212,12 +224,12 @@ void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter)
   else if (dynamic_cast<VSSliceFilter*>(filter) != nullptr)
   {
     VSSliceFilter* vsFilter = dynamic_cast<VSSliceFilter*>(filter);
-    fw = new VSSliceFilterWidget(vsFilter, getActiveViewWidget()->getVisualizationWidget()->GetInteractor(), this);
+    fw = new VSSliceFilterWidget(vsFilter, interactor, this);
   }
   else if (dynamic_cast<VSThresholdFilter*>(filter) != nullptr)
   {
     VSThresholdFilter* vsFilter = dynamic_cast<VSThresholdFilter*>(filter);
-    fw = new VSThresholdFilterWidget(vsFilter, getActiveViewWidget()->getVisualizationWidget()->GetInteractor(), this);
+    fw = new VSThresholdFilterWidget(vsFilter, interactor, this);
   }
 
   if (fw != nullptr)
