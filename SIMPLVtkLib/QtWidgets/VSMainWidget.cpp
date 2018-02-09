@@ -119,6 +119,71 @@ void VSMainWidget::resetCamera()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSMainWidget::setActiveView(VSAbstractViewWidget* viewWidget)
+{
+  VSMainWidgetBase::setActiveView(viewWidget);
+
+  if (getActiveViewWidget() != nullptr)
+  {
+    m_Internals->cameraXmBtn->setEnabled(true);
+    m_Internals->cameraXpBtn->setEnabled(true);
+    m_Internals->cameraYmBtn->setEnabled(true);
+    m_Internals->cameraYpBtn->setEnabled(true);
+    m_Internals->cameraZmBtn->setEnabled(true);
+    m_Internals->cameraZpBtn->setEnabled(true);
+
+    if (getCurrentFilter() != nullptr)
+    {
+      m_Internals->clipBtn->setEnabled(true);
+      m_Internals->maskBtn->setEnabled(true);
+      m_Internals->sliceBtn->setEnabled(true);
+    }
+    else
+    {
+      m_Internals->clipBtn->setDisabled(true);
+      m_Internals->maskBtn->setDisabled(true);
+      m_Internals->sliceBtn->setDisabled(true);
+    }
+  }
+  else
+  {
+    m_Internals->clipBtn->setDisabled(true);
+    m_Internals->maskBtn->setDisabled(true);
+    m_Internals->sliceBtn->setDisabled(true);
+
+    m_Internals->cameraXmBtn->setDisabled(true);
+    m_Internals->cameraXpBtn->setDisabled(true);
+    m_Internals->cameraYmBtn->setDisabled(true);
+    m_Internals->cameraYpBtn->setDisabled(true);
+    m_Internals->cameraZmBtn->setDisabled(true);
+    m_Internals->cameraZpBtn->setDisabled(true);
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidget::setCurrentFilter(VSAbstractFilter* filter)
+{
+  VSMainWidgetBase::setCurrentFilter(filter);
+
+  if (getActiveViewWidget() != nullptr && filter != nullptr)
+  {
+    m_Internals->clipBtn->setEnabled(true);
+    m_Internals->maskBtn->setEnabled(true);
+    m_Internals->sliceBtn->setEnabled(true);
+  }
+  else
+  {
+    m_Internals->clipBtn->setDisabled(true);
+    m_Internals->maskBtn->setDisabled(true);
+    m_Internals->sliceBtn->setDisabled(true);
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSMainWidget::activeCameraXPlus()
 {
   VSAbstractViewWidget* activeView = getActiveViewWidget();

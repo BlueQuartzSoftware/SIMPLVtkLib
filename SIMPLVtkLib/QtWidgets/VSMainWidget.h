@@ -65,6 +65,18 @@ protected:
 
 protected slots:
   /**
+  * @brief Notifies change in the active VSAbstractViewWidget
+  * @param viewWidget
+  */
+  void setActiveView(VSAbstractViewWidget* viewWidget) override;
+
+  /**
+   * @brief setCurrentFilter
+   * @param filter
+   */
+  void setCurrentFilter(VSAbstractFilter* filter) override;
+
+  /**
   * @brief Sets the active view camera position to the X+ axis
   */
   void activeCameraXPlus();

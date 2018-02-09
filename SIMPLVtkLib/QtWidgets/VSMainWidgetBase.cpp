@@ -63,8 +63,6 @@ VSMainWidgetBase::VSMainWidgetBase(QWidget* parent)
 // -----------------------------------------------------------------------------
 void VSMainWidgetBase::connectSlots()
 {
-  connect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*)),
-    this, SLOT(setCurrentFilter(VSAbstractFilter*)));
   connect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*)), 
     this, SLOT(filterAdded(VSAbstractFilter*)));
   connect(m_Controller, SIGNAL(filterRemoved(VSAbstractFilter*)), 
@@ -236,8 +234,6 @@ void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter)
   {
     m_FilterToFilterWidgetMap.insert(filter, fw);
   }
-
-  setCurrentFilter(filter);
 }
 
 // -----------------------------------------------------------------------------
