@@ -154,6 +154,18 @@ void VSFilterView::connectSlots()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSFilterView::mousePressEvent(QMouseEvent* event)
+{
+  clearSelection();
+
+  emit filterClicked(nullptr);
+
+  QTreeView::mousePressEvent(event);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 VSAbstractFilter* VSFilterView::getFilterFromIndex(const QModelIndex& index)
 {
   VSFilterModel* filterModel = dynamic_cast<VSFilterModel*>(model());
