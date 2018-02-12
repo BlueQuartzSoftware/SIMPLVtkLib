@@ -49,7 +49,7 @@
 #include <vtkUnstructuredGridAlgorithm.h>
 
 #include "SIMPLVtkLib/QtWidgets/VSMainWidget.h"
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSSliceFilter.h"
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSPlaneWidget.h"
 

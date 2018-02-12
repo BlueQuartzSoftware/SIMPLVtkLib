@@ -1,5 +1,5 @@
 /* ============================================================================
-* Copyright (c) 2009-2015 BlueQuartz Software, LLC
+* Copyright (c) 2009-2016 BlueQuartz Software, LLC
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -33,84 +33,131 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "VSController.h"
+#include "VSSIMPLDataContainerFilter.h"
 
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
+#include <vtkAlgorithmOutput.h>
+#include <vtkCellData.h>
+#include <vtkDataArray.h>
+#include <vtkDataSet.h>
+#include <vtkDataSetMapper.h>
+#include <vtkLookupTable.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkScalarBarActor.h>
+#include <vtkTrivialProducer.h>
+#include <vtkUnstructuredGridAlgorithm.h>
+
+#include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
+#include "SIMPLVtkLib/Visualization/Controllers/VSLookupTableController.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSController::VSController(QObject* parent)
-  : QObject(parent)
-  , m_FilterModel(new VSFilterModel())
+VSSIMPLDataContainerFilter::VSSIMPLDataContainerFilter(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDataContainer)
+: VSAbstractFilter()
+, m_WrappedDataContainer(wrappedDataContainer)
 {
-  connect(m_FilterModel, SIGNAL(filterAdded(VSAbstractFilter*)), this, SIGNAL(filterAdded(VSAbstractFilter*)));
-  connect(m_FilterModel, SIGNAL(filterRemoved(VSAbstractFilter*)), this, SIGNAL(filterRemoved(VSAbstractFilter*)));
+  createFilter();
+
+  setText(wrappedDataContainer->m_Name);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSController::~VSController()
+double* VSSIMPLDataContainerFilter::getBounds() const
 {
-  delete m_FilterModel;
+  return m_WrappedDataContainer->m_DataSet->GetBounds();
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSController::importData(DataContainerArray::Pointer dca)
+vtkAlgorithmOutput* VSSIMPLDataContainerFilter::getOutputPort()
 {
-  std::vector<SIMPLVtkBridge::WrappedDataContainerPtr> wrappedData = SIMPLVtkBridge::WrapDataContainerArrayAsStruct(dca);
+  if(m_TrivialProducer)
+  {
+    return m_TrivialProducer->GetOutputPort();
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VTK_PTR(vtkDataSet) VSSIMPLDataContainerFilter::getOutput()
+{
+  if(nullptr == m_WrappedDataContainer)
+  {
+    return nullptr;
+  }
+
+  return m_WrappedDataContainer->m_DataSet;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSSIMPLDataContainerFilter::updateAlgorithmInput(VSAbstractFilter* filter)
+{
+  // Do nothing
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSSIMPLDataContainerFilter::createFilter()
+{
+  VTK_PTR(vtkDataSet) dataSet = m_WrappedDataContainer->m_DataSet;
+  dataSet->ComputeBounds();
   
-  // Add VSSIMPLDataContainerFilter for each DataContainer with relevant data
-  size_t count = wrappedData.size();
-  for(size_t i = 0; i < count; i++)
+  vtkCellData* cellData = dataSet->GetCellData();
+  if(cellData)
   {
-    VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedData[i]);
-    m_FilterModel->addFilter(filter);
+    vtkDataArray* dataArray = cellData->GetArray(0);
+    if(dataArray)
+    {
+      char* name = dataArray->GetName();
+      cellData->SetActiveScalars(name);
+    }
   }
-
-  emit dataImported();
+  
+  m_TrivialProducer = VTK_PTR(vtkTrivialProducer)::New();
+  m_TrivialProducer->SetOutput(dataSet);
+  
+  emit updatedOutputPort(this);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSController::importData(DataContainer::Pointer dc)
+const QString VSSIMPLDataContainerFilter::getFilterName()
 {
-  SIMPLVtkBridge::WrappedDataContainerPtr wrappedData = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
-
-  // Add VSSIMPLDataContainerFilter if the DataContainer contains relevant data for rendering
-  if(wrappedData)
-  {
-    VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedData);
-    m_FilterModel->addFilter(filter);
-  }
-
-  emit dataImported();
+  return m_WrappedDataContainer->m_Name;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QVector<VSAbstractFilter*> VSController::getBaseFilters()
+SIMPLVtkBridge::WrappedDataContainerPtr VSSIMPLDataContainerFilter::getWrappedDataContainer()
 {
-  return m_FilterModel->getBaseFilters();
+  return m_WrappedDataContainer;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QVector<VSAbstractFilter*> VSController::getAllFilters()
+VSAbstractFilter::dataType_t VSSIMPLDataContainerFilter::getOutputType()
 {
-  return m_FilterModel->getAllFilters();
+  return IMAGE_DATA;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSFilterModel* VSController::getFilterModel()
+VSAbstractFilter::dataType_t VSSIMPLDataContainerFilter::getRequiredInputType()
 {
-  return m_FilterModel;
+  return ANY_DATA_SET;
 }

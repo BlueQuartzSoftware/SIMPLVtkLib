@@ -35,19 +35,10 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
-
 #include "Visualization/VisualFilterWidgets/VSAbstractFilterWidget.h"
-#include "ui_VSDataSetFilterWidget.h"
-
-#include <vtkSmartPointer.h>
-
-#include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
-class vtkTrivialProducer;
-class vtkAlgorithmOutput;
 class VSDataSetFilter;
 
 /**

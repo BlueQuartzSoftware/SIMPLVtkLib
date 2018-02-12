@@ -51,7 +51,7 @@ class QVTKInteractor;
 * @brief This is the base class for all visual filter widgets in SIMPLVtkLib.
 * Classes that inherit from this are widgets for the filters that handle various
 * vtk algorithms for filtering out parts of the vtkDataSet input into the top-level
-* VSDataSetFilter.  Filters can be chained together to be more specific about what
+* VSSIMPLDataContainerFilter.  Filters can be chained together to be more specific about what
 * kind of data should be shown by pushing the output of a filter as the input for
 * each of its child filters.
 */

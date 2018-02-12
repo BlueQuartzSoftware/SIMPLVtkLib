@@ -57,7 +57,7 @@
 
 #include <vtkGenericDataObjectWriter.h>
 
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
 #include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
 #include "SIMPLVtkLib/Visualization/Controllers/VSLookupTableController.h"
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
@@ -221,7 +221,7 @@ VSAbstractFilter* VSAbstractFilter::getChild(int index) const
 // -----------------------------------------------------------------------------
 SIMPLVtkBridge::WrappedDataContainerPtr VSAbstractFilter::getWrappedDataContainer()
 {
-  VSDataSetFilter* dataSetFilter = getDataSetFilter();
+  VSSIMPLDataContainerFilter* dataSetFilter = getDataSetFilter();
 
   if(nullptr == dataSetFilter)
   {
@@ -343,9 +343,9 @@ double* VSAbstractFilter::getBounds() const
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSDataSetFilter* VSAbstractFilter::getDataSetFilter()
+VSSIMPLDataContainerFilter* VSAbstractFilter::getDataSetFilter()
 {
-  VSDataSetFilter* cast = dynamic_cast<VSDataSetFilter*>(this);
+  VSSIMPLDataContainerFilter* cast = dynamic_cast<VSSIMPLDataContainerFilter*>(this);
 
   if(cast != nullptr)
   {

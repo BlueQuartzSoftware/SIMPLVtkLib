@@ -55,7 +55,7 @@ class QVTKInteractor;
  * and Z bounds. This class can be chained with other VSAbstractFilters to
  * further specify the data allowed to be visualized. This filter requires 
  * the incoming data type to be a vtkImageData, thus restricting it to following 
- * VSDataSetFilters.
+ * VSSIMPLDataContainerFilters.
  */
 class SIMPLVtkLib_EXPORT VSCropFilterWidget : public VSAbstractFilterWidget
 {

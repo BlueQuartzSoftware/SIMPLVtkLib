@@ -66,14 +66,14 @@ class vtkDataArray;
 
 class VSAbstractFilterWidget;
 class VSAbstractWidget;
-class VSDataSetFilter;
+class VSSIMPLDataContainerFilter;
 
 /**
 * @class VSAbstractFilter VSAbstractFilter.h 
 * SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilter.h
 * @brief This is the base class for all visual filters in SIMPLVtkLib.
 * Classes that inherit from this handle various vtk algorithms for filtering 
-* out parts of the vtkDataSet input into the top-level VSDataSetFilter.  Filters
+* out parts of the vtkDataSet input into the top-level VSSIMPLDataContainerFilter.  Filters
 * can be chained together to be more specific about what kind of data should be 
 * shown by pushing the output of a filter as the input for each of its child filters.
 */
@@ -150,7 +150,7 @@ public:
   QVector<VSAbstractFilter*> getDescendants() const;
 
   /**
-  * @brief Returns the WrappedDataContainerPtr from the VSDataSetFilter
+  * @brief Returns the WrappedDataContainerPtr from the VSSIMPLDataContainerFilter
   * @return
   */
   virtual SIMPLVtkBridge::WrappedDataContainerPtr getWrappedDataContainer();
@@ -235,10 +235,10 @@ protected:
   virtual void createFilter() = 0;
 
   /**
-  * @brief Returns a pointer to the VSDataSetFilter that stores the input vtkDataSet
+  * @brief Returns a pointer to the VSSIMPLDataContainerFilter that stores the input vtkDataSet
   * @return
   */
-  VSDataSetFilter* getDataSetFilter();
+  VSSIMPLDataContainerFilter* getDataSetFilter();
   
   /**
   * @brief Updates the input connection for the vtkAlgorithm if that was already setup

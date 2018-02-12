@@ -2,10 +2,11 @@
 set(VSVisualFilters
   VSAbstractFilter
   VSClipFilter
+  VSCropFilter
   VSDataSetFilter
   VSMaskFilter
+  VSSIMPLDataContainerFilter
   VSSliceFilter
-  VSCropFilter
   VSThresholdFilter
 )
 

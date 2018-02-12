@@ -49,7 +49,7 @@ class vtkImplicitDataSet;
 class vtkExtractGeometry;
 class vtkExtractUnstructuredGrid;
 class VSThresholdWidget;
-class VSDataSetFilter;
+class VSSIMPLDataContainerFilter;
 class vtkExtractSelectedThresholds;
 class vtkSelection;
 class vtkSelectionNode;

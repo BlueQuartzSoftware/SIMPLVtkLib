@@ -4,6 +4,7 @@ set(VSVisualFilterWidgets
   VSCropFilterWidget
   VSDataSetFilterWidget
   VSMaskFilterWidget
+  VSSIMPLDataContainerFilterWidget
   VSSliceFilterWidget
   VSThresholdFilterWidget
 )

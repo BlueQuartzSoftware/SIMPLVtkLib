@@ -52,13 +52,13 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSDataSetFilter::VSDataSetFilter(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDataContainer)
+VSDataSetFilter::VSDataSetFilter(VTK_PTR(vtkDataSet) dataSetPtr, const QString &displayName)
 : VSAbstractFilter()
-, m_WrappedDataContainer(wrappedDataContainer)
+, m_DataSet(dataSetPtr)
 {
   createFilter();
 
-  setText(wrappedDataContainer->m_Name);
+  setText(displayName);
 }
 
 // -----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ VSDataSetFilter::VSDataSetFilter(SIMPLVtkBridge::WrappedDataContainerPtr wrapped
 // -----------------------------------------------------------------------------
 double* VSDataSetFilter::getBounds() const
 {
-  return m_WrappedDataContainer->m_DataSet->GetBounds();
+  return m_DataSet->GetBounds();
 }
 
 // -----------------------------------------------------------------------------
@@ -89,12 +89,12 @@ vtkAlgorithmOutput* VSDataSetFilter::getOutputPort()
 // -----------------------------------------------------------------------------
 VTK_PTR(vtkDataSet) VSDataSetFilter::getOutput()
 {
-  if(nullptr == m_WrappedDataContainer)
+  if(nullptr == m_DataSet)
   {
     return nullptr;
   }
 
-  return m_WrappedDataContainer->m_DataSet;
+  return m_DataSet;
 }
 
 // -----------------------------------------------------------------------------
@@ -110,7 +110,7 @@ void VSDataSetFilter::updateAlgorithmInput(VSAbstractFilter* filter)
 // -----------------------------------------------------------------------------
 void VSDataSetFilter::createFilter()
 {
-  VTK_PTR(vtkDataSet) dataSet = m_WrappedDataContainer->m_DataSet;
+  VTK_PTR(vtkDataSet) dataSet = m_DataSet;
   dataSet->ComputeBounds();
   
   vtkCellData* cellData = dataSet->GetCellData();
@@ -135,15 +135,7 @@ void VSDataSetFilter::createFilter()
 // -----------------------------------------------------------------------------
 const QString VSDataSetFilter::getFilterName()
 {
-  return m_WrappedDataContainer->m_Name;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-SIMPLVtkBridge::WrappedDataContainerPtr VSDataSetFilter::getWrappedDataContainer()
-{
-  return m_WrappedDataContainer;
+  return text();
 }
 
 // -----------------------------------------------------------------------------

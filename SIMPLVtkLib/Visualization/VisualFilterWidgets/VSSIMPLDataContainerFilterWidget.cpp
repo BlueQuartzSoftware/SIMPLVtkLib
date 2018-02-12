@@ -1,5 +1,5 @@
 /* ============================================================================
-* Copyright (c) 2009-2015 BlueQuartz Software, LLC
+* Copyright (c) 2009-2016 BlueQuartz Software, LLC
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -33,84 +33,43 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "VSController.h"
+#include "VSSIMPLDataContainerFilterWidget.h"
 
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-VSController::VSController(QObject* parent)
-  : QObject(parent)
-  , m_FilterModel(new VSFilterModel())
-{
-  connect(m_FilterModel, SIGNAL(filterAdded(VSAbstractFilter*)), this, SIGNAL(filterAdded(VSAbstractFilter*)));
-  connect(m_FilterModel, SIGNAL(filterRemoved(VSAbstractFilter*)), this, SIGNAL(filterRemoved(VSAbstractFilter*)));
-}
+#include "ui_VSSIMPLDataContainerFilterWidget.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSController::~VSController()
+class VSSIMPLDataContainerFilterWidget::vsInternals : public Ui::VSSIMPLDataContainerFilterWidget
 {
-  delete m_FilterModel;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSController::importData(DataContainerArray::Pointer dca)
-{
-  std::vector<SIMPLVtkBridge::WrappedDataContainerPtr> wrappedData = SIMPLVtkBridge::WrapDataContainerArrayAsStruct(dca);
-  
-  // Add VSSIMPLDataContainerFilter for each DataContainer with relevant data
-  size_t count = wrappedData.size();
-  for(size_t i = 0; i < count; i++)
+public:
+  vsInternals()
   {
-    VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedData[i]);
-    m_FilterModel->addFilter(filter);
   }
+};
 
-  emit dataImported();
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSSIMPLDataContainerFilterWidget::VSSIMPLDataContainerFilterWidget(VSSIMPLDataContainerFilter *filter, QWidget* widget)
+: VSAbstractFilterWidget(widget)
+, m_Internals(new vsInternals())
+, m_DataContainerFilter(filter)
+{
+  m_Internals->setupUi(this);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSController::importData(DataContainer::Pointer dc)
+VSSIMPLDataContainerFilterWidget::~VSSIMPLDataContainerFilterWidget()
 {
-  SIMPLVtkBridge::WrappedDataContainerPtr wrappedData = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
-
-  // Add VSSIMPLDataContainerFilter if the DataContainer contains relevant data for rendering
-  if(wrappedData)
-  {
-    VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedData);
-    m_FilterModel->addFilter(filter);
-  }
-
-  emit dataImported();
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QVector<VSAbstractFilter*> VSController::getBaseFilters()
+void VSSIMPLDataContainerFilterWidget::setBounds(double* bounds)
 {
-  return m_FilterModel->getBaseFilters();
-}
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-QVector<VSAbstractFilter*> VSController::getAllFilters()
-{
-  return m_FilterModel->getAllFilters();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-VSFilterModel* VSController::getFilterModel()
-{
-  return m_FilterModel;
 }

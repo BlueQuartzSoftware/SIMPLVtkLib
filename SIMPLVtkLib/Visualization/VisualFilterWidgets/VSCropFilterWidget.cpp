@@ -48,7 +48,7 @@
 #include <vtkUnstructuredGridAlgorithm.h>
 
 #include "SIMPLVtkLib/QtWidgets/VSMainWidget.h"
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSCropFilter.h"
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSCropWidget.h"
 #include <vtkExtractVOI.h>
