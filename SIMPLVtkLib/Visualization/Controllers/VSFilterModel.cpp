@@ -109,6 +109,11 @@ VSAbstractFilter* VSFilterModel::getFilterFromIndex(QModelIndex index)
 // -----------------------------------------------------------------------------
 QModelIndex VSFilterModel::getIndexFromFilter(VSAbstractFilter* filter)
 {
+  if (filter == nullptr)
+  {
+    return QModelIndex();
+  }
+
   return filter->index();
 }
 

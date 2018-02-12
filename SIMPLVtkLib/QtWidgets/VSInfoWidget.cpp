@@ -164,18 +164,28 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* f
   m_FilterWidget = filterWidget;
 
   bool filterExists = (nullptr != filter);
-  m_Internals->applyBtn->setEnabled(filterExists);
-  m_Internals->resetBtn->setEnabled(filterExists);
-  m_Internals->deleteBtn->setEnabled(filterExists);
-
   if(filterExists && m_ViewWidget)
   {
-    m_ViewSettings = m_ViewWidget->getFilterViewSettings(m_Filter);
+    connectFilterViewSettings(m_ViewWidget->getFilterViewSettings(m_Filter));
   }
   else
   {
-    m_ViewSettings = nullptr;
+    connectFilterViewSettings(nullptr);
   }
+
+  // Check if VSFilterSettings exist and are valid
+  bool viewSettingsValid;
+  if(m_ViewSettings && m_ViewSettings->isValid())
+  {
+    viewSettingsValid = filterExists;
+  }
+  else
+  {
+    viewSettingsValid = false;
+  }
+  m_Internals->applyBtn->setEnabled(viewSettingsValid);
+  m_Internals->resetBtn->setEnabled(viewSettingsValid);
+  m_Internals->deleteBtn->setEnabled(viewSettingsValid);
 
   if (m_FilterWidget != nullptr)
   {
@@ -191,17 +201,53 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* f
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSInfoWidget::connectFilterViewSettings(VSFilterViewSettings* settings)
+{
+  if(m_ViewSettings)
+  {
+    disconnect(settings, SIGNAL(activeArrayIndexChanged(VSFilterViewSettings*, int)),
+      this, SLOT(listenArrayIndex(VSFilterViewSettings*, int)));
+    disconnect(settings, SIGNAL(activeComponentIndexChanged(VSFilterViewSettings*, int)),
+      this, SLOT(listenComponentIndex(VSFilterViewSettings, int)));
+    disconnect(settings, SIGNAL(mapColorsChanged(VSFilterViewSettings*, Qt::CheckState)),
+      this, SLOT(listenMapColors(VSFilterViewSettings*, Qt::CheckState)));
+    disconnect(settings, SIGNAL(alphaChanged(VSFilterViewSettings*, double)),
+      this, SLOT(listenAlpha(VSFilterViewSettings*, double)));
+    disconnect(settings, SIGNAL(showScalarBarChanged(VSFilterViewSettings*, bool)),
+      this, SLOT(listenScalarBar(VSFilterViewSettings*, bool)));
+  }
+
+  m_ViewSettings = settings;
+
+  if(m_ViewSettings)
+  {
+    connect(settings, SIGNAL(activeArrayIndexChanged(VSFilterViewSettings*, int)),
+      this, SLOT(listenArrayIndex(VSFilterViewSettings*, int)));
+    connect(settings, SIGNAL(activeComponentIndexChanged(VSFilterViewSettings*, int)),
+      this, SLOT(listenComponentIndex(VSFilterViewSettings, int)));
+    connect(settings, SIGNAL(mapColorsChanged(VSFilterViewSettings*, Qt::CheckState)),
+      this, SLOT(listenMapColors(VSFilterViewSettings*, Qt::CheckState)));
+    connect(settings, SIGNAL(alphaChanged(VSFilterViewSettings*, double)),
+      this, SLOT(listenAlpha(VSFilterViewSettings*, double)));
+    connect(settings, SIGNAL(showScalarBarChanged(VSFilterViewSettings*, bool)),
+      this, SLOT(listenScalarBar(VSFilterViewSettings*, bool)));
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSInfoWidget::setViewWidget(VSAbstractViewWidget* viewWidget)
 {
   m_ViewWidget = viewWidget;
 
   if(m_ViewWidget)
   {
-    m_ViewSettings = m_ViewWidget->getFilterViewSettings(m_Filter);
+    connectFilterViewSettings(m_ViewWidget->getFilterViewSettings(m_Filter));
   }
   else
   {
-    m_ViewSettings = nullptr;
+    connectFilterViewSettings(nullptr);
   }
 
   if (m_FilterWidget)
@@ -258,7 +304,8 @@ void VSInfoWidget::updateViewSettingInfo()
   }
 
   // Apply the current filter view settings to the widget
-  m_Internals->viewSettingsWidget->setEnabled(true);
+  bool validSettings = m_ViewSettings && m_ViewSettings->isValid();
+  m_Internals->viewSettingsWidget->setEnabled(validSettings);
 
   int activeArrayIndex = m_ViewSettings->getActiveArrayIndex();
   int activeComponentIndex = m_ViewSettings->getActiveComponentIndex() + 1;
@@ -275,7 +322,7 @@ void VSInfoWidget::updateViewSettingInfo()
   }
 
   m_Internals->showScalarBarCheckBox->setChecked(m_ViewSettings->isScalarBarVisible() ? Qt::Checked : Qt::Unchecked);
-  m_Internals->mapScalarsCheckBox->setChecked(m_ViewSettings->getMapColors() ? Qt::Checked : Qt::Unchecked);
+  m_Internals->mapScalarsCheckBox->setCheckState(m_ViewSettings->getMapColors());
   m_Internals->alphaSlider->setValue(m_ViewSettings->getAlpha() * 100);
 }
 
@@ -340,8 +387,7 @@ void VSInfoWidget::setScalarsMapped(int checkState)
     return;
   }
 
-  bool checked = checkState == Qt::Checked;
-  m_ViewSettings->setMapColors(checked);
+  m_ViewSettings->setMapColors(static_cast<Qt::CheckState>(checkState));
 }
 
 // -----------------------------------------------------------------------------
@@ -408,4 +454,44 @@ void VSInfoWidget::alphaSliderMoved(int value)
   }
 
   m_ViewSettings->setAlpha(value / 100.0);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::listenArrayIndex(VSFilterViewSettings* settings, int index)
+{
+  m_Internals->activeArrayCombo->setCurrentIndex(index);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::listenComponentIndex(VSFilterViewSettings* settings, int index)
+{
+  m_Internals->activeComponentCombo->setCurrentIndex(index);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::listenMapColors(VSFilterViewSettings* settings, Qt::CheckState state)
+{
+  m_Internals->mapScalarsCheckBox->setCheckState(state);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::listenAlpha(VSFilterViewSettings* settings, double alpha)
+{
+  m_Internals->alphaSlider->setValue(alpha * 100);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSInfoWidget::listenScalarBar(VSFilterViewSettings* settings, bool show)
+{
+  m_Internals->showScalarBarCheckBox->setChecked(show);
 }

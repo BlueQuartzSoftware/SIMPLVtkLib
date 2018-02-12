@@ -143,6 +143,41 @@ protected slots:
   */
   void alphaSliderMoved(int value);
 
+  /**
+  * @brief Listens for the active VSFilterViewSettings active array index to change
+  * @param settings
+  * @param index
+  */
+  void listenArrayIndex(VSFilterViewSettings* settings, int index);
+
+  /**
+  * @brief Listens for the active VSFilterViewSettings active component index to change
+  * @param settings
+  * @param index
+  */
+  void listenComponentIndex(VSFilterViewSettings* settings, int index);
+
+  /**
+  * @brief Listens for the active VSFilterViewSettings map colors value to change
+  * @param settings
+  * @param state
+  */
+  void listenMapColors(VSFilterViewSettings* settings, Qt::CheckState state);
+
+  /**
+  * @brief Listens for the active VSFilterViewSettings alpha value to change
+  * @param settings
+  * @param alpha
+  */
+  void listenAlpha(VSFilterViewSettings* settings, double alpha);
+
+  /**
+  * @brief Listens for the active VSFilterViewSettings scalar bar visibility to change
+  * @param settings
+  * @param show
+  */
+  void listenScalarBar(VSFilterViewSettings* settings, bool show);
+
 protected:
   /**
   * @brief Performs initial setup for the GUI
@@ -157,6 +192,12 @@ protected:
   * @brief Updates the information on the VSFilterViewSettings
   */
   void updateViewSettingInfo();
+
+  /**
+  * @brief Connects to the given VSFilterViewSettings to take advantage of its signals and slots
+  * @param settings
+  */
+  void connectFilterViewSettings(VSFilterViewSettings* settings);
 
 private:
   class VSInternals;

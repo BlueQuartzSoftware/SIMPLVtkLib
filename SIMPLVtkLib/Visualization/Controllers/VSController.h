@@ -42,6 +42,7 @@
 
 #include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
 #include "SIMPLVtkLib/Visualization/Controllers/VSFilterModel.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSTextFilter.h"
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
@@ -72,6 +73,13 @@ public:
   * as top-level VisualFilters
   * @param dca
   */
+  void importData(QString textLabel, QString tooltip, DataContainerArray::Pointer dca);
+
+  /**
+  * @brief Import data from a DataContainerArray and add any relevant DataContainers
+  * as top-level VisualFilters
+  * @param dca
+  */
   void importData(DataContainerArray::Pointer dca);
 
   /**
@@ -80,6 +88,13 @@ public:
   * @param dc
   */
   void importData(DataContainer::Pointer dc);
+
+  /**
+  * @brief Returns the first top level text filter with the given value;
+  * @param text
+  * @return
+  */
+  VSTextFilter* getBaseTextFilter(QString text);
 
   /**
   * @brief Returns a vector of top-level data filters

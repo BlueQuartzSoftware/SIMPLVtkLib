@@ -75,6 +75,7 @@ VSThresholdFilter::VSThresholdFilter(VSAbstractFilter* parent)
   m_ThresholdAlgorithm = nullptr;
   setParentFilter(parent);
   setText(getFilterName());
+  setToolTip(getToolTip());
 }
 
 // -----------------------------------------------------------------------------
@@ -96,6 +97,14 @@ void VSThresholdFilter::createFilter()
 const QString VSThresholdFilter::getFilterName()
 {
   return "Threshold";
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QString VSThresholdFilter::getToolTip() const
+{
+  return "Threshold Filter";
 }
 
 // -----------------------------------------------------------------------------

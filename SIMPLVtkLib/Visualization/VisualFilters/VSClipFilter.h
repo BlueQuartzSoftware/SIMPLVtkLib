@@ -39,9 +39,12 @@
 
 #include "VSAbstractFilter.h"
 
+#include <vtkDataSet.h>
 #include <vtkPlane.h>
 #include <vtkPlanes.h>
+#include <vtkTransform.h>
 
+#include "SIMPLVtkLib/SIMPLBridge/VtkMacros.h"
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
 class vtkClipDataSet;
@@ -82,6 +85,9 @@ public:
   */
   VSClipFilter(VSAbstractFilter* parent);
 
+  /**
+  * @brief Deconstructor
+  */
   ~VSClipFilter();
 
   /**
@@ -89,6 +95,12 @@ public:
   * @return
   */
   const QString getFilterName() override;
+
+  /**
+  * @brief Returns the tooltip to use for the filter
+  * @return
+  */
+  virtual QString getToolTip() const override;
 
   /**
   * @brief Applies the clip filter using a plane with the given values
@@ -99,13 +111,11 @@ public:
   void apply(double origin[3], double normal[3], bool inverted = false);
 
   /**
-  * @brief Applies the clip filter using a box with the given values
-  * @param origin
-  * @param scale
-  * @param rotation
+  * @brief Applies the clip filter using a box with the given vtkPlanes
+  * @param dataSet
   * @param inverted
   */
-  void apply(double origin[3], double scale[3], double rotation[3], bool inverted = false);
+  void apply(VTK_PTR(vtkPlanes) planes, VTK_PTR(vtkTransform) transform, bool inverted = false);
 
   /**
   * @brief Returns the output port to be used by vtkMappers and subsequent filters
@@ -155,25 +165,13 @@ public:
   bool getLastBoxInverted();
 
   /**
-  * @brief Returns the origin of the last applied box
+  * @brief Returns the vtkTransform of the last applied box
   * @return
   */
-  double* getLastBoxOrigin();
+  VTK_PTR(vtkTransform) getLastBoxTransform();
 
   /**
-  * @brief Returns the scale of the last applied box
-  * @return
-  */
-  double* getLastBoxScale();
-
-  /**
-  * @brief Returns the rotation of the last applied box
-  * @return
-  */
-  double* getLastBoxRotation();
-
-  /**
-   * @brief Returns the clip type string of the last applied box
+   * @brief Returns the clip type string of the last applied clip
    * @return
    */
   QString getLastClipTypeString();
@@ -183,15 +181,6 @@ protected:
   * @brief Initializes the algorithm and connects it to the vtkMapper
   */
   void createFilter() override;
-
-  /**
-  * @brief Creates a vtkImplicitFunction for handling box-shaped clipping
-  * @param origin
-  * @param scale
-  * @param rotation
-  * @return
-  */
-  VTK_PTR(vtkPlanes) getBoxFunction(double origin[3], double scale[3], double rotation[3]);
 
   /**
   * @brief This method updates the input port and connects it to the vtkAlgorithm if it exists
@@ -208,7 +197,5 @@ private:
 
   double m_LastPlaneOrigin[3];
   double m_LastPlaneNormal[3];
-  double m_LastBoxOrigin[3];
-  double m_LastBoxScale[3];
-  double m_LastBoxRotation[3];
+  VTK_PTR(vtkTransform) m_LastBoxTransform;
 };

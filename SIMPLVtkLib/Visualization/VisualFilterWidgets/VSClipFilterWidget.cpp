@@ -158,15 +158,9 @@ void VSClipFilterWidget::apply()
   }
   else if (m_Internals->clipTypeComboBox->currentText() == VSClipFilter::BoxClipTypeString)
   {
-    double origin[3];
-    double scale[3];
-    double rotation[3];
-
-    m_BoxWidget->getOrigin(origin);
-    m_BoxWidget->getScale(scale);
-    m_BoxWidget->getRotation(rotation);
-
-    m_ClipFilter->apply(origin, scale, rotation, m_Internals->insideOutCheckBox->isChecked());
+    VTK_PTR(vtkTransform) transform = m_BoxWidget->getTransform();
+    VTK_PTR(vtkPlanes) planes = m_BoxWidget->getPlanes();
+    m_ClipFilter->apply(planes, transform, m_Internals->insideOutCheckBox->isChecked());
   }
 }
 
@@ -191,14 +185,10 @@ void VSClipFilterWidget::reset()
   }
   else if (m_Internals->clipTypeComboBox->currentText() == VSClipFilter::BoxClipTypeString)
   {
-    double* origin = m_ClipFilter->getLastBoxOrigin();
-    double* scale = m_ClipFilter->getLastBoxScale();
-    double* rotation = m_ClipFilter->getLastBoxRotation();
     bool inverted = m_ClipFilter->getLastBoxInverted();
+    VTK_PTR(vtkTransform) transform = m_ClipFilter->getLastBoxTransform();
 
-    m_BoxWidget->setScale(scale);
-    m_BoxWidget->setOrigin(origin);
-    m_BoxWidget->setRotation(rotation);
+    m_BoxWidget->setTransform(transform);
     m_Internals->insideOutCheckBox->setChecked(inverted);
     m_BoxWidget->updateBoxWidget();
   }

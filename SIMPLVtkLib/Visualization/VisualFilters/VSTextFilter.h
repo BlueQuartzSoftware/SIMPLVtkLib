@@ -35,90 +35,74 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
-
-#include "Visualization/VisualFilters/VSClipFilter.h"
-#include "Visualization/VisualFilterWidgets/VSAbstractFilterWidget.h"
-
-#include <vtkPlane.h>
-
-#include "SIMPLVtkLib/SIMPLVtkLib.h"
-#include "SIMPLVtkLib/SIMPLBridge/VtkMacros.h"
-
-class vtkClipDataSet;
-class vtkTableBasedClipDataSet;
-class vtkImplicitPlaneWidget2;
-class VSPlaneWidget;
-class VSBoxWidget;
-class QVTKInteractor;
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilter.h"
 
 /**
- * @class VSClipFilterWidget VSClipFilterWidget.h
- * SIMPLVtkLib/Visualization/VisualFilters/VSClipFilterWidget.h
- * @brief This class is used to create a clip filter over a set of data.
- * This class can be chained with itself or other classes inheriting from 
- * VSAbstractFilter to be more specific about the data being visualized.
- * VSClipFilterWidget can use both plan and box clip types as well as inverting
- * the clip applied.
- */
-class SIMPLVtkLib_EXPORT VSClipFilterWidget : public VSAbstractFilterWidget
+* @class VSTextFilter VSTextFilter.h 
+* SIMPLVtkLib/Visualization/VisualFilters/VSTextFilter.h
+* @brief This class is used for nothing more than giving its children some sort 
+* of text label.  This filter does not create any data or modify incoming data 
+* in any way.
+*/
+class SIMPLVtkLib_EXPORT VSTextFilter : public VSAbstractFilter
 {
   Q_OBJECT
 
 public:
-    /**
-   * @brief VSClipFilterWidget
-   * @param filter
-   * @param interactor
-   * @param widget
-   */
-  VSClipFilterWidget(VSClipFilter *filter, QVTKInteractor* interactor, QWidget* widget = nullptr);
-
   /**
-  * @brief Deconstructor
+  * @brief Constructor
+  * @param parent
+  * @param text
   */
-  ~VSClipFilterWidget();
+  VSTextFilter(VSAbstractFilter* parent, QString text, QString toolTip);
 
   /**
-  * @brief Sets the visualization filter's bounds
-  * @param bounds
+  * @brief Returns the filter's name
+  * @return
   */
-  void setBounds(double* bounds);
+  const QString getFilterName() override;
 
   /**
-  * @brief Applies changes to the filter and updates the output
+  * @brief Returns the filter's tooltip
   */
-  void apply() override;
+  QString getToolTip() const override;
 
   /**
-   * @brief reset
-   */
-  void reset() override;
+  * @brief Returns the output port to be used by vtkMappers and subsequent filters
+  * @return
+  */
+  virtual vtkAlgorithmOutput* getOutputPort() override;
 
   /**
-   * @brief Sets whether the filter widget should render drawings in the visualization window
-   * @param enabled
-   */
-  void setDrawingEnabled(bool enabled) override;
+  * @brief Returns a smart pointer containing the output data from the filter
+  * @return
+  */
+  virtual VTK_PTR(vtkDataSet) getOutput() override;
 
   /**
-   * @brief setInteractor
-   * @param interactor
-   */
-  void setInteractor(QVTKInteractor* interactor) override;
+  * @brief Returns the ouput data type
+  * @return
+  */
+  dataType_t getOutputType() override;
 
-protected slots:
   /**
-   * @brief changeClipType
-   * @param clipType
-   */
-  void changeClipType(const QString &clipType);
+  * @brief Returns the required incoming data type
+  */
+  static dataType_t getRequiredInputType();
+
+protected:
+  /**
+  * @brief createFilter() not required by VSTextFilter
+  */
+  void createFilter() override;
+
+  /**
+  * @brief Updates the input port
+  * @param filter
+  */
+  void updateAlgorithmInput(VSAbstractFilter* filter) override;
 
 private:
-  class vsInternals;
-  vsInternals*                        m_Internals;
-
-  VSClipFilter*                       m_ClipFilter;
-  VSPlaneWidget*                      m_PlaneWidget;
-  VSBoxWidget*                        m_BoxWidget;
+  QString m_Text;
+  QString m_ToolTip;
 };

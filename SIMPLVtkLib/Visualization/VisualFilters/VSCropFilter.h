@@ -74,6 +74,12 @@ public:
   const QString getFilterName() override;
 
   /**
+  * @brief Returns the tooltip to use for the filter
+  * @return
+  */
+  virtual QString getToolTip() const override;
+
+  /**
   * @brief Applies the crop filter with the given volume of interest and sample rate
   * @param voi
   * @param sampleRate

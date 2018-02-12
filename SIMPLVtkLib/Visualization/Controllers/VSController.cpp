@@ -36,6 +36,7 @@
 #include "VSController.h"
 
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSTextFilter.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -54,6 +55,26 @@ VSController::VSController(QObject* parent)
 VSController::~VSController()
 {
   delete m_FilterModel;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSController::importData(QString textLabel, QString tooltip, DataContainerArray::Pointer dca)
+{
+  std::vector<SIMPLVtkBridge::WrappedDataContainerPtr> wrappedData = SIMPLVtkBridge::WrapDataContainerArrayAsStruct(dca);
+
+  VSTextFilter* textFilter = new VSTextFilter(nullptr, textLabel, tooltip);
+  m_FilterModel->addFilter(textFilter);
+
+  // Add VSDataSetFilter for each DataContainer with relevant data
+  size_t count = wrappedData.size();
+  for(size_t i = 0; i < count; i++)
+  {
+    VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedData[i]);
+    filter->setParentFilter(textFilter);
+    m_FilterModel->addFilter(filter);
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -89,6 +110,29 @@ void VSController::importData(DataContainer::Pointer dc)
   }
 
   emit dataImported();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSTextFilter* VSController::getBaseTextFilter(QString text)
+{
+  QVector<VSAbstractFilter*> baseFilters = getBaseFilters();
+  int count = baseFilters.size();
+
+  for(int i = 0; i < count; i++)
+  {
+    VSTextFilter* filter = dynamic_cast<VSTextFilter*>(baseFilters[i]);
+    if(filter)
+    {
+      if(filter->getFilterName().compare(text) == 0)
+      {
+        return filter;
+      }
+    }
+  }
+
+  return nullptr;
 }
 
 // -----------------------------------------------------------------------------

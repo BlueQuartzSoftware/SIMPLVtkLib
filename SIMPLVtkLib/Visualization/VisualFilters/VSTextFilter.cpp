@@ -33,107 +33,53 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "VSSliceFilter.h"
+#include "VSTextFilter.h"
 
-#include <QtCore/QString>
-
-#include <vtkAlgorithm.h>
 #include <vtkAlgorithmOutput.h>
-#include <vtkCutter.h>
-#include <vtkDataArray.h>
-#include <vtkDataSet.h>
-#include <vtkDataSetMapper.h>
-#include <vtkImplicitPlaneRepresentation.h>
-#include <vtkImplicitPlaneWidget2.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkUnstructuredGridAlgorithm.h>
-
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSPlaneWidget.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSSliceFilter::VSSliceFilter(VSAbstractFilter* parent)
-: VSAbstractFilter()
+VSTextFilter::VSTextFilter(VSAbstractFilter* parent, QString text, QString toolTip)
+  : VSAbstractFilter()
+  , m_Text(text)
+  , m_ToolTip(toolTip)
 {
-  m_SliceAlgorithm = nullptr;
   setParentFilter(parent);
+
+  setCheckState(Qt::Unchecked);
+  setCheckable(false);
+  setEditable(false);
+  
   setText(getFilterName());
-  setToolTip(getToolTip());
-
-  m_LastOrigin[0] = 0.0;
-  m_LastOrigin[1] = 0.0;
-  m_LastOrigin[2] = 0.0;
-
-  m_LastNormal[0] = 1.0;
-  m_LastNormal[1] = 0.0;
-  m_LastNormal[2] = 0.0;
+  setToolTip(toolTip);
+  QFont itemFont = font();
+  itemFont.setItalic(true);
+  setFont(itemFont);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSSliceFilter::createFilter()
+const QString VSTextFilter::getFilterName()
 {
-  m_SliceAlgorithm = vtkSmartPointer<vtkCutter>::New();
-  m_SliceAlgorithm->SetInputConnection(getParentFilter()->getOutputPort());
-  m_ConnectedInput = true;
+  return m_Text;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-const QString VSSliceFilter::getFilterName()
+QString VSTextFilter::getToolTip() const
 {
-  return "Slice";
+  return m_ToolTip;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QString VSSliceFilter::getToolTip() const
+vtkAlgorithmOutput* VSTextFilter::getOutputPort()
 {
-  return "Slice Filter";
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSSliceFilter::apply(double origin[3], double normal[3])
-{
-  if(nullptr == m_SliceAlgorithm)
-  {
-    createFilter();
-  }
-
-  // Save the applied values for resetting Plane-Type widgets
-  for(int i = 0; i < 3; i++)
-  {
-    m_LastOrigin[i] = origin[i];
-    m_LastNormal[i] = normal[i];
-  }
-
-  VTK_NEW(vtkPlane, planeWidget);
-  planeWidget->SetOrigin(origin);
-  planeWidget->SetNormal(normal);
-
-  m_SliceAlgorithm->SetCutFunction(planeWidget);
-  m_SliceAlgorithm->Update();
-
-  emit updatedOutputPort(this);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-vtkAlgorithmOutput* VSSliceFilter::getOutputPort()
-{
-  if(m_ConnectedInput && m_SliceAlgorithm)
-  {
-    return m_SliceAlgorithm->GetOutputPort();
-  }
-  else if(getParentFilter())
+  if(getParentFilter())
   {
     return getParentFilter()->getOutputPort();
   }
@@ -144,13 +90,9 @@ vtkAlgorithmOutput* VSSliceFilter::getOutputPort()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VTK_PTR(vtkDataSet) VSSliceFilter::getOutput()
+VTK_PTR(vtkDataSet) VSTextFilter::getOutput()
 {
-  if(m_ConnectedInput && m_SliceAlgorithm)
-  {
-    return m_SliceAlgorithm->GetOutput();
-  }
-  else if(getParentFilter())
+  if(getParentFilter())
   {
     return getParentFilter()->getOutput();
   }
@@ -161,7 +103,36 @@ VTK_PTR(vtkDataSet) VSSliceFilter::getOutput()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSSliceFilter::updateAlgorithmInput(VSAbstractFilter* filter)
+VSAbstractFilter::dataType_t VSTextFilter::getOutputType()
+{
+  // Return the parent's output type if a parent exists
+  if(getParentFilter())
+  {
+    return getParentFilter()->getOutputType();
+  }
+
+  return ANY_DATA_SET;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSAbstractFilter::dataType_t VSTextFilter::getRequiredInputType()
+{
+  return ANY_DATA_SET;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSTextFilter::createFilter()
+{
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSTextFilter::updateAlgorithmInput(VSAbstractFilter* filter)
 {
   if(nullptr == filter)
   {
@@ -170,44 +141,5 @@ void VSSliceFilter::updateAlgorithmInput(VSAbstractFilter* filter)
 
   m_InputPort = filter->getOutputPort();
 
-  if(m_ConnectedInput && m_SliceAlgorithm)
-  {
-    m_SliceAlgorithm->SetInputConnection(filter->getOutputPort());
-  }
-  else
-  {
-    emit updatedOutputPort(filter);
-  }
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-VSAbstractFilter::dataType_t VSSliceFilter::getOutputType()
-{
-  return POLY_DATA;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-VSAbstractFilter::dataType_t VSSliceFilter::getRequiredInputType()
-{
-  return ANY_DATA_SET;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-double* VSSliceFilter::getLastOrigin()
-{
-  return m_LastOrigin;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-double* VSSliceFilter::getLastNormal()
-{
-  return m_LastNormal;
+  emit updatedOutputPort(filter);
 }

@@ -88,6 +88,12 @@ public:
   VSAbstractFilter* getFilter();
 
   /**
+  * @brief Returns true if the VSFilterViewSettings can be displayed and false otherwise
+  * @return
+  */
+  bool isValid();
+
+  /**
   * @brief Returns true if the filter is displayed in for this view.  Returns false otherwise
   * @return
   */
@@ -120,10 +126,10 @@ public:
   int getNumberOfComponents(QString name);
 
   /**
-  * @brief Returns true if the filter values are mapped to a lookup table.  Returns false otherwise
+  * @brief Returns the check state for mapping filter values to a lookup table.
   * @return
   */
-  bool getMapColors();
+  Qt::CheckState getMapColors();
 
   /**
   * @brief Returns tha alpha transparency used for the displaying the actor
@@ -187,7 +193,7 @@ public slots:
   * @brief Updates whether or not the data values are mapped to the lookup table for this view
   * @param mapColors
   */
-  void setMapColors(bool mapColors);
+  void setMapColors(Qt::CheckState mapColorState);
 
   /**
   * @brief Sets the object's alpha transparency
@@ -223,7 +229,7 @@ signals:
   void visibilityChanged(VSFilterViewSettings*, bool);
   void activeArrayIndexChanged(VSFilterViewSettings*, int);
   void activeComponentIndexChanged(VSFilterViewSettings*, int);
-  void mapColorsChanged(VSFilterViewSettings*, bool);
+  void mapColorsChanged(VSFilterViewSettings*, Qt::CheckState);
   void alphaChanged(VSFilterViewSettings*, double);
   void showScalarBarChanged(VSFilterViewSettings*, bool);
   void requiresRender();
@@ -252,12 +258,24 @@ protected:
   */
   void updateColorMode();
 
+  /**
+  * @brief Returns true if the given array is a 3-Component color array
+  * @param array
+  * @return
+  */
+  bool isColorArray(vtkDataArray* array);
+
+  /**
+  * @brief Returns the current vtkDataArray specified by the given array index
+  */
+  vtkDataArray* getDataArray();
+
 private:
   VSAbstractFilter* m_Filter = nullptr;
   bool m_ShowFilter = true;
   int m_ActiveArray = 0;
   int m_ActiveComponent = -1;
-  bool m_MapColors = true;
+  Qt::CheckState m_MapColors = Qt::Checked;
   VTK_PTR(vtkMapper) m_Mapper = nullptr;
   VTK_PTR(vtkActor) m_Actor = nullptr;
   bool m_ShowScalarBar = true;

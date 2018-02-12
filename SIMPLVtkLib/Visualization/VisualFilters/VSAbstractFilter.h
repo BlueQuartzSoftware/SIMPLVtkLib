@@ -198,6 +198,12 @@ public:
   virtual const QString getFilterName() = 0;
 
   /**
+  * @brief Returns the tooltip to use for the filter
+  * @return
+  */
+  virtual QString getToolTip() const = 0;
+
+  /**
   * @brief Save the vtkDataSet output to a file
   * @param fileName
   */

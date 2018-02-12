@@ -7,6 +7,7 @@ set(VSVisualFilters
   VSMaskFilter
   VSSIMPLDataContainerFilter
   VSSliceFilter
+  VSTextFilter
   VSThresholdFilter
 )
 

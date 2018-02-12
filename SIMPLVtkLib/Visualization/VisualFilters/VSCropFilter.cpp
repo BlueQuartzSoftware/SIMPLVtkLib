@@ -61,6 +61,7 @@ VSCropFilter::VSCropFilter(VSAbstractFilter* parent)
 {
   m_CropAlgorithm = nullptr;
   setText(getFilterName());
+  setToolTip(getToolTip());
 
   for(int i = 0; i < 3; i++)
   {
@@ -119,6 +120,14 @@ void VSCropFilter::apply(int voi[6], int sampleRate[3])
 const QString VSCropFilter::getFilterName()
 {
   return "Crop";
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QString VSCropFilter::getToolTip() const
+{
+  return "Crop Filter";
 }
 
 // -----------------------------------------------------------------------------
