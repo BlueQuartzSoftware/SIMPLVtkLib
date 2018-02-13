@@ -62,10 +62,9 @@ class SIMPLVtkLib_EXPORT VSDataSetFilter : public VSAbstractFilter
 public:
     /**
    * @brief Constructor
-   * @param dataSetPtr
-   * @param displayName
+   * @param filePath
    */
-  VSDataSetFilter(vtkSmartPointer<vtkDataSet> dataSetPtr, const QString &displayName);
+  VSDataSetFilter(const QString &filePath);
 
   /**
   * @brief Returns the bounds of the vtkDataSet
@@ -91,6 +90,12 @@ public:
   const QString getFilterName() override;
 
   /**
+  * @brief Returns the tooltip to use for the filter
+  * @return
+  */
+  virtual QString getToolTip() const override;
+
+  /**
   * @brief Returns the output data type for the filter
   * @return
   */
@@ -101,6 +106,13 @@ public:
   * @return
   */
   static dataType_t getRequiredInputType();
+
+  /**
+   * @brief ContainsValidData
+   * @param filePath
+   * @return
+   */
+  static bool ContainsValidData(const QString &filePath);
 
 protected:
   /**
@@ -116,6 +128,12 @@ protected:
   void updateAlgorithmInput(VSAbstractFilter* filter) override;
 
 private:
+  QString m_FilePath;
   VTK_PTR(vtkDataSet) m_DataSet = nullptr;
   VTK_PTR(vtkTrivialProducer) m_TrivialProducer = nullptr;
+
+  /**
+   * @brief readImage
+   */
+  void readImage();
 };

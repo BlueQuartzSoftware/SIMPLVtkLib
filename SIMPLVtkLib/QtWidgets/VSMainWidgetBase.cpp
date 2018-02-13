@@ -38,11 +38,13 @@
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSClipFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSCropFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSDataSetFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSSliceFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSMaskFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSThresholdFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSClipFilterWidget.h"
 #include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSCropFilterWidget.h"
+#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSDataSetFilterWidget.h"
 #include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSSIMPLDataContainerFilterWidget.h"
 #include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSSliceFilterWidget.h"
 #include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSMaskFilterWidget.h"
@@ -222,6 +224,11 @@ void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter)
   {
     VSSIMPLDataContainerFilter* vsFilter = dynamic_cast<VSSIMPLDataContainerFilter*>(filter);
     fw = new VSSIMPLDataContainerFilterWidget(vsFilter, this);
+  }
+  else if (dynamic_cast<VSDataSetFilter*>(filter) != nullptr)
+  {
+    VSDataSetFilter* vsFilter = dynamic_cast<VSDataSetFilter*>(filter);
+    fw = new VSDataSetFilterWidget(vsFilter, this);
   }
   else if (dynamic_cast<VSSliceFilter*>(filter) != nullptr)
   {

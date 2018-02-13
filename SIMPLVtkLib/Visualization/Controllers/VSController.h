@@ -73,21 +73,27 @@ public:
   * as top-level VisualFilters
   * @param dca
   */
-  void importData(QString textLabel, QString tooltip, DataContainerArray::Pointer dca);
+  void importDataContainerArray(QString textLabel, QString tooltip, DataContainerArray::Pointer dca);
 
   /**
   * @brief Import data from a DataContainerArray and add any relevant DataContainers
   * as top-level VisualFilters
   * @param dca
   */
-  void importData(DataContainerArray::Pointer dca);
+  void importDataContainerArray(DataContainerArray::Pointer dca);
 
   /**
   * @brief Import data from a DataContainer and add a top-level VisualFilter if there
   * is relevant data for visualization
   * @param dc
   */
-  void importData(DataContainer::Pointer dc);
+  void importDataContainer(DataContainer::Pointer dc);
+
+  /**
+   * @brief Import data from a file
+   * @param filePath
+   */
+  void importData(const QString &filePath);
 
   /**
   * @brief Returns the first top level text filter with the given value;

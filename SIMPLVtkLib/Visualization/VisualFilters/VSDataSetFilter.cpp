@@ -35,30 +35,22 @@
 
 #include "VSDataSetFilter.h"
 
-#include <vtkAlgorithmOutput.h>
-#include <vtkCellData.h>
-#include <vtkDataArray.h>
-#include <vtkDataSet.h>
-#include <vtkDataSetMapper.h>
-#include <vtkLookupTable.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkScalarBarActor.h>
-#include <vtkTrivialProducer.h>
-#include <vtkUnstructuredGridAlgorithm.h>
+#include <QtCore/QFileInfo>
+#include <QtCore/QMimeDatabase>
 
-#include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
-#include "SIMPLVtkLib/Visualization/Controllers/VSLookupTableController.h"
+#include <vtkImageData.h>
+#include <vtkJPEGReader.h>
+#include <vtkPNGReader.h>
+#include <vtkTIFFReader.h>
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSDataSetFilter::VSDataSetFilter(VTK_PTR(vtkDataSet) dataSetPtr, const QString &displayName)
+VSDataSetFilter::VSDataSetFilter(const QString &filePath)
   : VSAbstractFilter()
-  , m_DataSet(dataSetPtr)
+  , m_FilePath(filePath)
 {
   createFilter();
-
-  setText(displayName);
 }
 
 // -----------------------------------------------------------------------------
@@ -110,24 +102,83 @@ void VSDataSetFilter::updateAlgorithmInput(VSAbstractFilter* filter)
 // -----------------------------------------------------------------------------
 void VSDataSetFilter::createFilter()
 {
-  VTK_PTR(vtkDataSet) dataSet = m_DataSet;
-  dataSet->ComputeBounds();
+  QFileInfo fi(m_FilePath);
+  QString ext = fi.completeSuffix().toLower();
 
-  vtkCellData* cellData = dataSet->GetCellData();
-  if(cellData)
+  QMimeDatabase db;
+  QMimeType mimeType = db.mimeTypeForFile(m_FilePath, QMimeDatabase::MatchContent);
+
+  setText(fi.fileName());
+
+  if (mimeType.name().startsWith("image/"))
   {
-    vtkDataArray* dataArray = cellData->GetArray(0);
-    if(dataArray)
-    {
-      char* name = dataArray->GetName();
-      cellData->SetActiveScalars(name);
-    }
+    readImage();
   }
 
-  m_TrivialProducer = VTK_PTR(vtkTrivialProducer)::New();
-  m_TrivialProducer->SetOutput(dataSet);
+  if (m_DataSet != nullptr)
+  {
+    m_DataSet->ComputeBounds();
 
-  emit updatedOutputPort(this);
+    m_TrivialProducer = VTK_PTR(vtkTrivialProducer)::New();
+    m_TrivialProducer->SetOutput(m_DataSet);
+
+    emit updatedOutputPort(this);
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSDataSetFilter::readImage()
+{
+  QMimeDatabase db;
+  QMimeType mimeType = db.mimeTypeForFile(m_FilePath, QMimeDatabase::MatchContent);
+
+  char* filePathPtr = m_FilePath.toLatin1().data();
+  if (mimeType.inherits("image/jpeg"))
+  {
+    VTK_NEW(vtkJPEGReader, imageReader);
+    imageReader->SetFileName(filePathPtr);
+    imageReader->Update();
+
+    m_DataSet = imageReader->GetOutput();
+  }
+  else if (mimeType.inherits("image/png"))
+  {
+    VTK_NEW(vtkPNGReader, imageReader);
+    imageReader->SetFileName(filePathPtr);
+    imageReader->Update();
+
+    m_DataSet = imageReader->GetOutput();
+  }
+  else if (mimeType.inherits("image/tiff"))
+  {
+    VTK_NEW(vtkTIFFReader, imageReader);
+    imageReader->SetFileName(filePathPtr);
+    imageReader->Update();
+
+    m_DataSet = imageReader->GetOutput();
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool VSDataSetFilter::ContainsValidData(const QString &filePath)
+{
+  QFileInfo fi(filePath);
+  QString ext = fi.completeSuffix().toLower();
+
+  QMimeDatabase db;
+  QMimeType mimeType = db.mimeTypeForFile(filePath, QMimeDatabase::MatchContent);
+
+  if (mimeType.inherits("image/jpeg") || mimeType.inherits("image/png") ||
+      mimeType.inherits("image/tiff") || ext == "dream3d" || ext == "vtk" || ext == "stl")
+  {
+    return true;
+  }
+
+  return false;
 }
 
 // -----------------------------------------------------------------------------
@@ -136,6 +187,14 @@ void VSDataSetFilter::createFilter()
 const QString VSDataSetFilter::getFilterName()
 {
   return text();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QString VSDataSetFilter::getToolTip() const
+{
+  return "Dataset Filter";
 }
 
 // -----------------------------------------------------------------------------
