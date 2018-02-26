@@ -282,7 +282,7 @@ double VSThresholdFilter::getLastMaxValue()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QString VSThresholdFilter::setLastArrayName(QString lastArrayName)
+void VSThresholdFilter::setLastArrayName(QString lastArrayName)
 {
   m_LastArrayName = lastArrayName;
 }

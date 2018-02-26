@@ -42,6 +42,7 @@
 #include <QtGui/QColor>
 
 #include <vtkActor.h>
+#include <vtkDataSetSurfaceFilter.h>
 #include <vtkMapper.h>
 #include <vtkScalarBarActor.h>
 #include <vtkScalarBarWidget.h>
@@ -310,6 +311,7 @@ protected:
 
 private:
   VSAbstractFilter* m_Filter = nullptr;
+  VTK_PTR(vtkDataSetSurfaceFilter) m_DataSetFilter = nullptr;
   bool m_ShowFilter = true;
   int m_ActiveArray = 0;
   int m_ActiveComponent = -1;

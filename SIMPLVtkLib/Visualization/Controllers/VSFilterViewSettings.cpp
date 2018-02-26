@@ -510,8 +510,13 @@ void VSFilterViewSettings::setupActors()
     return;
   }
 
+  m_DataSetFilter = VTK_PTR(vtkDataSetSurfaceFilter)::New();
+  m_DataSetFilter->SetInputConnection(m_Filter->getOutputPort());
+  m_DataSetFilter->UseStripsOn();
+  m_DataSetFilter->Update();
+
   m_Mapper = VTK_PTR(vtkDataSetMapper)::New();
-  m_Mapper->SetInputConnection(m_Filter->getOutputPort());
+  m_Mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
 
   m_Actor = VTK_PTR(vtkActor)::New();
   m_Actor->SetMapper(m_Mapper);
@@ -560,7 +565,8 @@ void VSFilterViewSettings::updateInputPort(VSAbstractFilter* filter)
     return;
   }
 
-  m_Mapper->SetInputConnection(filter->getOutputPort());
+  m_DataSetFilter->SetInputConnection(filter->getOutputPort());
+  m_DataSetFilter->Update();
   emit requiresRender();
 }
 

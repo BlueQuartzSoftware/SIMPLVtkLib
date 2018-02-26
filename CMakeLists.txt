@@ -128,6 +128,7 @@ endif()
 # Look for Vtk 8.0 as we need it for the plugin GUI to be generated
 # These are the required component libraries
 set(VtkComponents
+		vtkFiltersGeometry
     vtkGUISupportQt
     vtkRenderingCore
     vtkRenderingFreeType
