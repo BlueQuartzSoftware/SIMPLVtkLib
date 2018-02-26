@@ -217,7 +217,7 @@ protected slots:
    * @brief
    * @param filter
    */
-  void filterAdded(VSAbstractFilter* filter);
+  void filterAdded(VSAbstractFilter* filter, bool currentFilter);
 
   /**
    * @brief Removes filter from the FilterToFilterWidget map

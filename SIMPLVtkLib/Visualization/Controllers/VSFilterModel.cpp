@@ -46,7 +46,7 @@ VSFilterModel::VSFilterModel(QObject* parent)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSFilterModel::addFilter(VSAbstractFilter* filter)
+void VSFilterModel::addFilter(VSAbstractFilter* filter, bool currentFilter)
 {
   if(nullptr == filter)
   {
@@ -58,7 +58,7 @@ void VSFilterModel::addFilter(VSAbstractFilter* filter)
     appendRow(filter);
   }
 
-  emit filterAdded(filter);
+  emit filterAdded(filter, currentFilter);
 }
 
 // -----------------------------------------------------------------------------

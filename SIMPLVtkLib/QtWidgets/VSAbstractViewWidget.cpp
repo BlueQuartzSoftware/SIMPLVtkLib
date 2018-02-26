@@ -95,7 +95,6 @@ void VSAbstractViewWidget::copyFilters(VSFilterViewSettings::Map filters)
 // -----------------------------------------------------------------------------
 void VSAbstractViewWidget::clearFilters()
 {
-  size_t count = m_FilterViewSettings.size();
   for(auto iter = m_FilterViewSettings.begin(); iter != m_FilterViewSettings.end(); iter++)
   {
     VSFilterViewSettings* viewSettings = iter->second;
@@ -112,7 +111,7 @@ void VSAbstractViewWidget::clearFilters()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSAbstractViewWidget::filterAdded(VSAbstractFilter* filter)
+void VSAbstractViewWidget::filterAdded(VSAbstractFilter* filter, bool currentFilter)
 {
   if(nullptr == filter)
   {
@@ -613,14 +612,13 @@ void VSAbstractViewWidget::setController(VSController* controller)
   }
 
   m_Controller = controller;
-  connect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*)), this, SLOT(filterAdded(VSAbstractFilter*)));
+  connect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*, bool)), this, SLOT(filterAdded(VSAbstractFilter*, bool)));
   connect(m_Controller, SIGNAL(filterRemoved(VSAbstractFilter*)), this, SLOT(filterRemoved(VSAbstractFilter*)));
   
   // Clear old filter view settings and create new ones
   clearFilters();
 
   QVector<VSAbstractFilter*> filters = controller->getAllFilters();
-  int count = filters.size();
   for(VSAbstractFilter* filter : filters)
   {
     VSFilterViewSettings* viewSettings = new VSFilterViewSettings(filter);

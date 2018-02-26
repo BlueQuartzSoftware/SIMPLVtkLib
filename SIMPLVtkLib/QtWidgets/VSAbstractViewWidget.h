@@ -165,7 +165,7 @@ protected slots:
   * @brief Connect a new visual filter's VSFilterViewSettings
   * @param filter
   */
-  void filterAdded(VSAbstractFilter* filter);
+  void filterAdded(VSAbstractFilter* filter, bool currentFilter);
 
   /**
   * @brief Removes the filter from the view

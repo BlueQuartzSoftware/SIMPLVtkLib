@@ -92,13 +92,6 @@ public:
   void importDataContainerArray(QString filePath, DataContainerArray::Pointer dca);
 
   /**
-  * @brief Import data from a DataContainerArray and add any relevant DataContainers
-  * as top-level VisualFilters
-  * @param dca
-  */
-  void importDataContainerArray(DataContainerArray::Pointer dca);
-
-  /**
   * @brief Import data from a DataContainer and add a top-level VisualFilter if there
   * is relevant data for visualization
   * @param dc
@@ -137,7 +130,7 @@ public:
   VSFilterModel* getFilterModel();
 
 signals:
-  void filterAdded(VSAbstractFilter*, QJsonObject = QJsonObject());
+  void filterAdded(VSAbstractFilter*, bool currentFilter);
   void filterRemoved(VSAbstractFilter*);
   void filterCheckStateChanged(VSAbstractFilter* filter);
 

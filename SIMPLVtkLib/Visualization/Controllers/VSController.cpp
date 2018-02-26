@@ -59,7 +59,7 @@ VSController::VSController(QObject* parent)
   : QObject(parent)
   , m_FilterModel(new VSFilterModel())
 {
-  connect(m_FilterModel, SIGNAL(filterAdded(VSAbstractFilter*)), this, SIGNAL(filterAdded(VSAbstractFilter*)));
+  connect(m_FilterModel, SIGNAL(filterAdded(VSAbstractFilter*, bool)), this, SIGNAL(filterAdded(VSAbstractFilter*, bool)));
   connect(m_FilterModel, SIGNAL(filterRemoved(VSAbstractFilter*)), this, SIGNAL(filterRemoved(VSAbstractFilter*)));
 }
 
@@ -79,33 +79,15 @@ void VSController::importDataContainerArray(QString filePath, DataContainerArray
   std::vector<SIMPLVtkBridge::WrappedDataContainerPtr> wrappedData = SIMPLVtkBridge::WrapDataContainerArrayAsStruct(dca);
 
   VSFileNameFilter* textFilter = new VSFileNameFilter(filePath);
-  m_FilterModel->addFilter(textFilter);
+  m_FilterModel->addFilter(textFilter, false);
 
   // Add VSDataSetFilter for each DataContainer with relevant data
   size_t count = wrappedData.size();
   for(size_t i = 0; i < count; i++)
   {
     VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedData[i], textFilter);
-    m_FilterModel->addFilter(filter);
+    m_FilterModel->addFilter(filter, (i == count - 1));
   }
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSController::importDataContainerArray(DataContainerArray::Pointer dca)
-{
-  std::vector<SIMPLVtkBridge::WrappedDataContainerPtr> wrappedData = SIMPLVtkBridge::WrapDataContainerArrayAsStruct(dca);
-  
-  // Add VSSIMPLDataContainerFilter for each DataContainer with relevant data
-  size_t count = wrappedData.size();
-  for(size_t i = 0; i < count; i++)
-  {
-    VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedData[i]);
-    m_FilterModel->addFilter(filter);
-  }
-
-  emit dataImported();
 }
 
 // -----------------------------------------------------------------------------
@@ -135,7 +117,7 @@ void VSController::importData(const QString &filePath)
   if(filter->getOutput())
   {
     VSFileNameFilter* textFilter = new VSFileNameFilter(filePath);
-    m_FilterModel->addFilter(textFilter);
+    m_FilterModel->addFilter(textFilter, false);
 
     filter->setParentFilter(textFilter);
     m_FilterModel->addFilter(filter);
@@ -289,11 +271,12 @@ void VSController::loadFilter(QJsonObject &obj, VSAbstractFilter* parentFilter)
 
   if (newFilter != nullptr)
   {
-    m_FilterModel->addFilter(newFilter);
+    QJsonObject childrenObj = obj["Child Filters"].toObject();
+
+    m_FilterModel->addFilter(newFilter, (childrenObj.size() == 0));
     newFilter->setCheckState(static_cast<Qt::CheckState>(obj["CheckState"].toInt()));
     emit filterCheckStateChanged(newFilter);
 
-    QJsonObject childrenObj = obj["Child Filters"].toObject();
     for (QJsonObject::iterator iter = childrenObj.begin(); iter != childrenObj.end(); iter++)
     {
       QJsonObject childObj = iter.value().toObject();

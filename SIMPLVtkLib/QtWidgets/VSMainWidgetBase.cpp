@@ -71,8 +71,8 @@ VSMainWidgetBase::VSMainWidgetBase(QWidget* parent)
 // -----------------------------------------------------------------------------
 void VSMainWidgetBase::connectSlots()
 {
-  connect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*)),
-    this, SLOT(filterAdded(VSAbstractFilter*)));
+  connect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*, bool)),
+    this, SLOT(filterAdded(VSAbstractFilter*, bool)));
   connect(m_Controller, SIGNAL(filterRemoved(VSAbstractFilter*)), 
     this, SLOT(filterRemoved(VSAbstractFilter*)));
 }
@@ -196,7 +196,7 @@ VSAbstractFilter* VSMainWidgetBase::getCurrentFilter()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter)
+void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter, bool currentFilter)
 {
   QVTKInteractor* interactor = nullptr;
   VSAbstractViewWidget* activeViewWidget = getActiveViewWidget();
@@ -252,7 +252,10 @@ void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter)
     m_FilterToFilterWidgetMap.insert(filter, fw);
   }
 
-  setCurrentFilter(filter);
+  if (currentFilter == true)
+  {
+    setCurrentFilter(filter);
+  }
 }
 
 // -----------------------------------------------------------------------------

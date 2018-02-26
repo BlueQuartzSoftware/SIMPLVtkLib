@@ -61,7 +61,7 @@ public:
   * @brief Adds a filter to the model
   * @param filter
   */
-  void addFilter(VSAbstractFilter* filter);
+  void addFilter(VSAbstractFilter* filter, bool currentFilter = true);
 
   /**
   * @brief Removes a filter from the model
@@ -95,7 +95,7 @@ public:
   QVector<VSAbstractFilter*> getAllFilters();
 
 signals:
-  void filterAdded(VSAbstractFilter* filter);
+  void filterAdded(VSAbstractFilter* filter, bool currentFilter);
   void filterRemoved(VSAbstractFilter* filter);
 
 public slots:
