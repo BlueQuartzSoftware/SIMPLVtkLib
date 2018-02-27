@@ -39,6 +39,7 @@
 #include <vtkCellData.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkDataSetMapper.h>
+#include <vtkPointData.h>
 #include <vtkProperty.h>
 #include <vtkTextProperty.h>
 
@@ -512,7 +513,10 @@ void VSFilterViewSettings::setupActors()
 
   m_DataSetFilter = VTK_PTR(vtkDataSetSurfaceFilter)::New();
   m_DataSetFilter->SetInputConnection(m_Filter->getOutputPort());
-  //m_DataSetFilter->UseStripsOn();
+  if(outputData->GetPointData() && outputData->GetPointData()->GetScalars())
+  {
+    m_DataSetFilter->UseStripsOn();
+  }
 
   m_Mapper = VTK_PTR(vtkDataSetMapper)::New();
   m_Mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
