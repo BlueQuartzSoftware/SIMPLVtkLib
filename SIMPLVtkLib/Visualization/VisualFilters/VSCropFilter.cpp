@@ -91,6 +91,7 @@ VSCropFilter* VSCropFilter::Create(QJsonObject &json, VSAbstractFilter* parent)
   filter->setSampleRate(lastSampleRate);
 
   filter->setInitialized(true);
+  filter->readTransformJson(json);
 
   return filter;
 }

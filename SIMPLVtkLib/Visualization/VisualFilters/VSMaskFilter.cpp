@@ -64,6 +64,7 @@ VSMaskFilter* VSMaskFilter::Create(QJsonObject &json, VSAbstractFilter* parent)
   filter->setLastArrayName(json["Last Array Name"].toString());
 
   filter->setInitialized(true);
+  filter->readTransformJson(json);
 
   return filter;
 }

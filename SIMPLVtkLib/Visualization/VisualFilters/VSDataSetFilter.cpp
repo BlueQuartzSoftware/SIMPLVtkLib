@@ -112,6 +112,7 @@ VSDataSetFilter* VSDataSetFilter::Create(const QString &filePath, QJsonObject &j
   VSDataSetFilter* filter = new VSDataSetFilter(filePath, parent);
 
   filter->setInitialized(true);
+  filter->readTransformJson(json);
   return filter;
 }
 

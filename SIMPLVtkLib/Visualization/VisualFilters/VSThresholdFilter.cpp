@@ -70,6 +70,7 @@ VSThresholdFilter* VSThresholdFilter::Create(QJsonObject &json, VSAbstractFilter
   filter->setLastMaxValue(json["Last Maximum Value"].toDouble());
 
   filter->setInitialized(true);
+  filter->readTransformJson(json);
 
   return filter;
 }

@@ -40,13 +40,15 @@
 #endif
 
 #include <QtWidgets/QWidget>
+
 #include <vector>
+
+#include <vtkImplicitFunction.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
 
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSTransform.h"
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
-
-class vtkRenderWindowInteractor;
-class vtkImplicitFunction;
 
 /**
 * @class VSAbstractWidget VSAbstractWidget.h 
@@ -67,7 +69,7 @@ public:
   * @param bounds
   * @param iren
   */
-  VSAbstractWidget(QWidget* parent, double bounds[6], vtkRenderWindowInteractor* iren);
+  VSAbstractWidget(QWidget* parent, VSTransform* transform, double bounds[6], vtkRenderWindowInteractor* iren);
 
   /**
   * @brief Copies the vtkWidget bounds
@@ -82,36 +84,10 @@ public:
   double* getBounds();
 
   /**
-  * @brief Copies the vtkWidget origin
-  * @param origin
-  */
-  void getOrigin(double origin[3]);
-  
-  /**
-  * @brief Returns the vtkWidget origin
-  * @return
-  */
-  double* getOrigin();
-
-  /**
   * @brief Sets the bounds
   * @param bounds
   */
   void setBounds(double bounds[6]);
-
-  /**
-  * @brief Sets the origin
-  * @param origin
-  */
-  virtual void setOrigin(double origin[3]);
-
-  /**
-  * @brief Sets the origin
-  * @param x
-  * @param y
-  * @param z
-  */
-  virtual void setOrigin(double x, double y, double z);
 
   /**
   * @brief Enables the vtkWidget
@@ -150,6 +126,12 @@ public:
 signals:
   void modified();
 
+protected slots:
+  /**
+  * @brief Updates the vtk widget for positioning in global space
+  */
+  virtual void updateGlobalSpace() = 0;
+
 protected:
   /**
   * @brief Updates the widget bounds
@@ -157,16 +139,32 @@ protected:
   virtual void updateBounds();
 
   /**
-  * @brief Updates the widget origin
+  * @brief Calculate the local origin from the given bounds and VSTransform
+  * @param bounds
+  * @param transform
+  * @return
   */
-  virtual void updateOrigin();
+  static double* calculateLocalOrigin(double* bounds, VSTransform* transform);
+
+  /**
+  * @brief Calculate the global origin from the given bounds
+  * @param bounds
+  * @return
+  */
+  static double* calculateGlobalOrigin(double* bounds);
+
+  /**
+  * @brief Returns the VSTransform used by this widget
+  * @return
+  */
+  VSTransform* getVSTransform();
 
   const double MIN_SIZE = 6.0;
 
 private:
   vtkRenderWindowInteractor * m_RenderWindowInteractor;
+  VSTransform* m_Transform;
   double m_Bounds[6];
-  double m_Origin[3];
 };
 
 #ifdef __clang__

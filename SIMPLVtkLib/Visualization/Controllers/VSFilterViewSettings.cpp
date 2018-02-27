@@ -565,7 +565,7 @@ void VSFilterViewSettings::updateInputPort(VSAbstractFilter* filter)
   }
 
   m_DataSetFilter->SetInputConnection(filter->getOutputPort());
-  m_DataSetFilter->Update();
+  //m_DataSetFilter->Update();
   emit requiresRender();
 }
 
@@ -577,12 +577,14 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
   if(m_Filter)
   {
     disconnect(m_Filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
+    disconnect(filter, SIGNAL(transformChanged()), this, SIGNAL(requiresRender()));
   }
 
   m_Filter = filter;
   if(filter)
   {
     connect(filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
+    connect(filter, SIGNAL(transformChanged()), this, SIGNAL(requiresRender()));
 
     if(filter->getArrayNames().size() < 1)
     {

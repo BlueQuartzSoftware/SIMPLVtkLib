@@ -35,21 +35,17 @@
 
 #include "VSAbstractWidget.h"
 
-#include <vtkRenderWindowInteractor.h>
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSAbstractWidget::VSAbstractWidget(QWidget* parent, double bounds[6], vtkRenderWindowInteractor* iren)
+VSAbstractWidget::VSAbstractWidget(QWidget* parent, VSTransform* transform, double bounds[6], vtkRenderWindowInteractor* iren)
 : QWidget(parent)
 , m_RenderWindowInteractor(iren)
+, m_Transform(transform)
 {
   setBounds(bounds);
 
-  for(int i = 0; i < 3; i++)
-  {
-    m_Origin[i] = (bounds[i * 2] + bounds[i * 2 + 1]) / 2.0;
-  }
+  connect(transform, SIGNAL(valuesChanged()), this, SLOT(updateGlobalSpace()));
 }
 
 // -----------------------------------------------------------------------------
@@ -74,20 +70,25 @@ double* VSAbstractWidget::getBounds()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSAbstractWidget::getOrigin(double origin[3])
+double* VSAbstractWidget::calculateLocalOrigin(double* bounds, VSTransform* transform)
 {
-  for(int i = 0; i < 3; i++)
-  {
-    origin[i] = this->m_Origin[i];
-  }
+  double* origin = calculateGlobalOrigin(bounds);
+  transform->localizePoint(origin);
+  return origin;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-double* VSAbstractWidget::getOrigin()
+double* VSAbstractWidget::calculateGlobalOrigin(double* bounds)
 {
-  return m_Origin;
+  double* origin = new double[3];
+  for(int i = 0; i < 3; i++)
+  {
+    origin[i] = (bounds[i * 2] + bounds[i * 2 + 1]) / 2.0;
+  }
+
+  return origin;
 }
 
 // -----------------------------------------------------------------------------
@@ -99,38 +100,15 @@ void VSAbstractWidget::setBounds(double bounds[6])
   {
     double offset = 0;
     if(bounds[i * 2 + 1] - bounds[i * 2] < MIN_SIZE)
+    {
       offset = (MIN_SIZE - (bounds[i * 2 + 1] - bounds[i * 2])) / 2.0;
+    }
 
     this->m_Bounds[i * 2] = bounds[i * 2] - offset;
     this->m_Bounds[i * 2 + 1] = bounds[i * 2 + 1] + offset;
   }
 
   updateBounds();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSAbstractWidget::setOrigin(double origin[3])
-{
-  for(int i = 0; i < 3; i++)
-  {
-    this->m_Origin[i] = origin[i];
-  }
-
-  updateOrigin();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSAbstractWidget::setOrigin(double x, double y, double z)
-{
-  m_Origin[0] = x;
-  m_Origin[1] = y;
-  m_Origin[2] = z;
-
-  updateOrigin();
 }
 
 // -----------------------------------------------------------------------------
@@ -159,6 +137,7 @@ void VSAbstractWidget::updateBounds()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSAbstractWidget::updateOrigin()
+VSTransform* VSAbstractWidget::getVSTransform()
 {
+  return m_Transform;
 }

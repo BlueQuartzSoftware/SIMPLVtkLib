@@ -105,8 +105,8 @@ VSClipFilter* VSClipFilter::Create(QJsonObject &json, VSAbstractFilter* parent)
   filter->setLastPlaneNormal(normals);
 
   QJsonArray boxTransformDataArray = json["Box Transform Data"].toArray();
-  double boxTransformData[12];
-  for (int i = 0; i < 12; i++)
+  double boxTransformData[16];
+  for (int i = 0; i < 16; i++)
   {
     boxTransformData[i] = boxTransformDataArray[i].toDouble();
   }
@@ -120,6 +120,7 @@ VSClipFilter* VSClipFilter::Create(QJsonObject &json, VSAbstractFilter* parent)
   filter->setLastBoxTransform(transform);
 
   filter->setInitialized(true);
+  filter->readTransformJson(json);
 
   return filter;
 }
@@ -200,7 +201,7 @@ void VSClipFilter::apply(VTK_PTR(vtkPlanes) planes, VTK_PTR(vtkTransform) transf
   // Handle Box-Type clips
   m_LastClipType = ClipType::BOX;
   m_LastBoxInverted = inverted;
-  m_LastBoxTransform = transform;
+  m_LastBoxTransform->DeepCopy(transform);
 
   m_ClipAlgorithm->SetClipFunction(planes);
   m_ClipAlgorithm->SetInsideOut(inverted);
@@ -301,7 +302,7 @@ void VSClipFilter::writeJson(QJsonObject &json)
   vtkMatrix4x4* matrix = m_LastBoxTransform->GetMatrix();
   double* matrixData = matrix->GetData();
   QJsonArray boxTransformData;
-  for (int i = 0; i < 12; i++)
+  for (int i = 0; i < 16; i++)
   {
     boxTransformData.append(matrixData[i]);
   }

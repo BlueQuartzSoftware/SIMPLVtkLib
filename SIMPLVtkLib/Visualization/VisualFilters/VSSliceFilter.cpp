@@ -85,6 +85,7 @@ VSSliceFilter* VSSliceFilter::Create(QJsonObject &json, VSAbstractFilter* parent
   filter->setLastNormal(normals);
 
   filter->setInitialized(true);
+  filter->readTransformJson(json);
 
   return filter;
 }

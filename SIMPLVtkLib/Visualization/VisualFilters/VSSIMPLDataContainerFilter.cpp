@@ -151,6 +151,7 @@ VSSIMPLDataContainerFilter* VSSIMPLDataContainerFilter::Create(const QString &fi
           VSSIMPLDataContainerFilter* newFilter = new VSSIMPLDataContainerFilter(wrappedDC, parent);
           newFilter->setToolTip(json["Tooltip"].toString());
           newFilter->setInitialized(true);
+          newFilter->readTransformJson(json);
           return newFilter;
         }
       }

@@ -154,7 +154,6 @@ void VSFilterView::setActiveFilter(VSAbstractFilter* filter, VSAbstractFilterWid
     return;
   }
 
-
   QModelIndex currentIndex = selectionModel()->currentIndex();
   QModelIndex newIndex = filterModel->getIndexFromFilter(filter);
 

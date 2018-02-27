@@ -66,7 +66,9 @@ VSSliceFilterWidget::VSSliceFilterWidget(VSSliceFilter* filter, vtkRenderWindowI
 {
   m_Internals->setupUi(this);
 
-  m_SliceWidget = new VSPlaneWidget(this, m_SliceFilter->getBounds(), interactor);
+  connect(m_SliceFilter->getTransform(), SIGNAL(valuesChanged()), this, SLOT(updateTransform()));
+
+  m_SliceWidget = new VSPlaneWidget(this, m_SliceFilter->getTransform(), m_SliceFilter->getTransformBounds(), interactor);
   m_SliceWidget->show();
 
   connect(m_SliceWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
@@ -107,13 +109,13 @@ void VSSliceFilterWidget::apply()
   VSAbstractFilterWidget::apply();
 
   double origin[3];
-  double normals[3];
+  double normal[3];
 
   m_SliceWidget->getOrigin(origin);
-  m_SliceWidget->getNormals(normals);
+  m_SliceWidget->getNormals(normal);
   m_SliceWidget->drawPlaneOff();
 
-  m_SliceFilter->apply(origin, normals);
+  m_SliceFilter->apply(origin, normal);
 }
 
 // -----------------------------------------------------------------------------
@@ -122,9 +124,9 @@ void VSSliceFilterWidget::apply()
 void VSSliceFilterWidget::reset()
 {
   double* origin = m_SliceFilter->getLastOrigin();
-  double* normals = m_SliceFilter->getLastNormal();
+  double* normal = m_SliceFilter->getLastNormal();
 
-  m_SliceWidget->setNormals(normals);
+  m_SliceWidget->setNormals(normal);
   m_SliceWidget->setOrigin(origin);
   m_SliceWidget->updatePlaneWidget();
   m_SliceWidget->drawPlaneOff();
@@ -152,4 +154,12 @@ void VSSliceFilterWidget::setInteractor(vtkRenderWindowInteractor* interactor)
   setRenderingEnabled(false);
   m_SliceWidget->setInteractor(interactor);
   setRenderingEnabled(rendered);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSSliceFilterWidget::updateTransform()
+{
+  setBounds(m_SliceFilter->getTransformBounds());
 }

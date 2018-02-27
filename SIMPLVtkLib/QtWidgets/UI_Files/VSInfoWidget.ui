@@ -118,7 +118,7 @@
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
-     <widget class="QWidget" name="viewSettingsWidget">
+     <widget class="QWidget" name="viewSettingsContainer">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -149,48 +149,7 @@
        <property name="spacing">
         <number>4</number>
        </property>
-       <item row="7" column="0">
-        <widget class="QWidget" name="transparencyWidget" native="true">
-         <layout class="QGridLayout" name="gridLayout_10">
-          <property name="leftMargin">
-           <number>1</number>
-          </property>
-          <property name="topMargin">
-           <number>1</number>
-          </property>
-          <property name="rightMargin">
-           <number>1</number>
-          </property>
-          <property name="bottomMargin">
-           <number>1</number>
-          </property>
-          <property name="spacing">
-           <number>4</number>
-          </property>
-          <item row="1" column="1">
-           <widget class="QSlider" name="alphaSlider">
-            <property name="maximum">
-             <number>100</number>
-            </property>
-            <property name="value">
-             <number>100</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="alphaLabel">
-            <property name="text">
-             <string>Alpha: </string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="8" column="0">
+       <item row="4" column="0">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -204,117 +163,20 @@
         </spacer>
        </item>
        <item row="2" column="0">
-        <widget class="QWidget" name="arrayVisibilityWidget" native="true">
-         <layout class="QGridLayout" name="gridLayout_8">
-          <property name="leftMargin">
-           <number>1</number>
-          </property>
-          <property name="topMargin">
-           <number>1</number>
-          </property>
-          <property name="rightMargin">
-           <number>1</number>
-          </property>
-          <property name="bottomMargin">
-           <number>1</number>
-          </property>
-          <property name="spacing">
-           <number>4</number>
-          </property>
-          <item row="5" column="1">
-           <widget class="QComboBox" name="representationCombo">
-            <property name="currentIndex">
-             <number>-1</number>
-            </property>
-            <item>
-             <property name="text">
-              <string>Point</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Wireframe</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Surface</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Surface With Edges</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="VSColorButton" name="colorBtn">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="activeArrayCombo">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="arrayLabel">
-            <property name="text">
-             <string>Array:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="componentLabel">
-            <property name="text">
-             <string>Component:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="activeComponentCombo">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="colorLabel">
-            <property name="text">
-             <string>Color: </string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="representationLabel">
-            <property name="text">
-             <string>Representation:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QWidget" name="colorPresetWidget" native="true">
-         <layout class="QGridLayout" name="gridLayout_9">
+        <widget class="QWidget" name="viewSettingsWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <layout class="QGridLayout" name="settingsLayout">
           <property name="leftMargin">
            <number>1</number>
           </property>
@@ -331,84 +193,258 @@
            <number>4</number>
           </property>
           <item row="0" column="0">
-           <widget class="QPushButton" name="selectPresetColorsBtn">
+           <widget class="QWidget" name="filterWidgetContainer" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <layout class="QGridLayout" name="filterWidgetLayout">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <property name="spacing">
+              <number>4</number>
+             </property>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="visibilityTopicLabel">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
             <property name="text">
-             <string>Select Preset Colors</string>
+             <string>Visibility Settings</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="invertColorScaleBtn">
+          <item row="2" column="0">
+           <widget class="QWidget" name="arrayVisibilityWidget" native="true">
+            <layout class="QGridLayout" name="gridLayout_8">
+             <property name="leftMargin">
+              <number>1</number>
+             </property>
+             <property name="topMargin">
+              <number>1</number>
+             </property>
+             <property name="rightMargin">
+              <number>1</number>
+             </property>
+             <property name="bottomMargin">
+              <number>1</number>
+             </property>
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <item row="5" column="1">
+              <widget class="QComboBox" name="representationCombo">
+               <property name="currentIndex">
+                <number>-1</number>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Point</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Wireframe</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Surface</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Surface With Edges</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="VSColorButton" name="colorBtn">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>1</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="activeArrayCombo">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="arrayLabel">
+               <property name="text">
+                <string>Array:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="componentLabel">
+               <property name="text">
+                <string>Component:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="activeComponentCombo">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="colorLabel">
+               <property name="text">
+                <string>Color: </string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="representationLabel">
+               <property name="text">
+                <string>Representation:</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="mapScalarsCheckBox">
             <property name="text">
-             <string>Invert Color Scale</string>
+             <string>Map Scalars</string>
             </property>
+            <property name="tristate">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QCheckBox" name="showScalarBarCheckBox">
+            <property name="text">
+             <string>Show Scalar Bar</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QWidget" name="colorPresetWidget" native="true">
+            <layout class="QGridLayout" name="gridLayout_9">
+             <property name="leftMargin">
+              <number>1</number>
+             </property>
+             <property name="topMargin">
+              <number>1</number>
+             </property>
+             <property name="rightMargin">
+              <number>1</number>
+             </property>
+             <property name="bottomMargin">
+              <number>1</number>
+             </property>
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QPushButton" name="selectPresetColorsBtn">
+               <property name="text">
+                <string>Select Preset Colors</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QPushButton" name="invertColorScaleBtn">
+               <property name="text">
+                <string>Invert Color Scale</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QWidget" name="transparencyWidget" native="true">
+            <layout class="QGridLayout" name="gridLayout_10">
+             <property name="leftMargin">
+              <number>1</number>
+             </property>
+             <property name="topMargin">
+              <number>1</number>
+             </property>
+             <property name="rightMargin">
+              <number>1</number>
+             </property>
+             <property name="bottomMargin">
+              <number>1</number>
+             </property>
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <item row="1" column="1">
+              <widget class="QSlider" name="alphaSlider">
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="alphaLabel">
+               <property name="text">
+                <string>Alpha: </string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QWidget" name="filterWidgetContainer" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <layout class="QGridLayout" name="filterWidgetLayout">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <property name="spacing">
-           <number>4</number>
-          </property>
-         </layout>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QCheckBox" name="mapScalarsCheckBox">
-         <property name="text">
-          <string>Map Scalars</string>
-         </property>
-         <property name="tristate">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="visibilityTopicLabel">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Visibility Settings</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QCheckBox" name="showScalarBarCheckBox">
-         <property name="text">
-          <string>Show Scalar Bar</string>
-         </property>
-        </widget>
+       <item row="3" column="0">
+        <widget class="VSTransformWidget" name="transformWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -421,6 +457,12 @@
    <class>VSColorButton</class>
    <extends>QPushButton</extends>
    <header>VSColorButton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>VSTransformWidget</class>
+   <extends>QWidget</extends>
+   <header>VSTransformWidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>

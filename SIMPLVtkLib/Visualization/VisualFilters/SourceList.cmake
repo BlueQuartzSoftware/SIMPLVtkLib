@@ -11,6 +11,7 @@ set(VSVisualFilters
   VSSliceFilter
   VSTextFilter
   VSThresholdFilter
+  VSTransform
 )
 
 # --------------------------------------------------------------------

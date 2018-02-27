@@ -77,6 +77,12 @@ public:
   */
   void copy(VSVisualizationWidget* other);
 
+  /**
+  * @brief Returns the renderer
+  * @return
+  */
+  VTK_PTR(vtkRenderer) getRenderer();
+
 signals:
   void mousePressed();
 
@@ -130,12 +136,6 @@ public slots:
   * @brief Clears the render window
   */
   virtual void clearRenderWindow();
-
-  /**
-  * @brief Returns the renderer
-  * @return
-  */
-  VTK_PTR(vtkRenderer) getRenderer();
 
 protected:
   /**

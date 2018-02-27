@@ -65,7 +65,7 @@ public:
   * @param bounds
   * @param iren
   */
-  VSBoxWidget(QWidget* parent, double bounds[6], vtkRenderWindowInteractor* iren);
+  VSBoxWidget(QWidget* parent, VSTransform* transform, double bounds[6], vtkRenderWindowInteractor* iren);
 
   /**
   * @brief Deconstructor
@@ -104,15 +104,7 @@ public:
   * @brief Sets the object's origin
   * @param origin
   */
-  void setOrigin(double origin[3]) override;
-
-  /**
-  * @brief Sets the object's origin
-  * @param x
-  * @param y
-  * @param z
-  */
-  void setOrigin(double x, double y, double z) override;
+  void setTranslation(double origin[3]);
 
   /**
   * @param Gets the box's transform
@@ -194,17 +186,13 @@ public slots:
   */
   void spinBoxValueChanged();
 
+protected slots:
+  /**
+  * @brief Updates the vtk widget for positioning in global space
+  */
+  virtual void updateGlobalSpace() override;
+
 protected:
-  /**
-  * @brief Updates the widget bounds
-  */
-  void updateBounds() override;
-
-  /**
-  * @brief Updates the widget origin
-  */
-  void updateOrigin() override;
-
   /**
   * @brief Sets the widget's transformation variables
   * @param position
@@ -214,6 +202,7 @@ protected:
   void setValues(double position[3], double rotation[3], double scale[3]);
 
 private:
+  VTK_PTR(vtkTransform) m_UseTransform;
   VTK_PTR(vtkTransform) m_ViewTransform;
   VTK_PTR(vtkBoxWidget2) m_BoxWidget;
   VTK_PTR(vtkBoxRepresentation) m_BoxRep;

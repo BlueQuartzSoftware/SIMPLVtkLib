@@ -118,7 +118,8 @@ void VSThresholdFilterWidget::reset()
   double lastUpperValue = m_ThresholdFilter->getLastMaxValue();
 
   setScalarName(lastArrayName);
-  setScalarRange(lastLowerValue, lastUpperValue);
+  setLowerThreshold(lastLowerValue);
+  setUpperThreshold(lastUpperValue);
 
   cancelChanges();
 }
@@ -188,9 +189,14 @@ void VSThresholdFilterWidget::initRange()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSThresholdFilterWidget::updateRange()
+void VSThresholdFilterWidget::updateRange(QString arrayName)
 {
-  vtkDataArray* dataArray = getDataArray(getScalarName());
+  if(arrayName.isEmpty())
+  {
+    arrayName = getScalarName();
+  }
+
+  vtkDataArray* dataArray = getDataArray(arrayName);
 
   if(dataArray)
   {
@@ -242,7 +248,7 @@ void VSThresholdFilterWidget::setScalarName(QString arrayName)
 {
   m_Internals->scalarsComboBox->setCurrentText(arrayName);
 
-  updateRange();
+  updateRange(arrayName);
 }
 
 // -----------------------------------------------------------------------------
