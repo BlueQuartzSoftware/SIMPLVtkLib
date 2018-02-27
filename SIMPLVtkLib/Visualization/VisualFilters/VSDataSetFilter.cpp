@@ -39,6 +39,7 @@
 #include <QtCore/QMimeDatabase>
 #include <QtCore/QUuid>
 
+#include <vtkBMPReader.h>
 #include <vtkPolyData.h>
 #include <vtkImageData.h>
 #include <vtkRectilinearGrid.h>
@@ -214,6 +215,14 @@ void VSDataSetFilter::readImage()
   else if (mimeType.inherits("image/tiff"))
   {
     VTK_NEW(vtkTIFFReader, imageReader);
+    imageReader->SetFileName(m_FilePath.toLatin1().data());
+    imageReader->Update();
+
+    m_DataSet = imageReader->GetOutput();
+  }
+  else if(mimeType.inherits("image/bmp"))
+  {
+    VTK_NEW(vtkBMPReader, imageReader);
     imageReader->SetFileName(m_FilePath.toLatin1().data());
     imageReader->Update();
 
