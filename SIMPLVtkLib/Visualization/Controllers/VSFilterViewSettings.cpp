@@ -512,7 +512,7 @@ void VSFilterViewSettings::setupActors()
   }
 
   m_DataSetFilter = VTK_PTR(vtkDataSetSurfaceFilter)::New();
-  m_DataSetFilter->SetInputConnection(m_Filter->getOutputPort());
+  m_DataSetFilter->SetInputConnection(m_Filter->getTransformedOutputPort());
   if(outputData->GetPointData() && outputData->GetPointData()->GetScalars())
   {
     m_DataSetFilter->UseStripsOn();
@@ -568,8 +568,8 @@ void VSFilterViewSettings::updateInputPort(VSAbstractFilter* filter)
     return;
   }
 
-  m_DataSetFilter->SetInputConnection(filter->getOutputPort());
-  //m_DataSetFilter->Update();
+  m_DataSetFilter->SetInputConnection(filter->getTransformedOutputPort());
+  m_DataSetFilter->Update();
   emit requiresRender();
 }
 
