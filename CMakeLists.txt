@@ -132,6 +132,7 @@ set(VtkComponents
     vtkGUISupportQt
     vtkRenderingCore
     vtkRenderingFreeType
+    vtkRenderingImage
     vtkRenderingOpenGL2
     vtkRenderingVolumeOpenGL2
     vtkRenderingContextOpenGL2

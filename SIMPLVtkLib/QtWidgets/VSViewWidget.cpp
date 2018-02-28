@@ -154,7 +154,7 @@ void VSViewWidget::toInactiveState()
 // -----------------------------------------------------------------------------
 void VSViewWidget::setFilterShowScalarBar(VSFilterViewSettings* viewSettings, bool showScalarBar)
 {
-  if(nullptr == viewSettings)
+  if(false == (viewSettings && viewSettings->getScalarBarWidget()))
   {
     return;
   }

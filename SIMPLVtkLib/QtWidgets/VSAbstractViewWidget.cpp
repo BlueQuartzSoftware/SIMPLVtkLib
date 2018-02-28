@@ -37,7 +37,7 @@
 
 #include <QtWidgets/QLayout>
 
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractDataFilter.h"
 
 // -----------------------------------------------------------------------------
 //
@@ -121,7 +121,7 @@ void VSAbstractViewWidget::filterAdded(VSAbstractFilter* filter)
 
   createFilterViewSettings(filter);
 
-  if(dynamic_cast<VSSIMPLDataContainerFilter*>(filter))
+  if(dynamic_cast<VSAbstractDataFilter*>(filter))
   {
     getVisualizationWidget()->resetCamera();
   }
@@ -156,14 +156,16 @@ void VSAbstractViewWidget::checkFilterViewSetting(VSFilterViewSettings* setting)
   {
     return;
   }
-  else if(nullptr == setting->getScalarBarWidget())
+
+  setFilterVisibility(setting, setting->isVisible());
+
+  if(nullptr == setting->getScalarBarWidget())
   {
     return;
   }
 
   setting->getScalarBarWidget()->SetInteractor(getVisualizationWidget()->GetInteractor());
 
-  setFilterVisibility(setting, setting->isVisible());
   setFilterShowScalarBar(setting, setting->isScalarBarVisible());
 }
 
@@ -291,7 +293,7 @@ void VSAbstractViewWidget::setFilterVisibility(VSFilterViewSettings* viewSetting
 
   if(filterVisible)
   {
-    getVisualizationWidget()->getRenderer()->AddActor(viewSettings->getActor());
+    getVisualizationWidget()->getRenderer()->AddViewProp(viewSettings->getActor());
 
     if(viewSettings->isScalarBarVisible())
     {
@@ -300,7 +302,7 @@ void VSAbstractViewWidget::setFilterVisibility(VSFilterViewSettings* viewSetting
   }
   else
   {
-    getVisualizationWidget()->getRenderer()->RemoveActor(viewSettings->getActor());
+    getVisualizationWidget()->getRenderer()->RemoveViewProp(viewSettings->getActor());
 
     if(viewSettings->isScalarBarVisible())
     {

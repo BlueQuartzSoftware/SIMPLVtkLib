@@ -36,12 +36,20 @@
 #include "VSFilterViewSettings.h"
 
 #include <vtkAbstractArray.h>
+#include <vtkActor.h>
 #include <vtkCellData.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkDataSetMapper.h>
+#include <vtkImageActor.h>
+#include <vtkImageData.h>
+#include <vtkImageResliceMapper.h>
+#include <vtkMapper.h>
 #include <vtkPointData.h>
 #include <vtkProperty.h>
 #include <vtkTextProperty.h>
+
+
+double* VSFilterViewSettings::NULL_COLOR = new double[3]{ 0.0, 0.0, 0.0 };
 
 // -----------------------------------------------------------------------------
 //
@@ -97,7 +105,7 @@ VSAbstractFilter* VSFilterViewSettings::getFilter()
 // -----------------------------------------------------------------------------
 bool VSFilterViewSettings::isValid()
 {
-  bool valid = m_Mapper && m_Actor && m_ScalarBarWidget;
+  bool valid = m_Mapper && m_Actor;// && m_ScalarBarWidget;
   return valid;
 }
 
@@ -186,15 +194,67 @@ double VSFilterViewSettings::getAlpha()
 // -----------------------------------------------------------------------------
 bool VSFilterViewSettings::isScalarBarVisible()
 {
-  return m_ShowScalarBar;
+  return m_ShowScalarBar && m_ScalarBarWidget;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VTK_PTR(vtkActor) VSFilterViewSettings::getActor()
+VTK_PTR(vtkProp3D) VSFilterViewSettings::getActor()
 {
   return m_Actor;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+vtkDataSetMapper* VSFilterViewSettings::getDataSetMapper()
+{
+  if(ActorType::DataSet == m_ActorType &&  isValid())
+  {
+    return vtkDataSetMapper::SafeDownCast(m_Mapper);
+  }
+
+  return nullptr;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+vtkActor* VSFilterViewSettings::getDataSetActor()
+{
+  if(ActorType::DataSet == m_ActorType && isValid())
+  {
+    return vtkActor::SafeDownCast(m_Actor);
+  }
+
+  return nullptr;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+vtkImageResliceMapper* VSFilterViewSettings::getImageMapper()
+{
+  if(ActorType::Image2D == m_ActorType && isValid())
+  {
+    return vtkImageResliceMapper::SafeDownCast(m_Mapper);
+  }
+
+  return nullptr;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+vtkImageSlice* VSFilterViewSettings::getImageSliceActor()
+{
+  if(ActorType::Image2D == m_ActorType && isValid())
+  {
+    return vtkImageSlice::SafeDownCast(m_Actor);
+  }
+
+  return nullptr;
 }
 
 // -----------------------------------------------------------------------------
@@ -241,12 +301,13 @@ void VSFilterViewSettings::setVisible(bool visible)
 // -----------------------------------------------------------------------------
 vtkDataArray* VSFilterViewSettings::getArrayAtIndex(int index)
 {
-  if(false == isValid())
+  vtkDataSetMapper* dataMapper = getDataSetMapper();
+  if(nullptr == dataMapper)
   {
     return nullptr;
   }
 
-  vtkDataSet* dataSet = m_Mapper->GetInput();
+  vtkDataSet* dataSet = dataMapper->GetInput();
   if(dataSet && dataSet->GetCellData())
   {
     return dataSet->GetCellData()->GetArray(index);
@@ -260,7 +321,7 @@ vtkDataArray* VSFilterViewSettings::getArrayAtIndex(int index)
 // -----------------------------------------------------------------------------
 void VSFilterViewSettings::setActiveArrayIndex(int index)
 {
-  if(false == isValid())
+  if(false == getDataSetMapper())
   {
     return;
   }
@@ -268,7 +329,7 @@ void VSFilterViewSettings::setActiveArrayIndex(int index)
   // Draw a solid color if index is -1
   if(index == -1)
   {
-    m_Mapper->SelectColorArray(-1);
+    getDataSetMapper()->SelectColorArray(-1);
     m_ActiveArray = -1;
 
     emit activeArrayIndexChanged(this, m_ActiveArray);
@@ -298,14 +359,15 @@ void VSFilterViewSettings::setActiveArrayIndex(int index)
 // -----------------------------------------------------------------------------
 void VSFilterViewSettings::setActiveComponentIndex(int index)
 {
-  if(false == isValid())
+  vtkDataSetMapper* mapper = getDataSetMapper();
+  if(nullptr == mapper)
   {
     return;
   }
 
   m_ActiveComponent = index;
 
-  VTK_PTR(vtkScalarsToColors) lookupTable = m_Mapper->GetLookupTable();
+  VTK_PTR(vtkScalarsToColors) lookupTable = mapper->GetLookupTable();
   VTK_PTR(vtkDataArray) dataArray = getArrayAtIndex(m_ActiveArray);
   if(nullptr == dataArray)
   {
@@ -319,8 +381,8 @@ void VSFilterViewSettings::setActiveComponentIndex(int index)
   }
 
   int numComponents = dataArray->GetNumberOfComponents();
-  m_Mapper->ColorByArrayComponent(m_ActiveArray, index);
-  m_Mapper->SetScalarModeToUseCellFieldData();
+  mapper->ColorByArrayComponent(m_ActiveArray, index);
+  mapper->SetScalarModeToUseCellFieldData();
   updateColorMode();
 
   if(numComponents == 1)
@@ -390,7 +452,8 @@ bool VSFilterViewSettings::isColorArray(vtkDataArray* dataArray)
 // -----------------------------------------------------------------------------
 void VSFilterViewSettings::updateColorMode()
 {
-  if(false == isValid())
+  vtkDataSetMapper* mapper = getDataSetMapper();
+  if(nullptr == mapper)
   {
     return;
   }
@@ -400,14 +463,14 @@ void VSFilterViewSettings::updateColorMode()
 
   if(m_MapColors && !unmapColorArray)
   {
-    m_Mapper->SetColorModeToMapScalars();
+    mapper->SetColorModeToMapScalars();
   }
   else
   {
-    m_Mapper->SetColorModeToDirectScalars();
+    mapper->SetColorModeToDirectScalars();
   }
 
-  m_Mapper->Update();
+  mapper->Update();
 }
 
 // -----------------------------------------------------------------------------
@@ -432,7 +495,8 @@ void VSFilterViewSettings::setMapColors(Qt::CheckState mapColorState)
 // -----------------------------------------------------------------------------
 void VSFilterViewSettings::setAlpha(double alpha)
 {
-  if(false == isValid())
+  vtkActor* actor = getDataSetActor();
+  if(nullptr == actor)
   {
     return;
   }
@@ -448,9 +512,9 @@ void VSFilterViewSettings::setAlpha(double alpha)
 
   m_Alpha = alpha;
 
-  vtkProperty* property = m_Actor->GetProperty();
+  vtkProperty* property = actor->GetProperty();
   property->SetOpacity(m_Alpha);
-  m_Actor->SetProperty(property);
+  actor->SetProperty(property);
 
   emit alphaChanged(this, m_Alpha);
   emit requiresRender();
@@ -461,7 +525,7 @@ void VSFilterViewSettings::setAlpha(double alpha)
 // -----------------------------------------------------------------------------
 void VSFilterViewSettings::invertScalarBar()
 {
-  if(false == isValid())
+  if(false == isValid() || nullptr == m_LookupTable)
   {
     return;
   }
@@ -475,7 +539,7 @@ void VSFilterViewSettings::invertScalarBar()
 // -----------------------------------------------------------------------------
 void VSFilterViewSettings::loadPresetColors(const QJsonObject& colors)
 {
-  if(false == isValid())
+  if(false == isValid() || nullptr == m_LookupTable)
   {
     return;
   }
@@ -511,6 +575,50 @@ void VSFilterViewSettings::setupActors()
     return;
   }
 
+  vtkImageData* imageData = dynamic_cast<vtkImageData*>(outputData.Get());
+  if(imageData && imageData->GetDimensions()[2] <= 2)
+  {
+    setupImageActors();
+  }
+  else
+  {
+    setupDataSetActors();
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::setupImageActors()
+{
+  VTK_NEW(vtkImageResliceMapper, mapper);
+  mapper->SetInputConnection(m_Filter->getOutputPort());
+  //mapper->ResampleToScreenPixelsOn();
+  //mapper->SeparateWindowLevelOperationOff();
+  mapper->AutoAdjustImageQualityOn();
+  //mapper->SliceAtFocalPointOn();
+  //mapper->SliceFacesCameraOn();
+  m_Mapper = mapper;
+
+  VTK_NEW(vtkImageSlice, actor);
+  actor->SetMapper(mapper);
+  m_Actor = actor;
+
+  setMapColors(Qt::Unchecked);
+  setScalarBarVisible(false);
+
+  m_ActorType = ActorType::Image2D;
+
+  emit requiresRender();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::setupDataSetActors()
+{
+  VTK_PTR(vtkDataSet) outputData = m_Filter->getOutput();
+
   m_DataSetFilter = VTK_PTR(vtkDataSetSurfaceFilter)::New();
   m_DataSetFilter->SetInputConnection(m_Filter->getTransformedOutputPort());
   if(outputData->GetPointData() && outputData->GetPointData()->GetScalars())
@@ -520,15 +628,16 @@ void VSFilterViewSettings::setupActors()
 
   m_Mapper = VTK_PTR(vtkDataSetMapper)::New();
   m_Mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
+  vtkDataSetMapper* mapper = dynamic_cast<vtkDataSetMapper*>(m_Mapper.Get());
 
   m_Actor = VTK_PTR(vtkActor)::New();
-  m_Actor->SetMapper(m_Mapper);
+  dynamic_cast<vtkActor*>(m_Actor.Get())->SetMapper(mapper);
 
   m_LookupTable = new VSLookupTableController();
-  m_Mapper->SetLookupTable(m_LookupTable->getColorTransferFunction());
+  mapper->SetLookupTable(m_LookupTable->getColorTransferFunction());
 
   m_ScalarBarActor = VTK_PTR(vtkScalarBarActor)::New();
-  m_ScalarBarActor->SetLookupTable(m_Mapper->GetLookupTable());
+  m_ScalarBarActor->SetLookupTable(mapper->GetLookupTable());
   m_ScalarBarWidget = VTK_PTR(vtkScalarBarWidget)::New();
   m_ScalarBarWidget->SetScalarBarActor(m_ScalarBarActor);
 
@@ -556,6 +665,8 @@ void VSFilterViewSettings::setupActors()
     setMapColors(Qt::Unchecked);
     setScalarBarVisible(false);
   }
+
+  m_ActorType = ActorType::DataSet;
 }
 
 // -----------------------------------------------------------------------------
@@ -604,12 +715,13 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
 // -----------------------------------------------------------------------------
 double* VSFilterViewSettings::getSolidColor()
 {
-  if(false == isValid())
+  vtkActor* actor = getDataSetActor();
+  if(nullptr == actor)
   {
-    return nullptr;
+    return NULL_COLOR;
   }
 
-  return m_Actor->GetProperty()->GetColor();
+  return actor->GetProperty()->GetColor();
 }
 
 // -----------------------------------------------------------------------------
@@ -617,12 +729,13 @@ double* VSFilterViewSettings::getSolidColor()
 // -----------------------------------------------------------------------------
 void VSFilterViewSettings::setSolidColor(double color[3])
 {
-  if(false == isValid())
+  vtkActor* actor = getDataSetActor();
+  if(nullptr == actor)
   {
     return;
   }
 
-  m_Actor->GetProperty()->SetColor(color);
+  actor->GetProperty()->SetColor(color);
 
   emit solidColorChanged(this, color);
   emit requiresRender();
@@ -633,13 +746,14 @@ void VSFilterViewSettings::setSolidColor(double color[3])
 // -----------------------------------------------------------------------------
 VSFilterViewSettings::Representation VSFilterViewSettings::getRepresentation()
 {
-  if(false == isValid())
+  vtkActor* actor = getDataSetActor();
+  if(nullptr == actor)
   {
     return Representation::Invalid;
   }
 
-  vtkProperty* property = m_Actor->GetProperty();
-  int rep = property->GetRepresentation();
+  vtkProperty* property = actor->GetProperty();
+  Representation rep = static_cast<Representation>(property->GetRepresentation());
   int edges = property->GetEdgeVisibility();
 
   if(1 == edges && Representation::Surface == rep)
@@ -647,7 +761,15 @@ VSFilterViewSettings::Representation VSFilterViewSettings::getRepresentation()
     return Representation::SurfaceWithEdges;
   }
 
-  return static_cast<Representation>(rep);
+  return rep;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+int VSFilterViewSettings::getRepresentationi()
+{
+  return static_cast<int>(getRepresentation());
 }
 
 // -----------------------------------------------------------------------------
@@ -655,20 +777,21 @@ VSFilterViewSettings::Representation VSFilterViewSettings::getRepresentation()
 // -----------------------------------------------------------------------------
 void VSFilterViewSettings::setRepresentation(Representation type)
 {
-  if(false == isValid())
+  vtkActor* actor = getDataSetActor();
+  if(nullptr == actor)
   {
     return;
   }
 
   if(type == Representation::SurfaceWithEdges)
   {
-    m_Actor->GetProperty()->SetRepresentation(Representation::Surface);
-    m_Actor->GetProperty()->EdgeVisibilityOn();
+    actor->GetProperty()->SetRepresentation(static_cast<int>(Representation::Surface));
+    actor->GetProperty()->EdgeVisibilityOn();
   }
   else
   {
-    m_Actor->GetProperty()->SetRepresentation(type);
-    m_Actor->GetProperty()->EdgeVisibilityOff();
+    actor->GetProperty()->SetRepresentation(static_cast<int>(type));
+    actor->GetProperty()->EdgeVisibilityOff();
   }
 
   emit representationChanged(this, type);

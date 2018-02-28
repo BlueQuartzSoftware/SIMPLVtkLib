@@ -343,7 +343,7 @@ void VSInfoWidget::updateViewSettingInfo()
   m_Internals->viewSettingsWidget->setEnabled(validSettings);
 
   // Representation
-  m_Internals->representationCombo->setCurrentIndex(m_ViewSettings->getRepresentation());
+  m_Internals->representationCombo->setCurrentIndex(m_ViewSettings->getRepresentationi());
 
   int activeArrayIndex = m_ViewSettings->getActiveArrayIndex();
   int activeComponentIndex = m_ViewSettings->getActiveComponentIndex() + 1;
@@ -546,7 +546,8 @@ void VSInfoWidget::colorButtonChanged(QColor color)
 // -----------------------------------------------------------------------------
 void VSInfoWidget::listenRepresentationType(VSFilterViewSettings* settings, VSFilterViewSettings::Representation rep)
 {
-  m_Internals->representationCombo->setCurrentIndex(rep);
+  int index = static_cast<int>(rep);
+  m_Internals->representationCombo->setCurrentIndex(index);
 }
 
 // -----------------------------------------------------------------------------
@@ -594,6 +595,11 @@ void VSInfoWidget::listenScalarBar(VSFilterViewSettings* settings, bool show)
 // -----------------------------------------------------------------------------
 void VSInfoWidget::listenSolidColor(VSFilterViewSettings* settings, double* color)
 {
+  if(nullptr == color)
+  {
+    return;
+  }
+
   QColor newColor = QColor::fromRgbF(color[0], color[1], color[2]);
   m_Internals->colorBtn->setColor(newColor, false);
 }
