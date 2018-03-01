@@ -86,9 +86,9 @@ SIMPLVtkBridge::~SIMPLVtkBridge()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-std::vector<SIMPLVtkBridge::WrappedDataContainerPtr> SIMPLVtkBridge::WrapDataContainerArrayAsStruct(DataContainerArray::Pointer dca, AttributeMatrix::Types types)
+SIMPLVtkBridge::WrappedDataContainerPtrCollection SIMPLVtkBridge::WrapDataContainerArrayAsStruct(DataContainerArray::Pointer dca, AttributeMatrix::Types types)
 {
-  std::vector<SIMPLVtkBridge::WrappedDataContainerPtr> wrappedDataContainers;
+  SIMPLVtkBridge::WrappedDataContainerPtrCollection wrappedDataContainers;
 
   if(!dca)
   {
@@ -170,9 +170,9 @@ SIMPLVtkBridge::WrappedDataContainerPtr SIMPLVtkBridge::WrapDataContainerAsStruc
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-std::vector<SIMPLVtkBridge::WrappedDataArrayPtr> SIMPLVtkBridge::WrapAttributeMatrixAsStructs(AttributeMatrix::Pointer attrMat)
+SIMPLVtkBridge::WrappedDataArrayPtrCollection SIMPLVtkBridge::WrapAttributeMatrixAsStructs(AttributeMatrix::Pointer attrMat)
 {
-  std::vector<WrappedDataArrayPtr> wrappedDataArrays;
+  WrappedDataArrayPtrCollection wrappedDataArrays;
 
   if(!attrMat)
   {
