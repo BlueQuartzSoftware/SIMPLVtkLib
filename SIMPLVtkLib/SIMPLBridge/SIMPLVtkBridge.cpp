@@ -36,6 +36,7 @@
 #include "SIMPLVtkBridge.h"
 
 #include <vtkCellData.h>
+#include <vtkCellDataToPointData.h>
 #include <vtkCharArray.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkDataArray.h>
@@ -49,12 +50,14 @@
 #include <vtkMappedUnstructuredGrid.h>
 #include <vtkNamedColors.h>
 #include <vtkPoints.h>
+#include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkPolygon.h>
 #include <vtkRectilinearGrid.h>
 #include <vtkScalarBarActor.h>
 #include <vtkScalarBarWidget.h>
 #include <vtkShortArray.h>
+#include <vtkStructuredPoints.h>
 #include <vtkTextProperty.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedIntArray.h>
@@ -154,9 +157,48 @@ SIMPLVtkBridge::WrappedDataContainerPtr SIMPLVtkBridge::WrapDataContainerAsStruc
           cellData->AddArray((*cellDataIter)->m_VtkArray);
         }
 
+        // Create point data from cell data
+        VTK_NEW(vtkCellDataToPointData, cell2Point);
+        cell2Point->SetInputData(dataSet);
+        cell2Point->PassCellDataOn();
+        cell2Point->Update();
+        
+        vtkDataSet* pointDataSet = nullptr;
+        switch(dataSet->GetDataObjectType())
+        {
+        case VTK_IMAGE_DATA:
+          pointDataSet = cell2Point->GetImageDataOutput();
+          break;
+        case VTK_STRUCTURED_GRID:
+          pointDataSet = cell2Point->GetUnstructuredGridOutput();
+          break;
+        case VTK_RECTILINEAR_GRID:
+          pointDataSet = cell2Point->GetRectilinearGridOutput();
+          break;
+        case VTK_STRUCTURED_POINTS:
+          pointDataSet = cell2Point->GetStructuredPointsOutput();
+          break;
+        case VTK_UNSTRUCTURED_GRID:
+          pointDataSet = cell2Point->GetUnstructuredGridOutput();
+          break;
+        case VTK_POLY_DATA:
+          pointDataSet = cell2Point->GetPolyDataOutput();
+          break;
+        default:
+          pointDataSet = cell2Point->GetOutput();
+          break;
+        }
+        dataSet->DeepCopy(pointDataSet);
+
+        // Set the active cell / point data scalars
         if(cellData->GetNumberOfArrays() > 0)
         {
           cellData->SetActiveScalars(cellData->GetArray(0)->GetName());
+        }
+        vtkPointData* pointData = dataSet->GetPointData();
+        if(pointData->GetNumberOfArrays() > 0)
+        {
+          pointData->SetActiveScalars(pointData->GetArray(0)->GetName());
         }
       }
     }

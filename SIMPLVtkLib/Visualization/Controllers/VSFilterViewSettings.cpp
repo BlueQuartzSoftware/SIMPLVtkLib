@@ -41,13 +41,12 @@
 #include <vtkColorTransferFunction.h>
 #include <vtkDataSetMapper.h>
 #include <vtkImageActor.h>
+#include <vtkImageSliceMapper.h>
 #include <vtkImageData.h>
-#include <vtkImageResliceMapper.h>
 #include <vtkMapper.h>
 #include <vtkPointData.h>
 #include <vtkProperty.h>
 #include <vtkTextProperty.h>
-
 
 double* VSFilterViewSettings::NULL_COLOR = new double[3]{ 0.0, 0.0, 0.0 };
 
@@ -212,7 +211,7 @@ vtkDataSetMapper* VSFilterViewSettings::getDataSetMapper()
 {
   if(ActorType::DataSet == m_ActorType &&  isValid())
   {
-    return vtkDataSetMapper::SafeDownCast(m_Mapper);
+    return dynamic_cast<vtkDataSetMapper*>(m_Mapper.Get());
   }
 
   return nullptr;
@@ -234,11 +233,11 @@ vtkActor* VSFilterViewSettings::getDataSetActor()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-vtkImageResliceMapper* VSFilterViewSettings::getImageMapper()
+vtkImageSliceMapper* VSFilterViewSettings::getImageMapper()
 {
   if(ActorType::Image2D == m_ActorType && isValid())
   {
-    return vtkImageResliceMapper::SafeDownCast(m_Mapper);
+    return dynamic_cast<vtkImageSliceMapper*>(m_Mapper.Get());
   }
 
   return nullptr;
@@ -251,7 +250,7 @@ vtkImageSlice* VSFilterViewSettings::getImageSliceActor()
 {
   if(ActorType::Image2D == m_ActorType && isValid())
   {
-    return vtkImageSlice::SafeDownCast(m_Actor);
+    return dynamic_cast<vtkImageSlice*>(m_Actor.Get());
   }
 
   return nullptr;
@@ -575,8 +574,7 @@ void VSFilterViewSettings::setupActors()
     return;
   }
 
-  vtkImageData* imageData = dynamic_cast<vtkImageData*>(outputData.Get());
-  if(imageData && imageData->GetDimensions()[2] <= 2)
+  if(isFlatImage())
   {
     setupImageActors();
   }
@@ -589,18 +587,50 @@ void VSFilterViewSettings::setupActors()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+bool VSFilterViewSettings::isFlatImage()
+{
+  VTK_PTR(vtkDataSet) outputData = m_Filter->getOutput();
+  if(nullptr == outputData)
+  {
+    return false;
+  }
+
+  vtkImageData* imageData = dynamic_cast<vtkImageData*>(outputData.Get());
+  if(nullptr == imageData)
+  {
+    return false;
+  }
+
+  if(imageData->GetPointData()->GetNumberOfArrays() != 1)
+  {
+    return false;
+  }
+
+  // Check extents
+  int* extent = imageData->GetExtent();
+  for(int i = 0; i < 3; i++)
+  {
+    if(extent[2 * i + 1] - extent[2 * i] <= 1)
+    {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSFilterViewSettings::setupImageActors()
 {
-  VTK_NEW(vtkImageResliceMapper, mapper);
+  vtkImageSliceMapper* mapper = vtkImageSliceMapper::New();
   mapper->SetInputConnection(m_Filter->getOutputPort());
-  //mapper->ResampleToScreenPixelsOn();
-  //mapper->SeparateWindowLevelOperationOff();
-  mapper->AutoAdjustImageQualityOn();
-  //mapper->SliceAtFocalPointOn();
-  //mapper->SliceFacesCameraOn();
+  mapper->SliceAtFocalPointOn();
+  mapper->SliceFacesCameraOn();
   m_Mapper = mapper;
 
-  VTK_NEW(vtkImageSlice, actor);
+  vtkImageSlice* actor = vtkImageSlice::New();
   actor->SetMapper(mapper);
   m_Actor = actor;
 
@@ -679,8 +709,15 @@ void VSFilterViewSettings::updateInputPort(VSAbstractFilter* filter)
     return;
   }
 
-  m_DataSetFilter->SetInputConnection(filter->getTransformedOutputPort());
-  m_DataSetFilter->Update();
+  if(m_DataSetFilter)
+  {
+    m_DataSetFilter->SetInputConnection(filter->getTransformedOutputPort());
+    m_DataSetFilter->Update();
+  }
+  else
+  {
+    m_Mapper->SetInputConnection(filter->getTransformedOutputPort());
+  }
   emit requiresRender();
 }
 

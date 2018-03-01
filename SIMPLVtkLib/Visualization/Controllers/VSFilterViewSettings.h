@@ -53,7 +53,7 @@
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
 class vtkDataSetMapper;
-class vtkImageResliceMapper;
+class vtkImageSliceMapper;
 class vtkImageSlice;
 
 /**
@@ -304,9 +304,11 @@ protected:
 
   vtkActor* getDataSetActor();
 
-  vtkImageResliceMapper* getImageMapper();
+  vtkImageSliceMapper* getImageMapper();
 
   vtkImageSlice* getImageSliceActor();
+
+  bool isFlatImage();
 
   /**
   * @brief Sets the visual filter makes any Qt connections required
