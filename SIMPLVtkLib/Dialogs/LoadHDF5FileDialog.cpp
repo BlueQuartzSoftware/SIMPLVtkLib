@@ -33,69 +33,109 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "VSImportThread.h"
+#include "LoadHDF5FileDialog.h"
 
-#include "SIMPLVtkLib/Visualization/Controllers/VSController.h"
-#include "SIMPLVtkLib/Visualization/Controllers/VSFilterModel.h"
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
+#include "SIMPLib/DataContainers/DataContainerArrayProxy.h"
+
+#include "SIMPLVtkLib/Dialogs/Utilities/DREAM3DFileTreeModel.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSImportThread::VSImportThread(VSController* controller)
-: QThread(controller)
-, m_Controller(controller)
+LoadHDF5FileDialog::LoadHDF5FileDialog(QWidget* parent) :
+  QDialog(parent)
 {
+  setupUi(this);
 
+  setupGui();
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSImportThread::addDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
+LoadHDF5FileDialog::~LoadHDF5FileDialog()
 {
-  VSFileNameFilter* fileFilter = new VSFileNameFilter(filePath);
-  addDataContainerArray(std::make_pair(fileFilter, dca));
+  
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSImportThread::addDataContainerArray(DcaFilePair fileDcPair)
+void LoadHDF5FileDialog::setupGui()
 {
-  m_WrappedList.push_back(fileDcPair);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSImportThread::run()
-{
-  while(m_WrappedList.size() > 0)
-  {
-    DcaFilePair filePair = m_WrappedList.front();
-    importDataContainerArray(filePair);
-
-    m_WrappedList.pop_front();
-  }
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSImportThread::importDataContainerArray(DcaFilePair filePair)
-{
-  VSFileNameFilter* fileFilter = filePair.first;
-  DataContainerArray::Pointer dca = filePair.second;
-  m_Controller->getFilterModel()->addFilter(fileFilter);
-  wait(1);
-
-  for(DataContainer::Pointer dc : dca->getDataContainers())
-  {
-    SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
-    if(wrappedDc)
+  DREAM3DFileTreeModel* model = new DREAM3DFileTreeModel();
+  connect(model, &DREAM3DFileTreeModel::dataChanged, [=] {
+    bool allChecked = true;
+    Qt::CheckState checkState = Qt::Unchecked;
+    for (int i = 0; i < model->rowCount(); i++)
     {
-      importDataContainer(fileFilter, wrappedDc);
+      QModelIndex dcIndex = model->index(i, DREAM3DFileItem::Name);
+      if (model->getCheckState(dcIndex) == Qt::Checked)
+      {
+        checkState = Qt::PartiallyChecked;
+      }
+      else
+      {
+        allChecked = false;
+      }
+    }
+
+    if (allChecked == true)
+    {
+      checkState = Qt::Checked;
+    }
+
+    selectAllCB->blockSignals(true);
+    selectAllCB->setCheckState(checkState);
+    selectAllCB->blockSignals(false);
+
+    checkState == Qt::Unchecked ? loadBtn->setEnabled(false) : loadBtn->setEnabled(true);
+  });
+
+  connect(selectAllCB, &QCheckBox::stateChanged, [=] (int state) {
+    Qt::CheckState checkState = static_cast<Qt::CheckState>(state);
+    if (checkState == Qt::PartiallyChecked)
+    {
+      selectAllCB->setCheckState(Qt::Checked);
+      return;
+    }
+
+    for (int i = 0; i < model->rowCount(); i++)
+    {
+      QModelIndex dcIndex = model->index(i, DREAM3DFileItem::Name);
+      model->setData(dcIndex, checkState, Qt::CheckStateRole);
+    }
+  });
+
+  treeView->setModel(model);
+
+  connect(loadBtn, &QPushButton::clicked, [=] {
+    accept();
+  });
+
+  connect(cancelBtn, &QPushButton::clicked, [=] {
+    reject();
+  });
+
+  loadBtn->setDisabled(true);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void LoadHDF5FileDialog::setProxy(DataContainerArrayProxy proxy)
+{
+  DREAM3DFileTreeModel* model = static_cast<DREAM3DFileTreeModel*>(treeView->model());
+  if (model != nullptr)
+  {
+    model->populateTreeWithProxy(proxy);
+    selectAllCB->setChecked(true);
+
+    QModelIndexList indexes = model->match(model->index(0, 0), Qt::DisplayRole, "*", -1, Qt::MatchWildcard|Qt::MatchRecursive);
+    for (int i = 0; i < indexes.size(); i++)
+    {
+      QModelIndex index = indexes[i];
+      treeView->expand(index);
     }
   }
 }
@@ -103,9 +143,14 @@ void VSImportThread::importDataContainerArray(DcaFilePair filePair)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSImportThread::importDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc)
+DataContainerArrayProxy LoadHDF5FileDialog::getDataStructureProxy()
 {
-  VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, fileFilter);
-  m_Controller->getFilterModel()->addFilter(filter);
-  wait(1);
+  DREAM3DFileTreeModel* model = static_cast<DREAM3DFileTreeModel*>(treeView->model());
+  if (model == nullptr)
+  {
+    return DataContainerArrayProxy();
+  }
+
+  return model->getModelProxy();
 }
+

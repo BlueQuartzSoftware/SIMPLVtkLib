@@ -1,5 +1,5 @@
 /* ============================================================================
-* Copyright (c) 2009-2017 BlueQuartz Software, LLC
+* Copyright (c) 2009-2016 BlueQuartz Software, LLC
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -35,74 +35,64 @@
 
 #pragma once
 
-#include <QtGui/QStandardItemModel>
+#include <QtCore/QList>
+#include <QtCore/QVariant>
+#include <QtCore/QVector>
 
-#include "SIMPLVtkLib/Visualization/Controllers/VSFilterViewSettings.h"
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilter.h"
+#include <QtGui/QIcon>
 
-#include "SIMPLVtkLib/SIMPLVtkLib.h"
+#include "SIMPLib/Common/SIMPLibSetGetMacros.h"
 
-/**
-* @class VSFilterModel VSFilterModel.h SIMPLVtkLib/QtWidgets/VSFilterModel.h
-* @brief This class handles the visual filter model for the VSController.
-*/
-class SIMPLVtkLib_EXPORT VSFilterModel : public QStandardItemModel
+class DREAM3DFileItem
 {
-  Q_OBJECT
+  public:
+    DREAM3DFileItem(const QVector<QVariant>& data, DREAM3DFileItem* parent = 0);
+    virtual ~DREAM3DFileItem();
 
-public:
-  /**
-  * @brief Constructor
-  * @param parent
-  */
-  VSFilterModel(QObject* parent = nullptr);
+    enum ColumnData
+    {
+      Name
+    };
 
-  /**
-  * @brief Adds a filter to the model
-  * @param filter
-  */
-  void addFilter(VSAbstractFilter* filter, bool currentFilter = true);
+    enum class ItemType : unsigned int
+    {
+      Unknown,
+      DataContainer,
+      AttributeMatrix,
+      DataArray,
+    };
 
-  /**
-  * @brief Removes a filter from the model
-  * @param filter
-  */
-  void removeFilter(VSAbstractFilter* filter);
+    SIMPL_INSTANCE_PROPERTY(Qt::CheckState, CheckState)
+    SIMPL_INSTANCE_PROPERTY(DREAM3DFileItem::ItemType, ItemType)
+    SIMPL_INSTANCE_PROPERTY(QIcon, Icon)
+    SIMPL_INSTANCE_PROPERTY(QString, ItemTooltip)
 
-  /**
-  * @brief Returns the visual filter stored at the given index
-  * @param index
-  * @return
-  */
-  VSAbstractFilter* getFilterFromIndex(QModelIndex index);
+    DREAM3DFileItem* child(int number);
+    DREAM3DFileItem* parent();
 
-  /**
-  * @brief Returns the model index of the given filter
-  * @param filter
-  * @return
-  */
-  QModelIndex getIndexFromFilter(VSAbstractFilter* filter);
+    int childCount() const;
+    int columnCount() const;
 
-  /**
-  * @brief Returns a vector of top-level filters in the model
-  * @return
-  */
-  QVector<VSAbstractFilter*> getBaseFilters();
+    QVariant data(int column) const;
+    bool setData(int column, const QVariant& value);
 
-  /**
-  * @brief Returns a vector of all visual filters in the model
-  */
-  QVector<VSAbstractFilter*> getAllFilters();
+    bool insertChild(int position, DREAM3DFileItem* child);
+    bool insertChildren(int position, int count, int columns);
+    bool insertColumns(int position, int columns);
 
-signals:
-  void filterAdded(VSAbstractFilter* filter, bool currentFilter);
-  void filterRemoved(VSAbstractFilter* filter);
+    bool removeChild(int position);
+    bool removeChildren(int position, int count);
+    bool removeColumns(int position, int columns);
 
-public slots:
-  /**
-  * @brief Updates the model to reflect the view settings found in a given view controller
-  * @param viewSettings
-  */
-  void updateModelForView(VSFilterViewSettings::Map viewSettings);
+    int childNumber() const;
+
+    void setParent(DREAM3DFileItem* parent);
+
+  private:
+    QList<DREAM3DFileItem*>               m_ChildItems;
+    QVector<QVariant>                     m_ItemData;
+    DREAM3DFileItem*                      m_ParentItem;
+
+    DREAM3DFileItem(const DREAM3DFileItem&);    // Copy Constructor Not Implemented
+    void operator=(const DREAM3DFileItem&);  // Operator '=' Not Implemented
 };
-

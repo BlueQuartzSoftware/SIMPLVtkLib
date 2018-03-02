@@ -1,5 +1,5 @@
 /* ============================================================================
-* Copyright (c) 2009-2017 BlueQuartz Software, LLC
+* Copyright (c) 2009-2015 BlueQuartz Software, LLC
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -35,74 +35,45 @@
 
 #pragma once
 
-#include <QtGui/QStandardItemModel>
+#include <list>
+#include <utility>
 
-#include "SIMPLVtkLib/Visualization/Controllers/VSFilterViewSettings.h"
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilter.h"
+#include <QtCore/QSemaphore>
+#include <QtCore/QFutureWatcher>
 
+#include "SIMPLib/DataContainers/DataContainerArray.h"
+
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSFileNameFilter.h"
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
-/**
-* @class VSFilterModel VSFilterModel.h SIMPLVtkLib/QtWidgets/VSFilterModel.h
-* @brief This class handles the visual filter model for the VSController.
-*/
-class SIMPLVtkLib_EXPORT VSFilterModel : public QStandardItemModel
+class VSController;
+
+class SIMPLVtkLib_EXPORT VSConcurrentImport : public QObject
 {
   Q_OBJECT
 
 public:
-  /**
-  * @brief Constructor
-  * @param parent
-  */
-  VSFilterModel(QObject* parent = nullptr);
+  using DcaFilePair = std::pair<VSFileNameFilter*, DataContainerArray::Pointer>;
 
-  /**
-  * @brief Adds a filter to the model
-  * @param filter
-  */
-  void addFilter(VSAbstractFilter* filter, bool currentFilter = true);
+  VSConcurrentImport(VSController* parent);
 
-  /**
-  * @brief Removes a filter from the model
-  * @param filter
-  */
-  void removeFilter(VSAbstractFilter* filter);
+  void addDataContainerArray(QString filePath, DataContainerArray::Pointer dca);
 
-  /**
-  * @brief Returns the visual filter stored at the given index
-  * @param index
-  * @return
-  */
-  VSAbstractFilter* getFilterFromIndex(QModelIndex index);
+  void run();
 
-  /**
-  * @brief Returns the model index of the given filter
-  * @param filter
-  * @return
-  */
-  QModelIndex getIndexFromFilter(VSAbstractFilter* filter);
+protected:
+  void addDataContainerArray(DcaFilePair wrappedFileDc);
+  void importDataContainerArray(DcaFilePair filePair);
+  void importDataContainer(VSFileNameFilter* fileFilter);
+  void importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
 
-  /**
-  * @brief Returns a vector of top-level filters in the model
-  * @return
-  */
-  QVector<VSAbstractFilter*> getBaseFilters();
+private:
+  VSController* m_Controller;
+  std::list<DcaFilePair> m_WrappedList;
 
-  /**
-  * @brief Returns a vector of all visual filters in the model
-  */
-  QVector<VSAbstractFilter*> getAllFilters();
+  QList<DataContainerShPtr> m_ImportDataContainerOrder;
+  QSemaphore m_ImportDataContainerOrderLock;
+  QVector< QSharedPointer<QFutureWatcher<void>> > m_ImportDataContainerWatchers;
+  int m_NumOfFinishedImportDataContainerThreads = 0;
 
-signals:
-  void filterAdded(VSAbstractFilter* filter, bool currentFilter);
-  void filterRemoved(VSAbstractFilter* filter);
-
-public slots:
-  /**
-  * @brief Updates the model to reflect the view settings found in a given view controller
-  * @param viewSettings
-  */
-  void updateModelForView(VSFilterViewSettings::Map viewSettings);
 };
-

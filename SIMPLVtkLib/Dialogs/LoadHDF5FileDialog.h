@@ -1,5 +1,5 @@
 /* ============================================================================
-* Copyright (c) 2009-2017 BlueQuartz Software, LLC
+* Copyright (c) 2009-2015 BlueQuartz Software, LLC
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -35,74 +35,37 @@
 
 #pragma once
 
-#include <QtGui/QStandardItemModel>
+#include <QtWidgets/QDialog>
 
-#include "SIMPLVtkLib/Visualization/Controllers/VSFilterViewSettings.h"
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilter.h"
+#include "ui_LoadHDF5FileDialog.h"
 
-#include "SIMPLVtkLib/SIMPLVtkLib.h"
+class DataContainerArrayProxy;
 
-/**
-* @class VSFilterModel VSFilterModel.h SIMPLVtkLib/QtWidgets/VSFilterModel.h
-* @brief This class handles the visual filter model for the VSController.
-*/
-class SIMPLVtkLib_EXPORT VSFilterModel : public QStandardItemModel
+class LoadHDF5FileDialog : public QDialog, public Ui::LoadHDF5FileDialog
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  /**
-  * @brief Constructor
-  * @param parent
-  */
-  VSFilterModel(QObject* parent = nullptr);
+  public:
+    LoadHDF5FileDialog(QWidget* parent = 0);
+    ~LoadHDF5FileDialog();
 
-  /**
-  * @brief Adds a filter to the model
-  * @param filter
-  */
-  void addFilter(VSAbstractFilter* filter, bool currentFilter = true);
+    /**
+     * @brief getLoadProxy
+     * @return
+     */
+    DataContainerArrayProxy getDataStructureProxy();
 
-  /**
-  * @brief Removes a filter from the model
-  * @param filter
-  */
-  void removeFilter(VSAbstractFilter* filter);
+    /**
+     * @brief setProxy
+     * @param proxy
+     */
+    void setProxy(DataContainerArrayProxy proxy);
 
-  /**
-  * @brief Returns the visual filter stored at the given index
-  * @param index
-  * @return
-  */
-  VSAbstractFilter* getFilterFromIndex(QModelIndex index);
+  protected:
+    void setupGui();
 
-  /**
-  * @brief Returns the model index of the given filter
-  * @param filter
-  * @return
-  */
-  QModelIndex getIndexFromFilter(VSAbstractFilter* filter);
+  private:
 
-  /**
-  * @brief Returns a vector of top-level filters in the model
-  * @return
-  */
-  QVector<VSAbstractFilter*> getBaseFilters();
-
-  /**
-  * @brief Returns a vector of all visual filters in the model
-  */
-  QVector<VSAbstractFilter*> getAllFilters();
-
-signals:
-  void filterAdded(VSAbstractFilter* filter, bool currentFilter);
-  void filterRemoved(VSAbstractFilter* filter);
-
-public slots:
-  /**
-  * @brief Updates the model to reflect the view settings found in a given view controller
-  * @param viewSettings
-  */
-  void updateModelForView(VSFilterViewSettings::Map viewSettings);
+    LoadHDF5FileDialog(const LoadHDF5FileDialog&); // Copy Constructor Not Implemented
+    void operator=(const LoadHDF5FileDialog&); // Operator '=' Not Implemented
 };
-

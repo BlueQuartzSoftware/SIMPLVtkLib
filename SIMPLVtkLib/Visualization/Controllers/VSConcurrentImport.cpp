@@ -1,5 +1,5 @@
 /* ============================================================================
-* Copyright (c) 2009-2017 BlueQuartz Software, LLC
+* Copyright (c) 2009-2015 BlueQuartz Software, LLC
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -33,137 +33,115 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "VSFilterModel.h"
+#include "VSConcurrentImport.h"
+
+#include <QtConcurrent>
+
+#include "SIMPLVtkLib/Visualization/Controllers/VSController.h"
+#include "SIMPLVtkLib/Visualization/Controllers/VSFilterModel.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSFilterModel::VSFilterModel(QObject* parent)
-  : QStandardItemModel(parent)
+VSConcurrentImport::VSConcurrentImport(VSController* controller)
+: QObject()
+, m_Controller(controller)
+, m_ImportDataContainerOrderLock(1)
 {
+
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSFilterModel::addFilter(VSAbstractFilter* filter, bool currentFilter)
+void VSConcurrentImport::addDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
 {
-  if(nullptr == filter)
-  {
-    return;
-  }
-
-  if(nullptr == filter->getParentFilter())
-  {
-    appendRow(filter);
-  }
-
-  emit filterAdded(filter, currentFilter);
+  VSFileNameFilter* fileFilter = new VSFileNameFilter(filePath);
+  addDataContainerArray(std::make_pair(fileFilter, dca));
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSFilterModel::removeFilter(VSAbstractFilter* filter)
+void VSConcurrentImport::addDataContainerArray(DcaFilePair fileDcPair)
 {
-  if(nullptr == filter)
-  {
-    return;
-  }
-
-  emit filterRemoved(filter);
-
-  if(filter->getParentFilter())
-  {
-    filter->deleteFilter();
-  }
-  else
-  {
-    QModelIndex index = getIndexFromFilter(filter);
-    removeRow(index.row());
-  }
-
-  //filter->deleteLater();
-  submit();
+  m_WrappedList.push_back(fileDcPair);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSAbstractFilter* VSFilterModel::getFilterFromIndex(QModelIndex index)
+void VSConcurrentImport::run()
 {
-  if(false == index.parent().isValid())
+  while(m_WrappedList.size() > 0)
   {
-    return dynamic_cast<VSAbstractFilter*>(item(index.row(), index.column()));
-  }
-  else
-  {
-    int i = index.row();
-    VSAbstractFilter* parentFilter = getFilterFromIndex(index.parent());
-    return parentFilter->getChild(i);
+    DcaFilePair filePair = m_WrappedList.front();
+    importDataContainerArray(filePair);
+
+    m_WrappedList.pop_front();
   }
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QModelIndex VSFilterModel::getIndexFromFilter(VSAbstractFilter* filter)
+void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 {
-  if (filter == nullptr)
-  {
-    return QModelIndex();
-  }
+  VSFileNameFilter* fileFilter = filePair.first;
+  DataContainerArray::Pointer dca = filePair.second;
+  m_Controller->getFilterModel()->addFilter(fileFilter);
 
-  return filter->index();
+  m_ImportDataContainerOrder = dca->getDataContainers();
+
+  size_t threadCount = QThreadPool::globalInstance()->maxThreadCount();
+  for (int i = 0; i < threadCount; i++)
+  {
+    //      QSharedPointer<QFutureWatcher<void>> watcher(new QFutureWatcher<void>());
+    //      connect(watcher.data(), &QFutureWatcher<void>::finished, this, [=] {
+    //        m_NumOfFinishedImportDataContainerThreads++;
+
+    //        if (m_NumOfFinishedImportDataContainerThreads == threadCount)
+    //        {
+
+    //        }
+    //      });
+
+    QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::importDataContainer, fileFilter);
+    //      watcher->setFuture(future);
+
+    //      m_ImportDataContainerWatchers.push_back(watcher);
+  }
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QVector<VSAbstractFilter*> VSFilterModel::getBaseFilters()
+void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
 {
-  QVector<VSAbstractFilter*> filters;
-
-  int count = rowCount();
-  for(int i = 0; i < count; i++)
+  while (m_ImportDataContainerOrder.size() > 0)
   {
-    QModelIndex modelIndex = index(i, 0);
-    VSAbstractFilter* filter = getFilterFromIndex(modelIndex);
-    if(filter)
+    if (m_ImportDataContainerOrderLock.tryAcquire() == true)
     {
-      filters.push_back(filter);
+      DataContainer::Pointer dc = m_ImportDataContainerOrder.front();
+      m_ImportDataContainerOrder.pop_front();
+
+      m_ImportDataContainerOrderLock.release();
+
+      SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
+      if(wrappedDc)
+      {
+        importWrappedDataContainer(fileFilter, wrappedDc);
+      }
     }
   }
-
-  return filters;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QVector<VSAbstractFilter*> VSFilterModel::getAllFilters()
+void VSConcurrentImport::importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc)
 {
-  QVector<VSAbstractFilter*> filters = getBaseFilters();
-
-  int count = filters.size();
-  for(int i = 0; i < count; i++)
-  {
-    filters.push_back(filters[i]);
-    filters.append(filters[i]->getDescendants());
-  }
-
-  return filters;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSFilterModel::updateModelForView(VSFilterViewSettings::Map viewSettings)
-{
-  for(auto iter = viewSettings.begin(); iter != viewSettings.end(); iter++)
-  {
-    VSFilterViewSettings* settings = iter->second;
-    VSAbstractFilter* filter = settings->getFilter();
-    filter->setCheckState(settings->isVisible() ? Qt::Checked : Qt::Unchecked);
-  }
+  VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, fileFilter);
+  m_Controller->getFilterModel()->addFilter(filter);
 }

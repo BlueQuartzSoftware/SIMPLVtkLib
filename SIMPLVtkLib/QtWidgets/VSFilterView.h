@@ -107,7 +107,7 @@ protected slots:
   * @brief Handles a new filter being inserted and automatically expands it
   * @param filter
   */
-  void insertFilter(VSAbstractFilter* filter);
+  void insertFilter(VSAbstractFilter* filter, bool currentFilter);
 
 protected:
   /**

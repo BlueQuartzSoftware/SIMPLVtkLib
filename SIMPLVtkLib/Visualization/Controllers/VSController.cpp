@@ -59,10 +59,10 @@ VSController::VSController(QObject* parent)
   : QObject(parent)
   , m_FilterModel(new VSFilterModel())
 {
-  connect(m_FilterModel, SIGNAL(filterAdded(VSAbstractFilter*)), this, SIGNAL(filterAdded(VSAbstractFilter*)));
+  connect(m_FilterModel, SIGNAL(filterAdded(VSAbstractFilter*, bool)), this, SIGNAL(filterAdded(VSAbstractFilter*, bool)));
   connect(m_FilterModel, SIGNAL(filterRemoved(VSAbstractFilter*)), this, SIGNAL(filterRemoved(VSAbstractFilter*)));
 
-  m_ImportThread = new VSImportThread(this);
+  m_ImportObject = new VSConcurrentImport(this);
 }
 
 // -----------------------------------------------------------------------------
@@ -78,8 +78,8 @@ VSController::~VSController()
 // -----------------------------------------------------------------------------
 void VSController::importDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
 {
-  m_ImportThread->addDataContainerArray(filePath, dca);
-  m_ImportThread->start();
+  m_ImportObject->addDataContainerArray(filePath, dca);
+  m_ImportObject->run();
 }
 
 // -----------------------------------------------------------------------------
@@ -87,8 +87,8 @@ void VSController::importDataContainerArray(QString filePath, DataContainerArray
 // -----------------------------------------------------------------------------
 void VSController::importDataContainerArray(DataContainerArray::Pointer dca)
 {
-  m_ImportThread->addDataContainerArray("No File", dca);
-  m_ImportThread->start();
+  m_ImportObject->addDataContainerArray("No File", dca);
+  m_ImportObject->run();
 
   //emit dataImported();
 }
@@ -120,7 +120,7 @@ void VSController::importData(const QString &filePath)
   if(filter->getOutput())
   {
     VSFileNameFilter* textFilter = new VSFileNameFilter(filePath);
-    m_FilterModel->addFilter(textFilter);
+    m_FilterModel->addFilter(textFilter, false);
 
     filter->setParentFilter(textFilter);
     m_FilterModel->addFilter(filter);
@@ -274,11 +274,12 @@ void VSController::loadFilter(QJsonObject &obj, VSAbstractFilter* parentFilter)
 
   if (newFilter != nullptr)
   {
-    m_FilterModel->addFilter(newFilter);
+    QJsonObject childrenObj = obj["Child Filters"].toObject();
+
+    m_FilterModel->addFilter(newFilter, (childrenObj.size() == 0));
     newFilter->setCheckState(static_cast<Qt::CheckState>(obj["CheckState"].toInt()));
     emit filterCheckStateChanged(newFilter);
 
-    QJsonObject childrenObj = obj["Child Filters"].toObject();
     for (QJsonObject::iterator iter = childrenObj.begin(); iter != childrenObj.end(); iter++)
     {
       QJsonObject childObj = iter.value().toObject();
@@ -332,12 +333,4 @@ QVector<VSAbstractFilter*> VSController::getAllFilters()
 VSFilterModel* VSController::getFilterModel()
 {
   return m_FilterModel;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-VSImportThread* VSController::getImportThread()
-{
-  return m_ImportThread;
 }

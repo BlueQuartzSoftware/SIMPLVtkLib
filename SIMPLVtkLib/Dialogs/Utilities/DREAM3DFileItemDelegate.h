@@ -1,5 +1,5 @@
 /* ============================================================================
-* Copyright (c) 2009-2015 BlueQuartz Software, LLC
+* Copyright (c) 2009-2016 BlueQuartz Software, LLC
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -35,37 +35,28 @@
 
 #pragma once
 
-#include <list>
-#include <utility>
+#include <QtCore/QModelIndex>
 
-#include <QtCore/QThread>
+#include <QStyledItemDelegate>
 
-#include "SIMPLib/DataContainers/DataContainerArray.h"
 
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSFileNameFilter.h"
-#include "SIMPLVtkLib/SIMPLVtkLib.h"
-
-class VSController;
-
-class SIMPLVtkLib_EXPORT VSImportThread : public QThread
+class DREAM3DFileItemDelegate : public QStyledItemDelegate
 {
-  Q_OBJECT
+    Q_OBJECT
 
-public:
-  using DcaFilePair = std::pair<VSFileNameFilter*, DataContainerArray::Pointer>;
+  public:
+    explicit DREAM3DFileItemDelegate(QObject* parent = 0);
 
-  VSImportThread(VSController* parent);
+    virtual ~DREAM3DFileItemDelegate();
 
-  void addDataContainerArray(QString filePath, DataContainerArray::Pointer dca);
+  protected:
+    QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const Q_DECL_OVERRIDE;
+    void setEditorData(QWidget* editor, const QModelIndex& index) const Q_DECL_OVERRIDE;
+    void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const Q_DECL_OVERRIDE;
+    void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const Q_DECL_OVERRIDE;
+    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const Q_DECL_OVERRIDE;
 
-  void run() override;
-
-protected:
-  void addDataContainerArray(DcaFilePair wrappedFileDc);
-  void importDataContainerArray(DcaFilePair filePair);
-  void importDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
-
-private:
-  VSController* m_Controller;
-  std::list<DcaFilePair> m_WrappedList;
+  private:
+    DREAM3DFileItemDelegate(const DREAM3DFileItemDelegate&) = delete; // Copy Constructor Not Implemented
+    void operator=(const DREAM3DFileItemDelegate&) = delete;        // Operator '=' Not Implemented
 };

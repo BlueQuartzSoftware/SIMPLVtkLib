@@ -1,5 +1,5 @@
 /* ============================================================================
-* Copyright (c) 2009-2017 BlueQuartz Software, LLC
+* Copyright (c) 2009-2016 BlueQuartz Software, LLC
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -33,137 +33,81 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "VSFilterModel.h"
+#include "DREAM3DFileItemDelegate.h"
+
+#include <QtCore/QFileInfo>
+
+#include <QtWidgets/QLineEdit>
+
+#include <QtGui/QIntValidator>
+#include <QtGui/QPainter>
+
+#include "SIMPLVtkLib/Dialogs/Utilities/DREAM3DFileTreeModel.h"
+#include "SIMPLVtkLib/Dialogs/Utilities/DREAM3DFileItem.h"
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSFilterModel::VSFilterModel(QObject* parent)
-  : QStandardItemModel(parent)
+DREAM3DFileItemDelegate::DREAM3DFileItemDelegate(QObject* parent)
+: QStyledItemDelegate(parent)
 {
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSFilterModel::addFilter(VSAbstractFilter* filter, bool currentFilter)
+DREAM3DFileItemDelegate::~DREAM3DFileItemDelegate() = default;
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+QWidget* DREAM3DFileItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-  if(nullptr == filter)
-  {
-    return;
-  }
-
-  if(nullptr == filter->getParentFilter())
-  {
-    appendRow(filter);
-  }
-
-  emit filterAdded(filter, currentFilter);
+  QLineEdit* editor = new QLineEdit(parent);
+  return editor;
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSFilterModel::removeFilter(VSAbstractFilter* filter)
+void DREAM3DFileItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
 {
-  if(nullptr == filter)
-  {
-    return;
-  }
-
-  emit filterRemoved(filter);
-
-  if(filter->getParentFilter())
-  {
-    filter->deleteFilter();
-  }
-  else
-  {
-    QModelIndex index = getIndexFromFilter(filter);
-    removeRow(index.row());
-  }
-
-  //filter->deleteLater();
-  submit();
+  QString value = index.model()->data(index, Qt::DisplayRole).toString();
+  QLineEdit* line = static_cast<QLineEdit*>(editor);
+  line->setText(value);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSAbstractFilter* VSFilterModel::getFilterFromIndex(QModelIndex index)
+void DREAM3DFileItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
-  if(false == index.parent().isValid())
+  DREAM3DFileTreeModel* treeModel = qobject_cast<DREAM3DFileTreeModel*>(model);
+
+  QLineEdit* line = static_cast<QLineEdit*>(editor);
+  QString value = line->text();
+
+  if(value.isEmpty() == false)
   {
-    return dynamic_cast<VSAbstractFilter*>(item(index.row(), index.column()));
-  }
-  else
-  {
-    int i = index.row();
-    VSAbstractFilter* parentFilter = getFilterFromIndex(index.parent());
-    return parentFilter->getChild(i);
+    QModelIndex bIndex = treeModel->index(index.row(), DREAM3DFileItem::Name, index.parent());
+    treeModel->setData(bIndex, value, Qt::DisplayRole);
   }
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QModelIndex VSFilterModel::getIndexFromFilter(VSAbstractFilter* filter)
+void DREAM3DFileItemDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-  if (filter == nullptr)
-  {
-    return QModelIndex();
-  }
-
-  return filter->index();
+  editor->setGeometry(option.rect);
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-QVector<VSAbstractFilter*> VSFilterModel::getBaseFilters()
+void DREAM3DFileItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-  QVector<VSAbstractFilter*> filters;
+  // Place any painting code here
 
-  int count = rowCount();
-  for(int i = 0; i < count; i++)
-  {
-    QModelIndex modelIndex = index(i, 0);
-    VSAbstractFilter* filter = getFilterFromIndex(modelIndex);
-    if(filter)
-    {
-      filters.push_back(filter);
-    }
-  }
-
-  return filters;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-QVector<VSAbstractFilter*> VSFilterModel::getAllFilters()
-{
-  QVector<VSAbstractFilter*> filters = getBaseFilters();
-
-  int count = filters.size();
-  for(int i = 0; i < count; i++)
-  {
-    filters.push_back(filters[i]);
-    filters.append(filters[i]->getDescendants());
-  }
-
-  return filters;
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSFilterModel::updateModelForView(VSFilterViewSettings::Map viewSettings)
-{
-  for(auto iter = viewSettings.begin(); iter != viewSettings.end(); iter++)
-  {
-    VSFilterViewSettings* settings = iter->second;
-    VSAbstractFilter* filter = settings->getFilter();
-    filter->setCheckState(settings->isVisible() ? Qt::Checked : Qt::Unchecked);
-  }
+  QStyledItemDelegate::paint(painter, option, index);
 }

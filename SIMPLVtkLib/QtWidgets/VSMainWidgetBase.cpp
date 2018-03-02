@@ -35,10 +35,19 @@
 
 #include "VSMainWidgetBase.h"
 
+#include <QtConcurrent>
+
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QFile>
 #include <QtCore/QUuid>
+
+#include <QtWidgets/QMessageBox>
+
+#include "SIMPLib/Utilities/SIMPLH5DataReader.h"
+#include "SIMPLib/Utilities/SIMPLH5DataReaderRequirements.h"
+
+#include "SIMPLVtkLib/Dialogs/LoadHDF5FileDialog.h"
 
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSClipFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSCropFilter.h"
@@ -71,10 +80,13 @@ VSMainWidgetBase::VSMainWidgetBase(QWidget* parent)
 // -----------------------------------------------------------------------------
 void VSMainWidgetBase::connectSlots()
 {
-  connect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*)),
-    this, SLOT(filterAdded(VSAbstractFilter*)));
+  connect(m_Controller, SIGNAL(filterAdded(VSAbstractFilter*, bool)),
+    this, SLOT(filterAdded(VSAbstractFilter*, bool)));
   connect(m_Controller, SIGNAL(filterRemoved(VSAbstractFilter*)), 
     this, SLOT(filterRemoved(VSAbstractFilter*)));
+
+  connect(this, SIGNAL(proxyFromFilePathGenerated(DataContainerArrayProxy, const QString &)),
+          this, SLOT(launchSIMPLSelectionDialog(DataContainerArrayProxy, const QString &)));
 }
 
 // -----------------------------------------------------------------------------
@@ -196,7 +208,7 @@ VSAbstractFilter* VSMainWidgetBase::getCurrentFilter()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter)
+void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter, bool currentFilter)
 {
   QVTKInteractor* interactor = nullptr;
   VSAbstractViewWidget* activeViewWidget = getActiveViewWidget();
@@ -252,7 +264,10 @@ void VSMainWidgetBase::filterAdded(VSAbstractFilter* filter)
     m_FilterToFilterWidgetMap.insert(filter, fw);
   }
 
-  setCurrentFilter(filter);
+  if (currentFilter == true)
+  {
+    setCurrentFilter(filter);
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -264,6 +279,163 @@ void VSMainWidgetBase::filterRemoved(VSAbstractFilter* filter)
   delete fw;
 
   m_FilterToFilterWidgetMap.remove(filter);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidgetBase::importFiles(QStringList filePaths)
+{
+  for (int i = 0; i < filePaths.size(); i++)
+  {
+    QString filePath = filePaths[i];
+
+    QMimeDatabase db;
+
+    QMimeType mimeType = db.mimeTypeForFile(filePath, QMimeDatabase::MatchContent);
+    QString mimeName = mimeType.name();
+
+    QFileInfo fi(filePath);
+    QString ext = fi.completeSuffix().toLower();
+    if (ext == "dream3d")
+    {
+      openDREAM3DFile(filePath);
+    }
+    else if (mimeType.inherits("image/png") || mimeType.inherits("image/tiff") || mimeType.inherits("image/jpeg"))
+    {
+      m_Controller->importData(filePath);
+    }
+    else if (ext == "vtk" || ext == "vti" || ext == "vtp" || ext == "vtr"
+             || ext == "vts" || ext == "vtu")
+    {
+      m_Controller->importData(filePath);
+    }
+    else if (ext == "stl")
+    {
+      m_Controller->importData(filePath);
+    }
+    else
+    {
+      QMessageBox::critical(this, "Invalid File Type",
+                            tr("IMF Viewer failed to open the file because the file extension, '.%1', is not supported by the "
+                               "application.").arg(ext), QMessageBox::StandardButton::Ok);
+      continue;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidgetBase::openDREAM3DFile(const QString &filePath)
+{
+  QFileInfo fi(filePath);
+
+  SIMPLH5DataReader reader;
+  connect(&reader, SIGNAL(errorGenerated(const QString &, const QString &, const int &)),
+          this, SLOT(generateError(const QString &, const QString &, const int &)));
+
+  bool success = reader.openFile(filePath);
+  if (success)
+  {
+    int err = 0;
+    SIMPLH5DataReaderRequirements req(SIMPL::Defaults::AnyPrimitive, SIMPL::Defaults::AnyComponentSize, AttributeMatrix::Type::Any, IGeometry::Type::Any);
+    DataContainerArrayProxy proxy = reader.readDataContainerArrayStructure(&req, err);
+    if (proxy.dataContainers.isEmpty())
+    {
+      return;
+    }
+
+    bool containsCellAttributeMatrices = false;
+    bool containsValidArrays = false;
+
+    QStringList dcNames = proxy.dataContainers.keys();
+    for (int i = 0; i < dcNames.size(); i++)
+    {
+      QString dcName = dcNames[i];
+      DataContainerProxy dcProxy = proxy.dataContainers[dcName];
+
+      // We want only data containers with geometries displayed
+      if (dcProxy.dcType == static_cast<unsigned int>(DataContainer::Type::Unknown))
+      {
+        proxy.dataContainers.remove(dcName);
+      }
+      else
+      {
+        QStringList amNames = dcProxy.attributeMatricies.keys();
+        for (int j = 0; j < amNames.size(); j++)
+        {
+          QString amName = amNames[j];
+          AttributeMatrixProxy amProxy = dcProxy.attributeMatricies[amName];
+
+          // We want only cell attribute matrices displayed
+          if (amProxy.amType != AttributeMatrix::Type::Cell)
+          {
+            dcProxy.attributeMatricies.remove(amName);
+            proxy.dataContainers[dcName] = dcProxy;
+          }
+          else
+          {
+            containsCellAttributeMatrices = true;
+
+            if (amProxy.dataArrays.size() > 0)
+            {
+              containsValidArrays = true;
+            }
+          }
+        }
+      }
+    }
+
+    if (proxy.dataContainers.size() <= 0)
+    {
+      QMessageBox::critical(this, "Invalid Data",
+                            tr("IMF Viewer failed to open file '%1' because the file does not "
+                               "contain any data containers with a supported geometry.").arg(fi.fileName()), QMessageBox::StandardButton::Ok);
+      return;
+    }
+
+    emit proxyFromFilePathGenerated(proxy, filePath);
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidgetBase::launchSIMPLSelectionDialog(DataContainerArrayProxy proxy, const QString &filePath)
+{
+  QSharedPointer<LoadHDF5FileDialog> dialog = QSharedPointer<LoadHDF5FileDialog>(new LoadHDF5FileDialog());
+  dialog->setProxy(proxy);
+  int ret = dialog->exec();
+
+  if (ret == QDialog::Accepted)
+  {
+    SIMPLH5DataReader reader;
+
+    bool success = reader.openFile(filePath);
+    if (success)
+    {
+      connect(&reader, SIGNAL(errorGenerated(const QString &, const QString &, const int &)),
+              this, SLOT(generateError(const QString &, const QString &, const int &)));
+
+      DataContainerArrayProxy dcaProxy = dialog->getDataStructureProxy();
+      DataContainerArray::Pointer dca = reader.readSIMPLDataUsingProxy(dcaProxy, false);
+      if (dca.get() == nullptr)
+      {
+        return;
+      }
+
+      m_Controller->importDataContainerArray(filePath, dca);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidgetBase::generateError(const QString &title, const QString &msg, const int &code)
+{
+  QMessageBox::critical(this, title, msg, QMessageBox::StandardButton::Ok);
 }
 
 // -----------------------------------------------------------------------------
