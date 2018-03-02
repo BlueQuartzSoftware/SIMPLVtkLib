@@ -288,6 +288,11 @@ void VSAbstractViewWidget::setFilterVisibility(VSFilterViewSettings* viewSetting
     return;
   }
 
+  if(nullptr == getVisualizationWidget()->getRenderer())
+  {
+    return;
+  }
+
   if(filterVisible)
   {
     getVisualizationWidget()->getRenderer()->AddViewProp(viewSettings->getActor());
@@ -350,20 +355,23 @@ void VSAbstractViewWidget::setFilterShowScalarBar(VSFilterViewSettings* viewSett
     return;
   }
 
-  if(viewSettings->isVisible())
+  if(viewSettings->getScalarBarWidget())
   {
-    if(viewSettings->isScalarBarVisible())
+    if(viewSettings->isVisible())
     {
-      viewSettings->getScalarBarWidget()->SetEnabled(1);
+      if(viewSettings->isScalarBarVisible())
+      {
+        viewSettings->getScalarBarWidget()->SetEnabled(1);
+      }
+      else
+      {
+        viewSettings->getScalarBarWidget()->SetEnabled(0);
+      }
     }
     else
     {
       viewSettings->getScalarBarWidget()->SetEnabled(0);
     }
-  }
-  else
-  {
-    viewSettings->getScalarBarWidget()->SetEnabled(0);
   }
 
   renderView();
