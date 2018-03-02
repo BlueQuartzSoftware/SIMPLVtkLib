@@ -313,6 +313,16 @@ protected:
   bool isFlatImage();
 
   /**
+  * @brief Updates the alpha for DataSet actors
+  */
+  void updateDataSetAlpha();
+
+  /**
+  * @breif Updates the alpha for 2D Image actors
+  */
+  void updateImageAlpha();
+
+  /**
   * @brief Sets the visual filter makes any Qt connections required
   * @param filter
   */

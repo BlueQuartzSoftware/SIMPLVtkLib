@@ -41,6 +41,7 @@
 #include <vtkColorTransferFunction.h>
 #include <vtkDataSetMapper.h>
 #include <vtkImageActor.h>
+#include <vtkImageProperty.h>
 #include <vtkImageSliceMapper.h>
 #include <vtkImageData.h>
 #include <vtkMapper.h>
@@ -104,7 +105,7 @@ VSAbstractFilter* VSFilterViewSettings::getFilter()
 // -----------------------------------------------------------------------------
 bool VSFilterViewSettings::isValid()
 {
-  bool valid = m_Mapper && m_Actor;// && m_ScalarBarWidget;
+  bool valid = m_Mapper && m_Actor;
   return valid;
 }
 
@@ -494,12 +495,6 @@ void VSFilterViewSettings::setMapColors(Qt::CheckState mapColorState)
 // -----------------------------------------------------------------------------
 void VSFilterViewSettings::setAlpha(double alpha)
 {
-  vtkActor* actor = getDataSetActor();
-  if(nullptr == actor)
-  {
-    return;
-  }
-
   if(alpha < 0.0)
   {
     alpha = 0.0;
@@ -511,12 +506,52 @@ void VSFilterViewSettings::setAlpha(double alpha)
 
   m_Alpha = alpha;
 
-  vtkProperty* property = actor->GetProperty();
-  property->SetOpacity(m_Alpha);
-  actor->SetProperty(property);
+  switch(m_ActorType)
+  {
+  case ActorType::DataSet:
+    updateDataSetAlpha();
+    break;
+  case ActorType::Image2D:
+    updateImageAlpha();
+    break;
+  default:
+    return;
+  }
 
   emit alphaChanged(this, m_Alpha);
   emit requiresRender();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::updateDataSetAlpha()
+{
+  vtkActor* actor = getDataSetActor();
+  if(nullptr == actor)
+  {
+    return;
+  }
+
+  vtkProperty* property = actor->GetProperty();
+  property->SetOpacity(m_Alpha);
+  actor->SetProperty(property);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::updateImageAlpha()
+{
+  vtkImageSlice* actor = getImageSliceActor();
+  if(nullptr == actor)
+  {
+    return;
+  }
+
+  vtkImageProperty* property = actor->GetProperty();
+  property->SetOpacity(m_Alpha);
+  actor->SetProperty(property);
 }
 
 // -----------------------------------------------------------------------------
