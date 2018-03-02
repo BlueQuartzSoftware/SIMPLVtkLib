@@ -35,6 +35,9 @@
 
 #pragma once
 
+#include <QtCore/QSemaphore>
+#include <QtCore/QFutureWatcher>
+
 #include <QtWidgets/QWidget>
 
 #include "SIMPLVtkLib/QtWidgets/VSAbstractViewWidget.h"
@@ -102,6 +105,12 @@ public:
   */
   void setInfoWidget(VSInfoWidget* infoWidget);
 
+  /**
+   * @brief importFiles
+   * @param filePaths
+   */
+  void importFiles(QStringList filePaths);
+
 public slots:
   /**
   * @brief Create a clip filter and set the given filter as its parent.  If no filter is provided,
@@ -158,6 +167,8 @@ public slots:
 signals:
   void changedActiveView(VSAbstractViewWidget* viewWidget);
   void changedActiveFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* filterWidget);
+
+  void proxyFromFilePathGenerated(DataContainerArrayProxy proxy, const QString &filePath);
 
 protected:
   /**
@@ -225,6 +236,20 @@ protected slots:
    */
   void filterRemoved(VSAbstractFilter* filter);
 
+  /**
+   * @brief launchSIMPLSelectionDialog
+   * @param proxy
+   */
+  void launchSIMPLSelectionDialog(DataContainerArrayProxy proxy, const QString &filePath);
+
+  /**
+   * @brief generateError
+   * @param title
+   * @param msg
+   * @param code
+   */
+  void generateError(const QString &title, const QString &msg, const int &code);
+
 private:
   VSController* m_Controller;
   VSAbstractFilter* m_CurrentFilter = nullptr;
@@ -233,4 +258,11 @@ private:
   VSInfoWidget* m_InfoWidget = nullptr;
 
   QMap<VSAbstractFilter*,VSAbstractFilterWidget*>  m_FilterToFilterWidgetMap;
+
+  /**
+   * @brief openDREAM3DFile
+   * @param filePath
+   * @param instance
+   */
+  void openDREAM3DFile(const QString &filePath);
 };

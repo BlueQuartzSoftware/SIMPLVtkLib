@@ -78,6 +78,9 @@ include(${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/QtWidgets/SourceList.cmake)
 include(${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/SIMPLBridge/SourceList.cmake)
 include(${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Visualization/SourceList.cmake)
 
+  # -- Include the Dialogs sources
+include(${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/SourceList.cmake)
+
 
 #------------------------------------------------------------------------------
 # Clear these variables and look for any extra Widget Directories that the
@@ -118,6 +121,15 @@ set(Project_SRCS
   ${${PROJECT_NAME}_QtWidgets_HDRS}
   ${${PROJECT_NAME}_QtWidgets_SRCS}
   ${${PROJECT_NAME}_QtWidgets_Generated_UI_HDRS}
+
+  ${${PROJECT_NAME}_Dialogs_Moc_HDRS}
+  ${${PROJECT_NAME}_Dialogs_HDRS}
+  ${${PROJECT_NAME}_Dialogs_SRCS}
+  ${${PROJECT_NAME}_Dialogs_Generated_UI_HDRS}
+
+  ${${PROJECT_NAME}_Dialogs_Utilities_Moc_HDRS}
+  ${${PROJECT_NAME}_Dialogs_Utilities_HDRS}
+  ${${PROJECT_NAME}_Dialogs_Utilities_SRCS}
 )
 
 if(UNIX AND NOT APPLE)
