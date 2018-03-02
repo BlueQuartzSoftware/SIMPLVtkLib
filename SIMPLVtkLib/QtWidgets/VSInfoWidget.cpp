@@ -229,16 +229,17 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* f
   case VSFilterViewSettings::ActorType::DataSet:
     m_Internals->viewSettingsWidget->setVisible(true);
     m_Internals->arrayVisibilityWidget->setVisible(true);
+    m_Internals->mappingWidget->setVisible(true);
     break;
   case VSFilterViewSettings::ActorType::Image2D:
     m_Internals->viewSettingsWidget->setVisible(true);
     m_Internals->arrayVisibilityWidget->setVisible(false);
+    m_Internals->mappingWidget->setVisible(false);
     break;
   case VSFilterViewSettings::ActorType::Invalid:
-    m_Internals->viewSettingsWidget->setVisible(false);
-    break;
   default:
     m_Internals->viewSettingsWidget->setVisible(false);
+    m_Internals->mappingWidget->setVisible(false);
     break;
   }
 
