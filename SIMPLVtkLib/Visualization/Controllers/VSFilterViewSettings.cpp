@@ -687,10 +687,6 @@ void VSFilterViewSettings::setupDataSetActors()
 
   m_DataSetFilter = VTK_PTR(vtkDataSetSurfaceFilter)::New();
   m_DataSetFilter->SetInputConnection(m_Filter->getTransformedOutputPort());
-  if(outputData->GetPointData() && outputData->GetPointData()->GetScalars())
-  {
-    m_DataSetFilter->UseStripsOn();
-  }
 
   m_Mapper = VTK_PTR(vtkDataSetMapper)::New();
   m_Mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
