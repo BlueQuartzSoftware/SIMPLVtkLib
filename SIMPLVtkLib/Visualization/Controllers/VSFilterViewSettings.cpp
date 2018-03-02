@@ -667,7 +667,6 @@ void VSFilterViewSettings::setupImageActors()
 
   vtkImageSlice* actor = vtkImageSlice::New();
   actor->SetMapper(mapper);
-  actor->GetProperty()->BackingOn();
   m_Actor = actor;
 
   setMapColors(Qt::Unchecked);
