@@ -157,15 +157,12 @@ void VSAbstractViewWidget::checkFilterViewSetting(VSFilterViewSettings* setting)
     return;
   }
 
-  setFilterVisibility(setting, setting->isVisible());
-
-  if(nullptr == setting->getScalarBarWidget())
+  if(setting->getScalarBarWidget())
   {
-    return;
+    setting->getScalarBarWidget()->SetInteractor(getVisualizationWidget()->GetInteractor());
   }
 
-  setting->getScalarBarWidget()->SetInteractor(getVisualizationWidget()->GetInteractor());
-
+  setFilterVisibility(setting, setting->isVisible());
   setFilterShowScalarBar(setting, setting->isScalarBarVisible());
 }
 
@@ -343,6 +340,16 @@ void VSAbstractViewWidget::setFilterMapColors(VSFilterViewSettings* viewSettings
 // -----------------------------------------------------------------------------
 void VSAbstractViewWidget::setFilterShowScalarBar(VSFilterViewSettings* viewSettings, bool showScalarBar)
 {
+  if(nullptr == viewSettings)
+  {
+    return;
+  }
+
+  if(nullptr == viewSettings->getScalarBarWidget())
+  {
+    return;
+  }
+
   if(viewSettings->isVisible())
   {
     if(viewSettings->isScalarBarVisible())
