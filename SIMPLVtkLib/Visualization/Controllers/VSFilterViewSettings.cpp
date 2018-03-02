@@ -812,6 +812,14 @@ int VSFilterViewSettings::getRepresentationi()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+VSFilterViewSettings::ActorType VSFilterViewSettings::getActorType()
+{
+  return m_ActorType;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSFilterViewSettings::setRepresentation(Representation type)
 {
   vtkActor* actor = getDataSetActor();

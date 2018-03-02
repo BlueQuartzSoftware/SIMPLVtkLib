@@ -201,9 +201,11 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* f
   }
 
   // Check if VSFilterSettings exist and are valid
+  VSFilterViewSettings::ActorType actorType = VSFilterViewSettings::ActorType::Invalid;
   if(m_ViewSettings && m_ViewSettings->isValid())
   {
     listenSolidColor(m_ViewSettings, m_ViewSettings->getSolidColor());
+    actorType = m_ViewSettings->getActorType();
   }
   
   if(m_FilterWidget != nullptr)
@@ -220,6 +222,24 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* f
   {
     m_Internals->applyBtn->setEnabled(false);
     m_Internals->resetBtn->setEnabled(false);
+  }
+
+  switch(actorType)
+  {
+  case VSFilterViewSettings::ActorType::DataSet:
+    m_Internals->viewSettingsWidget->setVisible(true);
+    m_Internals->arrayVisibilityWidget->setVisible(true);
+    break;
+  case VSFilterViewSettings::ActorType::Image2D:
+    m_Internals->viewSettingsWidget->setVisible(true);
+    m_Internals->arrayVisibilityWidget->setVisible(false);
+    break;
+  case VSFilterViewSettings::ActorType::Invalid:
+    m_Internals->viewSettingsWidget->setVisible(false);
+    break;
+  default:
+    m_Internals->viewSettingsWidget->setVisible(false);
+    break;
   }
 
   m_Internals->deleteBtn->setEnabled(filterExists);

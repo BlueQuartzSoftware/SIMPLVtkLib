@@ -196,6 +196,8 @@ public:
   */
   int getRepresentationi();
 
+  ActorType getActorType();
+
   /**
   * @brief Copies another VSFilterViewSettings for everything but the active filter
   * @param filter
