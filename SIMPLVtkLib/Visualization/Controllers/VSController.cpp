@@ -61,6 +61,8 @@ VSController::VSController(QObject* parent)
 {
   connect(m_FilterModel, SIGNAL(filterAdded(VSAbstractFilter*, bool)), this, SIGNAL(filterAdded(VSAbstractFilter*, bool)));
   connect(m_FilterModel, SIGNAL(filterRemoved(VSAbstractFilter*)), this, SIGNAL(filterRemoved(VSAbstractFilter*)));
+
+  m_ImportThread = new VSImportThread(this);
 }
 
 // -----------------------------------------------------------------------------
@@ -76,18 +78,19 @@ VSController::~VSController()
 // -----------------------------------------------------------------------------
 void VSController::importDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
 {
-  std::vector<SIMPLVtkBridge::WrappedDataContainerPtr> wrappedData = SIMPLVtkBridge::WrapDataContainerArrayAsStruct(dca);
+  m_ImportThread->addDataContainerArray(filePath, dca);
+  m_ImportThread->start();
+}
 
-  VSFileNameFilter* textFilter = new VSFileNameFilter(filePath);
-  m_FilterModel->addFilter(textFilter, false);
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSController::importDataContainerArray(DataContainerArray::Pointer dca)
+{
+  m_ImportThread->addDataContainerArray("No File", dca);
+  m_ImportThread->start();
 
-  // Add VSDataSetFilter for each DataContainer with relevant data
-  size_t count = wrappedData.size();
-  for(size_t i = 0; i < count; i++)
-  {
-    VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedData[i], textFilter);
-    m_FilterModel->addFilter(filter, (i == count - 1));
-  }
+  //emit dataImported();
 }
 
 // -----------------------------------------------------------------------------
@@ -330,4 +333,12 @@ QVector<VSAbstractFilter*> VSController::getAllFilters()
 VSFilterModel* VSController::getFilterModel()
 {
   return m_FilterModel;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSImportThread* VSController::getImportThread()
+{
+  return m_ImportThread;
 }

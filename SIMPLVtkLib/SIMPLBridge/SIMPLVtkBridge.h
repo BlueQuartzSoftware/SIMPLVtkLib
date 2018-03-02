@@ -79,15 +79,17 @@ public:
   };
 
   using WrappedDataArrayPtr = std::shared_ptr<WrappedDataArray>;
+  using WrappedDataArrayPtrCollection = std::vector<WrappedDataArrayPtr>;
 
   struct WrappedDataContainer
   {
     VTK_PTR(vtkDataSet) m_DataSet;
-    std::vector<WrappedDataArrayPtr> m_CellData;
+    WrappedDataArrayPtrCollection m_CellData;
     QString m_Name;
   };
 
   using WrappedDataContainerPtr = std::shared_ptr<WrappedDataContainer>;
+  using WrappedDataContainerPtrCollection = std::vector<WrappedDataContainerPtr>;
 
   virtual ~SIMPLVtkBridge();
 
@@ -98,7 +100,7 @@ public:
   * @param dca
   * @return
   */
-  static std::vector<WrappedDataContainerPtr> WrapDataContainerArrayAsStruct(DataContainerArray::Pointer dca, AttributeMatrix::Types types = AttributeMatrix::Types(1, AttributeMatrix::Type::Cell));
+  static WrappedDataContainerPtrCollection WrapDataContainerArrayAsStruct(DataContainerArray::Pointer dca, AttributeMatrix::Types types = AttributeMatrix::Types(1, AttributeMatrix::Type::Cell));
 
   /**
   * @brief Wraps a DataContainer from SIMPLib in a vtkDataSet if applicable and returns a WrappedDataContainerPtr
@@ -117,7 +119,7 @@ public:
   * @param am
   * @return
   */
-  static std::vector<WrappedDataArrayPtr> WrapAttributeMatrixAsStructs(AttributeMatrix::Pointer am);
+  static WrappedDataArrayPtrCollection WrapAttributeMatrixAsStructs(AttributeMatrix::Pointer am);
 
   /**
   * @brief Wraps a DataArray from SIMPLib in a vtkDataArray and returns a struct containing the wrapped

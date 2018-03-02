@@ -35,15 +35,16 @@
 
 #include "VSAbstractFilter.h"
 
-#include <QString>
+#include <QtCore/QString>
 
 #include <vtkAlgorithm.h>
 #include <vtkCellData.h>
 #include <vtkGenericDataObjectWriter.h>
+#include <vtkPointSet.h>
 
 #include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
 #include "SIMPLVtkLib/Visualization/Controllers/VSLookupTableController.h"
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractDataFilter.h"
 #include "SIMPLVtkLib/Visualization/VtkWidgets/VSAbstractWidget.h"
 
 // -----------------------------------------------------------------------------
@@ -54,9 +55,13 @@ VSAbstractFilter::VSAbstractFilter()
 , QStandardItem()
 , m_LoadingObject(QJsonObject())
 , m_InputPort(nullptr)
+, m_Transform(new VSTransform())
 {
   setCheckable(true);
   setCheckState(Qt::Checked);
+
+  connect(this, SIGNAL(updatedOutputPort(VSAbstractFilter*)), 
+    this, SLOT(connectTransformFilter(VSAbstractFilter*)));
 }
 
 // -----------------------------------------------------------------------------
@@ -95,7 +100,17 @@ void VSAbstractFilter::setParentFilter(VSAbstractFilter* parent)
   if(parent)
   {
     parent->addChild(this);
+
+    // Sets the transform's parent as well
+    m_Transform->setParent(parent->getTransform());
   }
+  else
+  {
+    // Sets the transform's parent to nullptr
+    m_Transform->setParent(nullptr);
+  }
+
+  updateTransformFilter();
 }
 
 // -----------------------------------------------------------------------------
@@ -199,21 +214,6 @@ VSAbstractFilter* VSAbstractFilter::getChild(int index) const
   }
 
   return getChildren()[index];
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-SIMPLVtkBridge::WrappedDataContainerPtr VSAbstractFilter::getWrappedDataContainer()
-{
-  VSSIMPLDataContainerFilter* dataSetFilter = getDataSetFilter();
-
-  if(nullptr == dataSetFilter)
-  {
-    return nullptr;
-  }
-
-  return dataSetFilter->getWrappedDataContainer();
 }
 
 // -----------------------------------------------------------------------------
@@ -328,9 +328,9 @@ double* VSAbstractFilter::getBounds() const
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSSIMPLDataContainerFilter* VSAbstractFilter::getDataSetFilter()
+VSAbstractDataFilter* VSAbstractFilter::getDataSetFilter()
 {
-  VSSIMPLDataContainerFilter* cast = dynamic_cast<VSSIMPLDataContainerFilter*>(this);
+  VSAbstractDataFilter* cast = dynamic_cast<VSAbstractDataFilter*>(this);
 
   if(cast != nullptr)
   {
@@ -429,7 +429,178 @@ void VSAbstractFilter::connectToOutuput(VSAbstractFilter* filter)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSAbstractFilter::connectTransformFilter(VSAbstractFilter* filter)
+{
+  // Update the transform filter's input port if the filter exists
+  if(m_TransformFilter)
+  {
+    m_TransformFilter->SetInputConnection(getOutputPort());
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSTransform* VSAbstractFilter::getTransform()
+{
+  return m_Transform.get();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+vtkAlgorithmOutput* VSAbstractFilter::getTransformedOutputPort()
+{
+  if(nullptr == m_TransformFilter)
+  {
+    createTransformFilter();
+  }
+
+  return m_TransformFilter->GetOutputPort();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VTK_PTR(vtkDataSet) VSAbstractFilter::getTransformedOutput()
+{
+  if(nullptr == m_TransformFilter)
+  {
+    createTransformFilter();
+  }
+
+  return m_TransformFilter->GetOutput();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractFilter::createTransformFilter()
+{
+  m_TransformFilter = VTK_PTR(vtkTransformFilter)::New();
+  
+  if(m_Transform)
+  {
+    m_TransformFilter->SetTransform(m_Transform->getGlobalTransform());
+    connect(m_Transform.get(), SIGNAL(valuesChanged()),
+      this, SLOT(updateTransformFilter()));
+  }
+  else
+  {
+    VTK_NEW(vtkTransform, transform);
+    m_TransformFilter->SetTransform(transform);
+  }
+  
+  m_TransformFilter->SetInputConnection(getOutputPort());
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VTK_PTR(vtkTransformFilter) VSAbstractFilter::getTransformFilter()
+{
+  if(nullptr == m_TransformFilter)
+  {
+    createTransformFilter();
+  }
+
+  return m_TransformFilter;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractFilter::updateTransformFilter()
+{
+  if(nullptr == m_TransformFilter)
+  {
+    createTransformFilter();
+  }
+
+  if(getTransform())
+  {
+    m_TransformFilter->SetTransform(getTransform()->getGlobalTransform());
+    emit transformChanged();
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+double* VSAbstractFilter::getTransformBounds()
+{
+  if(nullptr == m_TransformFilter || nullptr == getParentFilter())
+  {
+    return getBounds();
+  }
+
+  vtkTransformFilter* trans = vtkTransformFilter::New();
+  trans->SetInputConnection(getParentFilter()->getOutputPort());
+  trans->SetTransform(getTransform()->getGlobalTransform());
+  trans->Update();
+
+  return trans->GetOutput()->GetBounds();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSAbstractFilter::writeJson(QJsonObject &json)
 {
   json["CheckState"] = checkState();
+
+  // Save the transform settings
+  QJsonObject transformObject;
+  QJsonArray localPositionArray;
+  QJsonArray localRotationArray;
+  QJsonArray localScaleArray;
+
+  VSTransform* transform = getTransform();
+  double* localPos = transform->getLocalPosition();
+  double* localRot = transform->getLocalRotation();
+  double* localScale = transform->getLocalScale();
+
+  for(int i = 0; i < 3; i++)
+  {
+    localPositionArray.push_back(localPos[i]);
+    localRotationArray.push_back(localRot[i]);
+    localScaleArray.push_back(localScale[i]);
+  }
+
+  delete[] localPos;
+  delete[] localRot;
+  delete[] localScale;
+
+  transformObject["LocalPosition"] = localPositionArray;
+  transformObject["LocalRotation"] = localRotationArray;
+  transformObject["LocalScale"] = localScaleArray;
+
+  json["Transform"] = transformObject;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractFilter::readTransformJson(QJsonObject& json)
+{
+  QJsonObject transformObject = json["Transform"].toObject();
+  QJsonArray localPositionArray = transformObject["LocalPosition"].toArray();
+  QJsonArray localRotationArray = transformObject["LocalRotation"].toArray();
+  QJsonArray localScaleArray = transformObject["LocalScale"].toArray();
+
+  double localPos[3];
+  double localRot[3];
+  double localScale[3];
+
+  for(int i = 0; i < 3; i++)
+  {
+    localPos[i] = localPositionArray[i].toDouble();
+    localRot[i] = localRotationArray[i].toDouble();
+    localScale[i] = localScaleArray[i].toDouble();
+  }
+
+  VSTransform* transform = getTransform();
+  transform->setLocalPosition(localPos);
+  transform->setLocalRotation(localRot);
+  transform->setLocalScale(localScale);
 }

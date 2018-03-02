@@ -1,5 +1,5 @@
 /* ============================================================================
-* Copyright (c) 2009-2016 BlueQuartz Software, LLC
+* Copyright (c) 2009-2015 BlueQuartz Software, LLC
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -35,76 +35,37 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <list>
+#include <utility>
 
-#include "SIMPLVtkLib/Visualization/VisualFilters/VSSliceFilter.h"
-#include "SIMPLVtkLib/Visualization/VisualFilterWidgets/VSAbstractFilterWidget.h"
-#include "SIMPLVtkLib/Visualization/VtkWidgets/VSPlaneWidget.h"
+#include <QtCore/QThread>
 
+#include "SIMPLib/DataContainers/DataContainerArray.h"
+
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSFileNameFilter.h"
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
-/**
- * @class VSSliceFilterWidget VSSliceFilterWidget.h
- * SIMPLVtkLib/Visualization/VisualFilters/VSSliceFilterWidget.h
- * @brief This class controls the slice filter and, as with other classes 
- * inheriting from VSAbstractFilter, can be chained together to further 
- * specify what part of the volume should be rendered.
- */
-class SIMPLVtkLib_EXPORT VSSliceFilterWidget : public VSAbstractFilterWidget
+class VSController;
+
+class SIMPLVtkLib_EXPORT VSImportThread : public QThread
 {
   Q_OBJECT
 
 public:
-  /**
-  * @brief Constructor
-  * @param parentWidget
-  * @param parent
-  */
-  VSSliceFilterWidget(VSSliceFilter* filter, vtkRenderWindowInteractor* interactor, QWidget* parent = nullptr);
+  using DcaFilePair = std::pair<VSFileNameFilter*, DataContainerArray::Pointer>;
 
-  /**
-  * @brief Deconstructor
-  */
-  ~VSSliceFilterWidget();
+  VSImportThread(VSController* parent);
 
-  /**
-  * @brief Sets the filter's bounds
-  * @param bounds
-  */
-  void setBounds(double* bounds);
+  void addDataContainerArray(QString filePath, DataContainerArray::Pointer dca);
 
-  /**
-  * @brief Applies changes to the filter and updates the output
-  */
-  void apply() override;
+  void run() override;
 
-  /**
-   * @brief reset
-   */
-  void reset() override;
-
-  /**
-  * @brief Sets whether the filter widget should render drawings in the visualization window
-  * @param enabled
-  */
-  void setRenderingEnabled(bool enabled) override;
-
-  /**
-  * @brief setInteractor
-  * @param interactor
-  */
-  void setInteractor(vtkRenderWindowInteractor* interactor) override;
-
-protected slots:
-  /**
-  * @brief Updates the filter widget when the transform is updated
-  */
-  void updateTransform();
+protected:
+  void addDataContainerArray(DcaFilePair wrappedFileDc);
+  void importDataContainerArray(DcaFilePair filePair);
+  void importDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
 
 private:
-  class vsInternals;
-  vsInternals*                    m_Internals;
-
-  VSSliceFilter*                  m_SliceFilter;
-  VSPlaneWidget*                  m_SliceWidget;
+  VSController* m_Controller;
+  std::list<DcaFilePair> m_WrappedList;
 };

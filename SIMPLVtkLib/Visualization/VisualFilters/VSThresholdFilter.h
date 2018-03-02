@@ -144,9 +144,9 @@ public:
 
   /**
   * @brief Sets the name of the array last used for thresholding
-  * @return
+  * @param lastArrayName
   */
-  QString setLastArrayName(QString lastArrayName);
+  void setLastArrayName(QString lastArrayName);
 
   /**
   * @brief Sets the last minimum value for thresholding

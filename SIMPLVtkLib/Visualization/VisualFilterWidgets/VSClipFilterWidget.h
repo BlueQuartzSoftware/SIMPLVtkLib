@@ -59,7 +59,7 @@ class SIMPLVtkLib_EXPORT VSClipFilterWidget : public VSAbstractFilterWidget
   Q_OBJECT
 
 public:
-    /**
+  /**
    * @brief VSClipFilterWidget
    * @param filter
    * @param interactor
@@ -106,6 +106,11 @@ protected slots:
    * @param clipType
    */
   void changeClipType(int clipType);
+
+  /**
+  * @brief Calls updates for the VSTransform
+  */
+  void updateTransform();
 
 private:
   class vsInternals;

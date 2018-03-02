@@ -116,13 +116,6 @@ public:
   */
   void setUpperThreshold(double max);
 
-  /**
-  * @brief Sets the range to threshold over
-  * @param min
-  * @param max
-  */
-  void setScalarRange(double min, double max);
-
 protected slots:
   /**
   * @brief Handles changes in the scalar combo box
@@ -165,7 +158,14 @@ protected:
   /**
   * @brief Updates the range based on the current selected data array
   */
-  void updateRange();
+  void updateRange(QString arrayName = "");
+
+  /**
+  * @brief Sets the acceptable range to threshold over
+  * @param min
+  * @param max
+  */
+  void setScalarRange(double min, double max);
 
   /**
   * @brief Initializes the range to fit the first scalar array

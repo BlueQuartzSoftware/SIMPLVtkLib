@@ -41,25 +41,28 @@
 
 #include <memory>
 
-#include <vtkTrivialProducer.h>
 #include <vtkAlgorithmOutput.h>
 #include <vtkDataArray.h>
 #include <vtkDataSet.h>
+#include <vtkTransformFilter.h>
+#include <vtkTrivialProducer.h>
 
 #include <QtCore/QList>
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVector>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 #include <QtGui/QStandardItemModel>
 
 #include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
 #include "SIMPLVtkLib/SIMPLBridge/VtkMacros.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSTransform.h"
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
-class VSSIMPLDataContainerFilter;
+class VSAbstractDataFilter;
 
 /**
 * @class VSAbstractFilter VSAbstractFilter.h 
@@ -98,7 +101,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  ~VSAbstractFilter();
+  virtual ~VSAbstractFilter();
 
   /**
   * @brief Deletes the item and removes it from the model
@@ -150,12 +153,6 @@ public:
   QVector<VSAbstractFilter*> getDescendants() const;
 
   /**
-  * @brief Returns the WrappedDataContainerPtr from the VSSIMPLDataContainerFilter
-  * @return
-  */
-  virtual SIMPLVtkBridge::WrappedDataContainerPtr getWrappedDataContainer();
-
-  /**
   * @brief Returns a list of array names
   * @return
   */
@@ -181,6 +178,12 @@ public:
   virtual double* getBounds() const;
 
   /**
+  * @brief Returns the bounds from the vtkTransformFilter
+  * @return
+  */
+  virtual double* getTransformBounds();
+
+  /**
   * @brief Returns the output port for the filter
   * @return
   */
@@ -190,6 +193,18 @@ public:
   * @brief Returns the output data for the filter
   */
   virtual VTK_PTR(vtkDataSet) getOutput() = 0;
+
+  /**
+  * @brief Returns the output port for the transformed filtered data
+  * @return
+  */
+  virtual vtkAlgorithmOutput* getTransformedOutputPort();
+
+  /**
+  * @brief Returns the transformed output data
+  * @return
+  */
+  virtual VTK_PTR(vtkDataSet) getTransformedOutput();
 
   /**
   * @brief Returns the filter name
@@ -224,13 +239,20 @@ public:
   static bool compatibleInput(dataType_t inputType, dataType_t requiredType);
 
   /**
-   * @brief Writes values to a json file from the filter
-   * @param json
-   */
+  * @brief Returns a pointer to the object's transform
+  * @return
+  */
+  VSTransform* getTransform();
+
+  /**
+  * @brief Writes values to a json file from the filter
+  * @param json
+  */
   virtual void writeJson(QJsonObject &json);
 
 signals:
   void updatedOutputPort(VSAbstractFilter* filter);
+  void transformChanged();
 
 protected slots:
   /**
@@ -239,6 +261,17 @@ protected slots:
   * @param filter
   */
   void connectToOutuput(VSAbstractFilter* filter);
+  
+  /**
+  * @brief Forms connections with the given filter's VSTransform
+  * @param filter
+  */
+  void connectTransformFilter(VSAbstractFilter* filter);
+
+  /**
+  * @brief Updates the transform used by the transform filter
+  */
+  void updateTransformFilter();
 
 protected:
   /**
@@ -247,10 +280,20 @@ protected:
   virtual void createFilter() = 0;
 
   /**
-  * @brief Returns a pointer to the VSSIMPLDataContainerFilter that stores the input vtkDataSet
+  * @brief Creates the vtkTransformFilter for output
+  */
+  void createTransformFilter();
+
+  /**
+  * @brief Returns the vtkTransformFilter used
+  */
+  VTK_PTR(vtkTransformFilter) getTransformFilter();
+
+  /*
+  * @brief Returns a pointer to the VSAbstractDataFilter that stores the input vtkDataSet
   * @return
   */
-  VSSIMPLDataContainerFilter* getDataSetFilter();
+  VSAbstractDataFilter* getDataSetFilter();
   
   /**
   * @brief Updates the input connection for the vtkAlgorithm if that was already setup
@@ -265,11 +308,16 @@ protected:
   */
   QStringList getComponentList(vtkAbstractArray* array);
 
+  /**
+  * @brief Reads the transformation data from json and applies it to the filter
+  * @param json
+  */
+  void readTransformJson(QJsonObject& json);
+
   bool m_ConnectedInput = false;
   VTK_PTR(vtkAlgorithmOutput) m_InputPort;
 
 private:
-
   /**
   * @brief Adds a child VSAbstractFilter
   * @param child
@@ -281,6 +329,9 @@ private:
   * @param child
   */
   void removeChild(VSAbstractFilter* child);
+
+  std::shared_ptr<VSTransform> m_Transform;
+  VTK_PTR(vtkTransformFilter) m_TransformFilter;
 };
 
 #ifdef __clang__

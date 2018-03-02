@@ -191,16 +191,19 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* f
     connectFilterViewSettings(nullptr);
   }
 
-  // Check if VSFilterSettings exist and are valid
-  bool viewSettingsValid;
-  if(m_ViewSettings && m_ViewSettings->isValid())
+  if(filterExists)
   {
-    viewSettingsValid = filterExists;
-    listenSolidColor(m_ViewSettings, m_ViewSettings->getSolidColor());
+    m_Internals->transformWidget->setTransform(filter->getTransform());
   }
   else
   {
-    viewSettingsValid = false;
+    m_Internals->transformWidget->setTransform(nullptr);
+  }
+
+  // Check if VSFilterSettings exist and are valid
+  if(m_ViewSettings && m_ViewSettings->isValid())
+  {
+    listenSolidColor(m_ViewSettings, m_ViewSettings->getSolidColor());
   }
   
   if(m_FilterWidget != nullptr)
@@ -223,20 +226,6 @@ void VSInfoWidget::setFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* f
 
   updateFilterInfo();
   updateViewSettingInfo();
-
-  // Update widget size
-  QSize preferredSize = sizeHint();
-  int newWidth;
-  if(parentWidget())
-  {
-    newWidth = std::min(width(), parentWidget()->width());
-  }
-  else
-  {
-    newWidth = width();
-  }
-  preferredSize.setWidth(width());
-  resize(preferredSize);
 }
 
 // -----------------------------------------------------------------------------
@@ -266,7 +255,6 @@ void VSInfoWidget::connectFilterViewSettings(VSFilterViewSettings* settings)
 
   if(m_ViewSettings)
   {
-    
     connect(settings, SIGNAL(representationChanged(VSFilterViewSettings*, VSFilterViewSettings::Representation)),
       this, SLOT(listenRepresentationType(VSFilterViewSettings*, VSFilterViewSettings::Representation)));
     connect(settings, SIGNAL(activeArrayIndexChanged(VSFilterViewSettings*, int)),
@@ -344,12 +332,14 @@ void VSInfoWidget::updateViewSettingInfo()
     m_Internals->showScalarBarCheckBox->setChecked(Qt::Unchecked);
     m_Internals->mapScalarsCheckBox->setChecked(Qt::Unchecked);
 
+    m_Internals->viewSettingsContainer->setEnabled(m_Filter);
     m_Internals->viewSettingsWidget->setEnabled(false);
     return;
   }
 
   // Apply the current filter view settings to the widget
   bool validSettings = m_ViewSettings && m_ViewSettings->isValid();
+  m_Internals->viewSettingsContainer->setEnabled(m_Filter);
   m_Internals->viewSettingsWidget->setEnabled(validSettings);
 
   // Representation

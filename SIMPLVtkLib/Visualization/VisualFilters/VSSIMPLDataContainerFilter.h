@@ -99,10 +99,10 @@ public:
   static QUuid GetUuid();
 
   /**
-  * @brief Returns the VtkDataSetStruct_t used by the filter
+  * @brief Returns the WrappedDataContainerPtr used by the filter
   * @return
   */
-  SIMPLVtkBridge::WrappedDataContainerPtr getWrappedDataContainer() override;
+  SIMPLVtkBridge::WrappedDataContainerPtr getWrappedDataContainer();
 
   /**
    * @brief Creates a SIMPLDataContainer filter from the source .dream3d file and json object

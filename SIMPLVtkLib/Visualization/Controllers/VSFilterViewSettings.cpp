@@ -511,7 +511,7 @@ void VSFilterViewSettings::setupActors()
   }
 
   m_Mapper = VTK_PTR(vtkDataSetMapper)::New();
-  m_Mapper->SetInputConnection(m_Filter->getOutputPort());
+  m_Mapper->SetInputConnection(m_Filter->getTransformedOutputPort());
 
   m_Actor = VTK_PTR(vtkActor)::New();
   m_Actor->SetMapper(m_Mapper);
@@ -560,7 +560,7 @@ void VSFilterViewSettings::updateInputPort(VSAbstractFilter* filter)
     return;
   }
 
-  m_Mapper->SetInputConnection(filter->getOutputPort());
+  m_Mapper->SetInputConnection(filter->getTransformedOutputPort());
   emit requiresRender();
 }
 
@@ -572,12 +572,14 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
   if(m_Filter)
   {
     disconnect(m_Filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
+    disconnect(filter, SIGNAL(transformChanged()), this, SIGNAL(requiresRender()));
   }
 
   m_Filter = filter;
   if(filter)
   {
     connect(filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
+    connect(filter, SIGNAL(transformChanged()), this, SIGNAL(requiresRender()));
 
     if(filter->getArrayNames().size() < 1)
     {

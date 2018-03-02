@@ -99,6 +99,7 @@ VSFileNameFilter* VSFileNameFilter::Create(QJsonObject &json, VSAbstractFilter* 
   newFilter->setFont(font);
 
   newFilter->setInitialized(true);
+  newFilter->readTransformJson(json);
 
   return newFilter;
 }

@@ -69,6 +69,7 @@ VSTextFilter* VSTextFilter::Create(QJsonObject &json, VSAbstractFilter* parent)
   filter->setFont(font);
 
   filter->setInitialized(true);
+  filter->readTransformJson(json);
 
   return filter;
 }

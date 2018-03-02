@@ -1,5 +1,5 @@
 /* ============================================================================
-* Copyright (c) 2009-2016 BlueQuartz Software, LLC
+* Copyright (c) 2009-2015 BlueQuartz Software, LLC
 *
 * Redistribution and use in source and binary forms, with or without modification,
 * are permitted provided that the following conditions are met:
@@ -33,133 +33,79 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "VSSliceFilterWidget.h"
+#include "VSImportThread.h"
 
-#include <QtCore/QString>
-
-#include <vtkDataSet.h>
-#include <vtkPlane.h>
-
-#include "SIMPLVtkLib/QtWidgets/VSMainWidget.h"
+#include "SIMPLVtkLib/Visualization/Controllers/VSController.h"
+#include "SIMPLVtkLib/Visualization/Controllers/VSFilterModel.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
 
-#include "ui_VSSliceFilterWidget.h"
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VSImportThread::VSImportThread(VSController* controller)
+: QThread(controller)
+, m_Controller(controller)
+{
+
+}
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-class VSSliceFilterWidget::vsInternals : public Ui::VSSliceFilterWidget
+void VSImportThread::addDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
 {
-public:
-  vsInternals()
+  VSFileNameFilter* fileFilter = new VSFileNameFilter(filePath);
+  addDataContainerArray(std::make_pair(fileFilter, dca));
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSImportThread::addDataContainerArray(DcaFilePair fileDcPair)
+{
+  m_WrappedList.push_back(fileDcPair);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSImportThread::run()
+{
+  while(m_WrappedList.size() > 0)
   {
+    DcaFilePair filePair = m_WrappedList.front();
+    importDataContainerArray(filePair);
+
+    m_WrappedList.pop_front();
   }
-};
+}
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSSliceFilterWidget::VSSliceFilterWidget(VSSliceFilter* filter, vtkRenderWindowInteractor *interactor, QWidget* parent)
-: VSAbstractFilterWidget(parent)
-, m_Internals(new vsInternals())
-, m_SliceFilter(filter)
+void VSImportThread::importDataContainerArray(DcaFilePair filePair)
 {
-  m_Internals->setupUi(this);
+  VSFileNameFilter* fileFilter = filePair.first;
+  DataContainerArray::Pointer dca = filePair.second;
+  m_Controller->getFilterModel()->addFilter(fileFilter);
+  wait(1);
 
-  connect(m_SliceFilter->getTransform(), SIGNAL(valuesChanged()), this, SLOT(updateTransform()));
-
-  m_SliceWidget = new VSPlaneWidget(this, m_SliceFilter->getTransform(), m_SliceFilter->getTransformBounds(), interactor);
-  m_SliceWidget->show();
-
-  connect(m_SliceWidget, SIGNAL(modified()), this, SLOT(changesWaiting()));
-
-  if (m_SliceFilter->isInitialized() == true)
+  for(DataContainer::Pointer dc : dca->getDataContainers())
   {
-    m_SliceFilter->setInitialized(false);
-    reset();
-    apply();
+    SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
+    if(wrappedDc)
+    {
+      importDataContainer(fileFilter, wrappedDc);
+    }
   }
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSSliceFilterWidget::~VSSliceFilterWidget()
+void VSImportThread::importDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc)
 {
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSSliceFilterWidget::setBounds(double* bounds)
-{
-  if(nullptr == bounds)
-  {
-    return;
-  }
-
-  m_SliceWidget->setBounds(bounds);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSSliceFilterWidget::apply()
-{
-  VSAbstractFilterWidget::apply();
-
-  double origin[3];
-  double normal[3];
-
-  m_SliceWidget->getOrigin(origin);
-  m_SliceWidget->getNormals(normal);
-  m_SliceWidget->drawPlaneOff();
-
-  m_SliceFilter->apply(origin, normal);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSSliceFilterWidget::reset()
-{
-  double* origin = m_SliceFilter->getLastOrigin();
-  double* normal = m_SliceFilter->getLastNormal();
-
-  m_SliceWidget->setNormals(normal);
-  m_SliceWidget->setOrigin(origin);
-  m_SliceWidget->updatePlaneWidget();
-  m_SliceWidget->drawPlaneOff();
-
-  cancelChanges();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSSliceFilterWidget::setRenderingEnabled(bool enabled)
-{
-  VSAbstractFilterWidget::setRenderingEnabled(enabled);
-
-  (enabled) ? m_SliceWidget->enable() : m_SliceWidget->disable();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSSliceFilterWidget::setInteractor(vtkRenderWindowInteractor* interactor)
-{
-  bool rendered = getRenderingEnabled();
-
-  setRenderingEnabled(false);
-  m_SliceWidget->setInteractor(interactor);
-  setRenderingEnabled(rendered);
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSSliceFilterWidget::updateTransform()
-{
-  setBounds(m_SliceFilter->getTransformBounds());
+  VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, fileFilter);
+  m_Controller->getFilterModel()->addFilter(filter);
+  wait(1);
 }
