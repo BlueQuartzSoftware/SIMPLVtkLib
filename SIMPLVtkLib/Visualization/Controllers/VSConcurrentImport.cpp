@@ -33,7 +33,9 @@
 *
 * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "VSImportThread.h"
+#include "VSConcurrentImport.h"
+
+#include <QtConcurrent>
 
 #include "SIMPLVtkLib/Visualization/Controllers/VSController.h"
 #include "SIMPLVtkLib/Visualization/Controllers/VSFilterModel.h"
@@ -42,9 +44,10 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSImportThread::VSImportThread(VSController* controller)
-: QThread(controller)
+VSConcurrentImport::VSConcurrentImport(VSController* controller)
+: QObject()
 , m_Controller(controller)
+, m_ImportDataContainerOrderLock(1)
 {
 
 }
@@ -52,7 +55,7 @@ VSImportThread::VSImportThread(VSController* controller)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSImportThread::addDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
+void VSConcurrentImport::addDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
 {
   VSFileNameFilter* fileFilter = new VSFileNameFilter(filePath);
   addDataContainerArray(std::make_pair(fileFilter, dca));
@@ -61,7 +64,7 @@ void VSImportThread::addDataContainerArray(QString filePath, DataContainerArray:
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSImportThread::addDataContainerArray(DcaFilePair fileDcPair)
+void VSConcurrentImport::addDataContainerArray(DcaFilePair fileDcPair)
 {
   m_WrappedList.push_back(fileDcPair);
 }
@@ -69,7 +72,7 @@ void VSImportThread::addDataContainerArray(DcaFilePair fileDcPair)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSImportThread::run()
+void VSConcurrentImport::run()
 {
   while(m_WrappedList.size() > 0)
   {
@@ -83,19 +86,53 @@ void VSImportThread::run()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSImportThread::importDataContainerArray(DcaFilePair filePair)
+void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 {
   VSFileNameFilter* fileFilter = filePair.first;
   DataContainerArray::Pointer dca = filePair.second;
   m_Controller->getFilterModel()->addFilter(fileFilter);
-  wait(1);
 
-  for(DataContainer::Pointer dc : dca->getDataContainers())
+  m_ImportDataContainerOrder = dca->getDataContainers();
+
+  size_t threadCount = QThreadPool::globalInstance()->maxThreadCount();
+  for (int i = 0; i < threadCount; i++)
   {
-    SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
-    if(wrappedDc)
+    //      QSharedPointer<QFutureWatcher<void>> watcher(new QFutureWatcher<void>());
+    //      connect(watcher.data(), &QFutureWatcher<void>::finished, this, [=] {
+    //        m_NumOfFinishedImportDataContainerThreads++;
+
+    //        if (m_NumOfFinishedImportDataContainerThreads == threadCount)
+    //        {
+
+    //        }
+    //      });
+
+    QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::importDataContainer, fileFilter);
+    //      watcher->setFuture(future);
+
+    //      m_ImportDataContainerWatchers.push_back(watcher);
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
+{
+  while (m_ImportDataContainerOrder.size() > 0)
+  {
+    if (m_ImportDataContainerOrderLock.tryAcquire() == true)
     {
-      importDataContainer(fileFilter, wrappedDc);
+      DataContainer::Pointer dc = m_ImportDataContainerOrder.front();
+      m_ImportDataContainerOrder.pop_front();
+
+      m_ImportDataContainerOrderLock.release();
+
+      SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
+      if(wrappedDc)
+      {
+        importWrappedDataContainer(fileFilter, wrappedDc);
+      }
     }
   }
 }
@@ -103,9 +140,8 @@ void VSImportThread::importDataContainerArray(DcaFilePair filePair)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSImportThread::importDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc)
+void VSConcurrentImport::importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc)
 {
   VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, fileFilter);
   m_Controller->getFilterModel()->addFilter(filter);
-  wait(1);
 }

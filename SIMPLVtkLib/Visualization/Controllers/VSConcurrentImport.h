@@ -38,7 +38,8 @@
 #include <list>
 #include <utility>
 
-#include <QtCore/QThread>
+#include <QtCore/QSemaphore>
+#include <QtCore/QFutureWatcher>
 
 #include "SIMPLib/DataContainers/DataContainerArray.h"
 
@@ -47,25 +48,32 @@
 
 class VSController;
 
-class SIMPLVtkLib_EXPORT VSImportThread : public QThread
+class SIMPLVtkLib_EXPORT VSConcurrentImport : public QObject
 {
   Q_OBJECT
 
 public:
   using DcaFilePair = std::pair<VSFileNameFilter*, DataContainerArray::Pointer>;
 
-  VSImportThread(VSController* parent);
+  VSConcurrentImport(VSController* parent);
 
   void addDataContainerArray(QString filePath, DataContainerArray::Pointer dca);
 
-  void run() override;
+  void run();
 
 protected:
   void addDataContainerArray(DcaFilePair wrappedFileDc);
   void importDataContainerArray(DcaFilePair filePair);
-  void importDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
+  void importDataContainer(VSFileNameFilter* fileFilter);
+  void importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
 
 private:
   VSController* m_Controller;
   std::list<DcaFilePair> m_WrappedList;
+
+  QList<DataContainerShPtr> m_ImportDataContainerOrder;
+  QSemaphore m_ImportDataContainerOrderLock;
+  QVector< QSharedPointer<QFutureWatcher<void>> > m_ImportDataContainerWatchers;
+  int m_NumOfFinishedImportDataContainerThreads = 0;
+
 };

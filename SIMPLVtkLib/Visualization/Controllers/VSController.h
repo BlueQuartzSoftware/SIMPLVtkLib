@@ -42,7 +42,7 @@
 
 #include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
 #include "SIMPLVtkLib/Visualization/Controllers/VSFilterModel.h"
-#include "SIMPLVtkLib/Visualization/Controllers/VSImportThread.h"
+#include "SIMPLVtkLib/Visualization/Controllers/VSConcurrentImport.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSFileNameFilter.h"
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
@@ -137,12 +137,6 @@ public:
   */
   VSFilterModel* getFilterModel();
 
-  /**
-  * @brief Returns the VSImportThread used by the controller
-  * @return
-  */
-  VSImportThread* getImportThread();
-
 signals:
   void filterAdded(VSAbstractFilter*, bool currentFilter);
   void filterRemoved(VSAbstractFilter*);
@@ -152,7 +146,7 @@ signals:
 
 private:
   VSFilterModel* m_FilterModel;
-  VSImportThread* m_ImportThread;
+  VSConcurrentImport* m_ImportObject;
 
   /**
    * @brief saveFilter
