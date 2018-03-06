@@ -119,7 +119,7 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
 
       m_ImportDataContainerOrderLock.release();
 
-      SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
+      SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapGeometryPtr(dc);
       if(wrappedDc)
       {
         importWrappedDataContainer(fileFilter, wrappedDc);

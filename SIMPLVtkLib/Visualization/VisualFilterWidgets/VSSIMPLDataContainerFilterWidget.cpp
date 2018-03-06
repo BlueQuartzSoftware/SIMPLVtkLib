@@ -65,6 +65,8 @@ VSSIMPLDataContainerFilterWidget::VSSIMPLDataContainerFilterWidget(VSSIMPLDataCo
     reset();
     apply();
   }
+
+  changesWaiting();
 }
 
 // -----------------------------------------------------------------------------

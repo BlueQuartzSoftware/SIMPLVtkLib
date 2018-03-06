@@ -99,6 +99,11 @@ public:
   static QUuid GetUuid();
 
   /**
+  * @brief Wrap the entire DataContainer
+  */
+  void apply();
+
+  /**
   * @brief Returns the WrappedDataContainerPtr used by the filter
   * @return
   */

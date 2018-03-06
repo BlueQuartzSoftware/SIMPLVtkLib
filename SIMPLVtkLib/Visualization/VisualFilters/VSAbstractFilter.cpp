@@ -56,12 +56,13 @@ VSAbstractFilter::VSAbstractFilter()
 , m_LoadingObject(QJsonObject())
 , m_InputPort(nullptr)
 , m_Transform(new VSTransform())
+, m_OutlineFilter(vtkOutlineFilter::New())
 {
   setCheckable(true);
   setCheckState(Qt::Checked);
 
   connect(this, SIGNAL(updatedOutputPort(VSAbstractFilter*)), 
-    this, SLOT(connectTransformFilter(VSAbstractFilter*)));
+    this, SLOT(connectAdditionalOutputFilters(VSAbstractFilter*)));
 }
 
 // -----------------------------------------------------------------------------
@@ -119,7 +120,7 @@ void VSAbstractFilter::setParentFilter(VSAbstractFilter* parent)
 void VSAbstractFilter::addChild(VSAbstractFilter* child)
 {
   connect(this, SIGNAL(updatedOutputPort(VSAbstractFilter*)), 
-    child, SLOT(connectToOutuput(VSAbstractFilter*)), Qt::UniqueConnection);
+    child, SLOT(connectToOutput(VSAbstractFilter*)), Qt::UniqueConnection);
 
   appendRow(child);
 }
@@ -131,7 +132,7 @@ void VSAbstractFilter::removeChild(VSAbstractFilter* child)
 {
   int row = getIndexOfChild(child);
 
-  disconnect(this, SIGNAL(updatedOutputPort(VSAbstractFilter*)), child, SLOT(connectToOutuput(VSAbstractFilter*)));
+  disconnect(this, SIGNAL(updatedOutputPort(VSAbstractFilter*)), child, SLOT(connectToOutput(VSAbstractFilter*)));
   removeRow(row);
 }
 
@@ -405,7 +406,7 @@ void VSAbstractFilter::saveFile(QString fileName)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSAbstractFilter::connectToOutuput(VSAbstractFilter* filter)
+void VSAbstractFilter::connectToOutput(VSAbstractFilter* filter)
 {
   if(nullptr == filter)
   {
@@ -429,13 +430,24 @@ void VSAbstractFilter::connectToOutuput(VSAbstractFilter* filter)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSAbstractFilter::connectTransformFilter(VSAbstractFilter* filter)
+void VSAbstractFilter::connectAdditionalOutputFilters(VSAbstractFilter* filter)
 {
+  // Update the outline filter connection
+  m_OutlineFilter->SetInputConnection(getOutputPort());
+
   // Update the transform filter's input port if the filter exists
   if(m_TransformFilter)
   {
     m_TransformFilter->SetInputConnection(getOutputPort());
   }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+vtkAlgorithmOutput* VSAbstractFilter::getOutlinePort()
+{
+  return m_OutlineFilter->GetOutputPort();
 }
 
 // -----------------------------------------------------------------------------

@@ -617,6 +617,8 @@ void VSFilterViewSettings::setupActors()
   {
     setupDataSetActors();
   }
+
+  setRepresentation(Representation::Outline);
 }
 
 // -----------------------------------------------------------------------------
@@ -689,6 +691,7 @@ void VSFilterViewSettings::setupDataSetActors()
 
   m_Mapper = VTK_PTR(vtkDataSetMapper)::New();
   m_Mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
+  //m_Mapper->SetInputConnection(m_Filter->getOutlinePort());
   vtkDataSetMapper* mapper = dynamic_cast<vtkDataSetMapper*>(m_Mapper.Get());
 
   m_Actor = VTK_PTR(vtkActor)::New();
@@ -814,22 +817,24 @@ void VSFilterViewSettings::setSolidColor(double color[3])
 // -----------------------------------------------------------------------------
 VSFilterViewSettings::Representation VSFilterViewSettings::getRepresentation()
 {
-  vtkActor* actor = getDataSetActor();
-  if(nullptr == actor)
-  {
-    return Representation::Invalid;
-  }
+  return m_Representation;
 
-  vtkProperty* property = actor->GetProperty();
-  Representation rep = static_cast<Representation>(property->GetRepresentation());
-  int edges = property->GetEdgeVisibility();
+  //vtkActor* actor = getDataSetActor();
+  //if(nullptr == actor)
+  //{
+  //  return Representation::Invalid;
+  //}
 
-  if(1 == edges && Representation::Surface == rep)
-  {
-    return Representation::SurfaceWithEdges;
-  }
+  //vtkProperty* property = actor->GetProperty();
+  //Representation rep = static_cast<Representation>(property->GetRepresentation());
+  //int edges = property->GetEdgeVisibility();
 
-  return rep;
+  //if(1 == edges && Representation::Surface == rep)
+  //{
+  //  return Representation::SurfaceWithEdges;
+  //}
+
+  //return rep;
 }
 
 // -----------------------------------------------------------------------------
@@ -856,18 +861,29 @@ void VSFilterViewSettings::setRepresentation(Representation type)
   vtkActor* actor = getDataSetActor();
   if(nullptr == actor)
   {
+    m_Representation = Representation::Invalid;
     return;
   }
 
-  if(type == Representation::SurfaceWithEdges)
+  m_Representation = type;
+  if(type == Representation::Outline)
   {
-    actor->GetProperty()->SetRepresentation(static_cast<int>(Representation::Surface));
-    actor->GetProperty()->EdgeVisibilityOn();
+    getDataSetMapper()->SetInputConnection(m_Filter->getOutlinePort());
   }
   else
   {
-    actor->GetProperty()->SetRepresentation(static_cast<int>(type));
-    actor->GetProperty()->EdgeVisibilityOff();
+    getDataSetMapper()->SetInputConnection(m_DataSetFilter->GetOutputPort());
+
+    if(type == Representation::SurfaceWithEdges)
+    {
+      actor->GetProperty()->SetRepresentation(static_cast<int>(Representation::Surface));
+      actor->GetProperty()->EdgeVisibilityOn();
+    }
+    else
+    {
+      actor->GetProperty()->SetRepresentation(static_cast<int>(type) - 1);
+      actor->GetProperty()->EdgeVisibilityOff();
+    }
   }
 
   emit representationChanged(this, type);

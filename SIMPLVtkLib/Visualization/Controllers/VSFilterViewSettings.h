@@ -74,11 +74,12 @@ public:
   enum class Representation : int
   {
     Invalid = -1,
-    Points = 0,
-    Wireframe = 1,
-    Surface = 2,
-    SurfaceWithEdges = 3,
-    Default = Surface
+    Outline,
+    Points,
+    Wireframe,
+    Surface,
+    SurfaceWithEdges,
+    Default = Outline
   };
 
   enum class ActorType : int
@@ -196,6 +197,10 @@ public:
   */
   int getRepresentationi();
 
+  /**
+  * @brief Returns the current actor type
+  * @return
+  */
   ActorType getActorType();
 
   /**
@@ -291,6 +296,7 @@ signals:
   void alphaChanged(VSFilterViewSettings*, double);
   void showScalarBarChanged(VSFilterViewSettings*, bool);
   void requiresRender();
+  void updatedActor(vtkProp3D* oldProp, vtkProp3D* newProp);
 
 protected:
   /**
@@ -298,18 +304,48 @@ protected:
   */
   void setupActors();
 
+  /**
+  * @brief Creates a vtkImageSliceMapper and vtkImageSlice for displaying 2D Image data
+  */
   void setupImageActors();
 
+  /**
+  * @brief Creates a vtkDataSetMapper and vtkActor for displaying generic vtkDataSets
+  */
   void setupDataSetActors();
 
+  /**
+  * @brief Returns the vtkDataSetMapper if the ActorType is DataSet and the settings are valid.
+  * Returns nullptr otherwise.
+  * @return
+  */
   vtkDataSetMapper* getDataSetMapper();
 
+  /**
+  * @brief Returns the vtkActor if the ActorType is DataSet and the settings are valid.
+  * Returns nullptr otherwise.
+  * @return
+  */
   vtkActor* getDataSetActor();
 
+  /**
+  * @brief Returns the vtkImageSliceMapper if the ActorType is Image2D and the settings are valid.
+  * Returns nullptr otherwise.
+  * @return
+  */
   vtkImageSliceMapper* getImageMapper();
 
+  /**
+  * @brief Returns the vtkImageSlice if the ActorType is Image2D and the settings are valid.
+  * Returns nullptr otherwise.
+  * @return
+  */
   vtkImageSlice* getImageSliceActor();
 
+  /**
+  * @brief Returns true if data set is a 2D image.  Returns false otherwise.
+  * @return
+  */
   bool isFlatImage();
 
   /**
@@ -360,6 +396,7 @@ private:
   int m_ActiveArray = 0;
   int m_ActiveComponent = -1;
   Qt::CheckState m_MapColors = Qt::Checked;
+  Representation m_Representation = Representation::Default;
   VTK_PTR(vtkAbstractMapper3D) m_Mapper = nullptr;
   VTK_PTR(vtkProp3D) m_Actor = nullptr;
   bool m_ShowScalarBar = true;

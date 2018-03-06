@@ -271,6 +271,11 @@
                </property>
                <item>
                 <property name="text">
+                 <string>Outline</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
                  <string>Point</string>
                 </property>
                </item>

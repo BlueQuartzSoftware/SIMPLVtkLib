@@ -86,6 +86,7 @@ public:
     VTK_PTR(vtkDataSet) m_DataSet;
     WrappedDataArrayPtrCollection m_CellData;
     QString m_Name;
+    DataContainer::Pointer m_DataContainer;
   };
 
   using WrappedDataContainerPtr = std::shared_ptr<WrappedDataContainer>;
@@ -112,6 +113,21 @@ public:
   * @return
   */
   static WrappedDataContainerPtr WrapDataContainerAsStruct(DataContainer::Pointer dc, AttributeMatrix::Types types = AttributeMatrix::Types(1, AttributeMatrix::Type::Cell));
+
+  /**
+  * @brief Wraps a DataContainer geometry from SIMPLib in a vtkDataSet if applicable and returns a WrappeddataContainerPtr
+  * without any data arrays wrapped and imported. A nullptr is returned if there are no eligible AttributeMatrixes to wrap.
+  * @param dc
+  * @param types
+  * @return
+  */
+  static WrappedDataContainerPtr WrapGeometryPtr(DataContainer::Pointer dc, AttributeMatrix::Types types = AttributeMatrix::Types(1, AttributeMatrix::Type::Cell));
+
+  /**
+  * @brief Finish wrapping the given DataContainer
+  * @param wrappedDc
+  */
+  static void FinishWrappingDataContainerStruct(WrappedDataContainerPtr wrappedDc, AttributeMatrix::Types types = AttributeMatrix::Types(1, AttributeMatrix::Type::Cell));
 
   /**
   * @brief Wraps the DataArrays contained within SIMPLib's AttributeMatrix in vtkDataArrays for use in VTK
