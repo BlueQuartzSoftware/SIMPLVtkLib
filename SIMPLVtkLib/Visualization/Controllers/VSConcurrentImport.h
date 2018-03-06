@@ -68,7 +68,6 @@ protected:
   void importDataContainer(VSFileNameFilter* fileFilter);
   void importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
   void applyDataFilters();
-  void applyDataFilter(VSSIMPLDataContainerFilter* filter);
 
 private:
   VSController* m_Controller;

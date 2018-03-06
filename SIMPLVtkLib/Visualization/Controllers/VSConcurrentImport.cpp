@@ -152,18 +152,9 @@ void VSConcurrentImport::applyDataFilters()
     {
       VSSIMPLDataContainerFilter* filter = m_UnappliedDataFilters.front();
       m_UnappliedDataFilters.pop_front();
-
       m_UnappliedDataFilterLock.release();
 
-      applyDataFilter(filter);
+      filter->apply();
     }
   }
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSConcurrentImport::applyDataFilter(VSSIMPLDataContainerFilter* filter)
-{
-  filter->apply();
 }

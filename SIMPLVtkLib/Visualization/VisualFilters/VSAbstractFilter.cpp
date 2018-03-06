@@ -119,11 +119,10 @@ void VSAbstractFilter::setParentFilter(VSAbstractFilter* parent)
 // -----------------------------------------------------------------------------
 void VSAbstractFilter::addChild(VSAbstractFilter* child)
 {
-  //appendRow(child);
-  int x = 0;
-
   connect(this, SIGNAL(updatedOutputPort(VSAbstractFilter*)), 
     child, SLOT(connectToOutput(VSAbstractFilter*)), Qt::UniqueConnection);
+
+  appendRow(child);
 }
 
 // -----------------------------------------------------------------------------
