@@ -50,6 +50,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QObject>
+#include <QtCore/QSemaphore>
 #include <QtCore/QString>
 #include <QtCore/QVector>
 #include <QtCore/QJsonObject>
@@ -259,6 +260,7 @@ public:
 
 signals:
   void updatedOutputPort(VSAbstractFilter* filter);
+  void updatedOutput();
   void transformChanged();
 
 protected slots:
@@ -341,6 +343,7 @@ private:
   VTK_PTR(vtkTransformFilter) m_TransformFilter;
   VTK_PTR(vtkOutlineFilter) m_OutlineFilter;
   //VTK_PTR(vtkTransformFilter) m_OutlineTransformFilter;
+  QSemaphore m_ChildLock;
 };
 
 #ifdef __clang__

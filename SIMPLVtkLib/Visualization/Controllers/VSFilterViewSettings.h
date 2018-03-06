@@ -282,6 +282,8 @@ public slots:
 
   void importedData();
 
+  void checkDataType();
+
   /**
   * @brief Updates the input connection for the vtkMapper
   * @param filter
@@ -298,13 +300,13 @@ signals:
   void alphaChanged(VSFilterViewSettings*, double);
   void showScalarBarChanged(VSFilterViewSettings*, bool);
   void requiresRender();
-  void updatedActor(vtkProp3D* oldProp, vtkProp3D* newProp);
+  void swappingActors(vtkProp3D* oldProp, vtkProp3D* newProp);
 
 protected:
   /**
   * @brief Performs initial setup commands for any actors used in the view settings
   */
-  void setupActors();
+  void setupActors(bool outline = true);
 
   /**
   * @brief Creates a vtkImageSliceMapper and vtkImageSlice for displaying 2D Image data

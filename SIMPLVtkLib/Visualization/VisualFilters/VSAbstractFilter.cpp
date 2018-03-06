@@ -36,6 +36,7 @@
 #include "VSAbstractFilter.h"
 
 #include <QtCore/QString>
+#include <QtCore/QThread>
 
 #include <vtkAlgorithm.h>
 #include <vtkCellData.h>
@@ -57,6 +58,7 @@ VSAbstractFilter::VSAbstractFilter()
 , m_InputPort(nullptr)
 , m_Transform(new VSTransform())
 , m_OutlineFilter(vtkOutlineFilter::New())
+, m_ChildLock(1)
 {
   setCheckable(true);
   setCheckState(Qt::Checked);
@@ -97,6 +99,12 @@ VSAbstractFilter* VSAbstractFilter::getParentFilter() const
 // -----------------------------------------------------------------------------
 void VSAbstractFilter::setParentFilter(VSAbstractFilter* parent)
 {
+  if(getParentFilter())
+  {
+    disconnect(parent, SIGNAL(updatedOutput()),
+      this, SIGNAL(updatedOutput()));
+  }
+
   setParent(parent);
   if(parent)
   {
@@ -104,6 +112,9 @@ void VSAbstractFilter::setParentFilter(VSAbstractFilter* parent)
 
     // Sets the transform's parent as well
     m_Transform->setParent(parent->getTransform());
+
+    connect(parent, SIGNAL(updatedOutput()),
+      this, SIGNAL(updatedOutput()));
   }
   else
   {
@@ -122,7 +133,13 @@ void VSAbstractFilter::addChild(VSAbstractFilter* child)
   connect(this, SIGNAL(updatedOutputPort(VSAbstractFilter*)), 
     child, SLOT(connectToOutput(VSAbstractFilter*)), Qt::UniqueConnection);
 
+  // Avoid crashing when adding children from multiple threads
+  while(false == m_ChildLock.tryAcquire())
+  {
+    QThread::currentThread()->wait();
+  }
   appendRow(child);
+  m_ChildLock.release();
 }
 
 // -----------------------------------------------------------------------------

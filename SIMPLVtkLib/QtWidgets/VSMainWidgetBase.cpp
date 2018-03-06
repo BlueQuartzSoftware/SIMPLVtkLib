@@ -488,6 +488,10 @@ void VSMainWidgetBase::setActiveView(VSAbstractViewWidget* viewWidget)
 // -----------------------------------------------------------------------------
 void VSMainWidgetBase::setFilterVisibility(VSFilterViewSettings* viewSettings, bool visible)
 {
+  if(false == (viewSettings && viewSettings->getFilter()))
+  {
+    return;
+  }
   if(nullptr == m_ActiveViewWidget)
   {
     return;

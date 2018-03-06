@@ -180,6 +180,8 @@ protected slots:
   */
   void setFilterVisibility(VSFilterViewSettings* viewSettings, bool filterVisible);
 
+  void swapActors(vtkProp3D* oldProp, vtkProp3D* newProp);
+
   /**
   * @brief Change the active filter's array index
   * @param index

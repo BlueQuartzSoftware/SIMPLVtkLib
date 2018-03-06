@@ -602,7 +602,7 @@ void VSFilterViewSettings::setScalarBarVisible(bool visible)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSFilterViewSettings::setupActors()
+void VSFilterViewSettings::setupActors(bool outline)
 {
   VTK_PTR(vtkDataSet) outputData = m_Filter->getOutput();
   if(nullptr == outputData)
@@ -620,7 +620,10 @@ void VSFilterViewSettings::setupActors()
     setupDataSetActors();
   }
 
-  setRepresentation(Representation::Outline);
+  if(outline)
+  {
+    setRepresentation(Representation::Outline);
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -667,18 +670,22 @@ void VSFilterViewSettings::setupImageActors()
   mapper->SetInputConnection(m_Filter->getOutputPort());
   mapper->SliceAtFocalPointOn();
   mapper->SliceFacesCameraOn();
-  m_Mapper = mapper;
 
   vtkImageSlice* actor = vtkImageSlice::New();
   actor->SetMapper(mapper);
-  m_Actor = actor;
-
+  
   setMapColors(Qt::Unchecked);
   setScalarBarVisible(false);
 
-  m_ActorType = ActorType::Image2D;
+  if(ActorType::DataSet == m_ActorType && isVisible())
+  {
+    emit swappingActors(m_Actor.Get(), actor);
+  }
 
-  emit requiresRender();
+  m_Mapper = mapper;
+  m_Actor = actor;
+
+  m_ActorType = ActorType::Image2D;
 }
 
 // -----------------------------------------------------------------------------
@@ -691,13 +698,11 @@ void VSFilterViewSettings::setupDataSetActors()
   m_DataSetFilter = VTK_PTR(vtkDataSetSurfaceFilter)::New();
   m_DataSetFilter->SetInputConnection(m_Filter->getTransformedOutputPort());
 
-  m_Mapper = VTK_PTR(vtkDataSetMapper)::New();
-  m_Mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
-  //m_Mapper->SetInputConnection(m_Filter->getOutlinePort());
-  vtkDataSetMapper* mapper = dynamic_cast<vtkDataSetMapper*>(m_Mapper.Get());
+  vtkDataSetMapper* mapper = vtkDataSetMapper::New();
+  mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
 
-  m_Actor = VTK_PTR(vtkActor)::New();
-  dynamic_cast<vtkActor*>(m_Actor.Get())->SetMapper(mapper);
+  vtkActor* actor = vtkActor::New();
+  actor->SetMapper(mapper);
 
   m_LookupTable = new VSLookupTableController();
   mapper->SetLookupTable(m_LookupTable->getColorTransferFunction());
@@ -731,6 +736,14 @@ void VSFilterViewSettings::setupDataSetActors()
     setMapColors(Qt::Unchecked);
     setScalarBarVisible(false);
   }
+
+  if(ActorType::Image2D == m_ActorType && isVisible())
+  {
+    emit swappingActors(m_Actor.Get(), actor);
+  }
+
+  m_Mapper = mapper;
+  m_Actor = actor;
 
   m_ActorType = ActorType::DataSet;
 }
@@ -909,8 +922,19 @@ void VSFilterViewSettings::importedData()
 {
   if(dynamic_cast<VSAbstractDataFilter*>(getFilter()) && getRepresentation() == Representation::Outline)
   {
+    setupActors(false);
     setRepresentation(Representation::Surface);
+    emit requiresRender();
   }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::checkDataType()
+{
+  setupActors(false);
+  emit requiresRender();
 }
 
 // -----------------------------------------------------------------------------

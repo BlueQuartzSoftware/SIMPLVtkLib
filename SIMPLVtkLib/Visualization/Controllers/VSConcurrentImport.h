@@ -62,11 +62,15 @@ public:
 
   void run();
 
+signals:
+  void importedFilter(VSAbstractFilter* filter, bool currentFilter = false);
+
 protected:
   void addDataContainerArray(DcaFilePair wrappedFileDc);
   void importDataContainerArray(DcaFilePair filePair);
   void importDataContainer(VSFileNameFilter* fileFilter);
   void importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
+  void addDataFilters();
   void applyDataFilters();
 
 private:
@@ -77,7 +81,7 @@ private:
   QList<DataContainerShPtr> m_ImportDataContainerOrder;
   QSemaphore m_ImportDataContainerOrderLock;
   QSemaphore m_UnappliedDataFilterLock;
+  QSemaphore m_FilterLock;
   QVector< QSharedPointer<QFutureWatcher<void>> > m_ImportDataContainerWatchers;
   int m_NumOfFinishedImportDataContainerThreads = 0;
-
 };
