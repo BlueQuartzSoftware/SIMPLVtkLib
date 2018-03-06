@@ -70,6 +70,11 @@ public:
   */
   void setBounds(double* bounds);
 
+  /**
+  * @brief Applies changes to the filter and updates the output
+  */
+  void apply() override;
+
 private:
   class vsInternals;
   vsInternals*                                    m_Internals;

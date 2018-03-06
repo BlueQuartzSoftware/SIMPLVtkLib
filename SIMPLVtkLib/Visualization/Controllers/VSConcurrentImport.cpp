@@ -48,8 +48,9 @@ VSConcurrentImport::VSConcurrentImport(VSController* controller)
 : QObject()
 , m_Controller(controller)
 , m_ImportDataContainerOrderLock(1)
+, m_UnappliedDataFilterLock(1)
 {
-
+  m_UnappliedDataFilters.clear();
 }
 
 // -----------------------------------------------------------------------------
@@ -126,6 +127,8 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
       }
     }
   }
+
+  applyDataFilters();
 }
 
 // -----------------------------------------------------------------------------
@@ -135,4 +138,32 @@ void VSConcurrentImport::importWrappedDataContainer(VSFileNameFilter* fileFilter
 {
   VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, fileFilter);
   m_Controller->getFilterModel()->addFilter(filter);
+  m_UnappliedDataFilters.push_back(filter);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSConcurrentImport::applyDataFilters()
+{
+  while(m_UnappliedDataFilters.size() > 0)
+  {
+    if(m_UnappliedDataFilterLock.tryAcquire() == true)
+    {
+      VSSIMPLDataContainerFilter* filter = m_UnappliedDataFilters.front();
+      m_UnappliedDataFilters.pop_front();
+
+      m_UnappliedDataFilterLock.release();
+
+      applyDataFilter(filter);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSConcurrentImport::applyDataFilter(VSSIMPLDataContainerFilter* filter)
+{
+  filter->apply();
 }

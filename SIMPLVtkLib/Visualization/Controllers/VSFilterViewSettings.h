@@ -280,6 +280,8 @@ public slots:
   */
   void setRepresentation(Representation type);
 
+  void importedData();
+
   /**
   * @brief Updates the input connection for the vtkMapper
   * @param filter

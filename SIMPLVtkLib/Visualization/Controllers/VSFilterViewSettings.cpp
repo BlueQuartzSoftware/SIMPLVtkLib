@@ -49,6 +49,8 @@
 #include <vtkProperty.h>
 #include <vtkTextProperty.h>
 
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractDataFilter.h"
+
 double* VSFilterViewSettings::NULL_COLOR = new double[3]{ 0.0, 0.0, 0.0 };
 
 // -----------------------------------------------------------------------------
@@ -764,6 +766,11 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
   {
     disconnect(m_Filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
     disconnect(filter, SIGNAL(transformChanged()), this, SIGNAL(requiresRender()));
+
+    if(dynamic_cast<VSAbstractDataFilter*>(filter))
+    {
+      disconnect(filter, SIGNAL(dataImported()), this, SLOT(importedData()));
+    }
   }
 
   m_Filter = filter;
@@ -777,6 +784,11 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
       setScalarBarVisible(false);
       setMapColors(Qt::Unchecked);
       m_ActiveArray = -1;
+    }
+
+    if(dynamic_cast<VSAbstractDataFilter*>(filter))
+    {
+      connect(filter, SIGNAL(dataImported()), this, SLOT(importedData()));
     }
   }
 }
@@ -888,6 +900,17 @@ void VSFilterViewSettings::setRepresentation(Representation type)
 
   emit representationChanged(this, type);
   emit requiresRender();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::importedData()
+{
+  if(dynamic_cast<VSAbstractDataFilter*>(getFilter()) && getRepresentation() == Representation::Outline)
+  {
+    setRepresentation(Representation::Surface);
+  }
 }
 
 // -----------------------------------------------------------------------------

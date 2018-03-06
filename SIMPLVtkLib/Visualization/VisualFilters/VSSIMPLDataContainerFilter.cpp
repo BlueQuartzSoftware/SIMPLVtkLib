@@ -229,6 +229,7 @@ void VSSIMPLDataContainerFilter::apply()
 {
   SIMPLVtkBridge::FinishWrappingDataContainerStruct(m_WrappedDataContainer);
   m_TrivialProducer->SetOutput(m_WrappedDataContainer->m_DataSet);
+  emit dataImported();
 }
 
 // -----------------------------------------------------------------------------

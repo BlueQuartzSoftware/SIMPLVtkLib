@@ -44,6 +44,7 @@
 #include "SIMPLib/DataContainers/DataContainerArray.h"
 
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSFileNameFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
 class VSController;
@@ -66,13 +67,17 @@ protected:
   void importDataContainerArray(DcaFilePair filePair);
   void importDataContainer(VSFileNameFilter* fileFilter);
   void importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
+  void applyDataFilters();
+  void applyDataFilter(VSSIMPLDataContainerFilter* filter);
 
 private:
   VSController* m_Controller;
   std::list<DcaFilePair> m_WrappedList;
+  std::list<VSSIMPLDataContainerFilter*> m_UnappliedDataFilters;
 
   QList<DataContainerShPtr> m_ImportDataContainerOrder;
   QSemaphore m_ImportDataContainerOrderLock;
+  QSemaphore m_UnappliedDataFilterLock;
   QVector< QSharedPointer<QFutureWatcher<void>> > m_ImportDataContainerWatchers;
   int m_NumOfFinishedImportDataContainerThreads = 0;
 

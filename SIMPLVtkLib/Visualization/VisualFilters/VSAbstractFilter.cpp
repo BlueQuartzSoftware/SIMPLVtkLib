@@ -88,7 +88,7 @@ void VSAbstractFilter::deleteFilter()
 // -----------------------------------------------------------------------------
 VSAbstractFilter* VSAbstractFilter::getParentFilter() const
 {
-  VSAbstractFilter* parentFilter = dynamic_cast<VSAbstractFilter*>(QStandardItem::parent());
+  VSAbstractFilter* parentFilter = dynamic_cast<VSAbstractFilter*>(QObject::parent());
   return parentFilter;
 }
 
@@ -119,10 +119,11 @@ void VSAbstractFilter::setParentFilter(VSAbstractFilter* parent)
 // -----------------------------------------------------------------------------
 void VSAbstractFilter::addChild(VSAbstractFilter* child)
 {
+  //appendRow(child);
+  int x = 0;
+
   connect(this, SIGNAL(updatedOutputPort(VSAbstractFilter*)), 
     child, SLOT(connectToOutput(VSAbstractFilter*)), Qt::UniqueConnection);
-
-  appendRow(child);
 }
 
 // -----------------------------------------------------------------------------

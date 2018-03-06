@@ -47,6 +47,8 @@
 */
 class SIMPLVtkLib_EXPORT VSAbstractDataFilter : public VSAbstractFilter
 {
+  Q_OBJECT
+
 public:
   /**
   * @brief Constructor
@@ -64,6 +66,9 @@ public:
   * @return
   */
   dataType_t getOutputType() override;
+
+signals:
+  void dataImported();
 
 protected:
   /**
