@@ -59,10 +59,11 @@ VSController::VSController(QObject* parent)
   : QObject(parent)
   , m_FilterModel(new VSFilterModel())
 {
+  m_ImportObject = new VSConcurrentImport(this);
+
   connect(m_FilterModel, SIGNAL(filterAdded(VSAbstractFilter*, bool)), this, SIGNAL(filterAdded(VSAbstractFilter*, bool)));
   connect(m_FilterModel, SIGNAL(filterRemoved(VSAbstractFilter*)), this, SIGNAL(filterRemoved(VSAbstractFilter*)));
-
-  m_ImportObject = new VSConcurrentImport(this);
+  connect(m_ImportObject, SIGNAL(blockRender(bool)), this, SIGNAL(blockRender(bool)));
 }
 
 // -----------------------------------------------------------------------------
@@ -79,7 +80,7 @@ VSController::~VSController()
 void VSController::importDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
 {
   m_ImportObject->addDataContainerArray(filePath, dca);
-  m_ImportObject->run();
+  m_ImportObject->start();
 }
 
 // -----------------------------------------------------------------------------
@@ -88,7 +89,7 @@ void VSController::importDataContainerArray(QString filePath, DataContainerArray
 void VSController::importDataContainerArray(DataContainerArray::Pointer dca)
 {
   m_ImportObject->addDataContainerArray("No File", dca);
-  m_ImportObject->run();
+  m_ImportObject->start();
 
   //emit dataImported();
 }

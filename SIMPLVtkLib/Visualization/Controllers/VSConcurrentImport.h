@@ -38,8 +38,9 @@
 #include <list>
 #include <utility>
 
-#include <QtCore/QSemaphore>
 #include <QtCore/QFutureWatcher>
+#include <QtCore/QSemaphore>
+#include <QtCore/QThread>
 
 #include "SIMPLib/DataContainers/DataContainerArray.h"
 
@@ -49,7 +50,7 @@
 
 class VSController;
 
-class SIMPLVtkLib_EXPORT VSConcurrentImport : public QObject
+class SIMPLVtkLib_EXPORT VSConcurrentImport : public QThread
 {
   Q_OBJECT
 
@@ -64,6 +65,7 @@ public:
 
 signals:
   void importedFilter(VSAbstractFilter* filter, bool currentFilter = false);
+  void blockRender(bool block = true);
 
 protected:
   void addDataContainerArray(DcaFilePair wrappedFileDc);

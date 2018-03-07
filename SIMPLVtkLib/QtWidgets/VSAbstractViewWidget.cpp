@@ -590,8 +590,26 @@ void VSAbstractViewWidget::closeView()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSAbstractViewWidget::setBlockRender(bool block)
+{
+  m_BlockRender = block;
+
+  if(false == block)
+  {
+    renderView();
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSAbstractViewWidget::renderView()
 {
+  if(m_BlockRender)
+  {
+    return;
+  }
+
   VSVisualizationWidget* visualizationWidget = getVisualizationWidget();
   if(visualizationWidget)
   {
@@ -604,6 +622,11 @@ void VSAbstractViewWidget::renderView()
 // -----------------------------------------------------------------------------
 void VSAbstractViewWidget::resetCamera()
 {
+  if(m_BlockRender)
+  {
+    return;
+  }
+
   VSVisualizationWidget* visualizationWidget = getVisualizationWidget();
   if(visualizationWidget && visualizationWidget->getRenderer())
   {

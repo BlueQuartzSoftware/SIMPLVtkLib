@@ -164,6 +164,12 @@ public slots:
   */
   void renderAllViews();
 
+  /**
+  * @brief Sets whether or not calls to render should be blocked
+  * @param block
+  */
+  void setBlockRender(bool block);
+
 signals:
   void changedActiveView(VSAbstractViewWidget* viewWidget);
   void changedActiveFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* filterWidget);

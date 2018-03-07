@@ -141,7 +141,7 @@ signals:
   void filterAdded(VSAbstractFilter*, bool currentFilter);
   void filterRemoved(VSAbstractFilter*);
   void filterCheckStateChanged(VSAbstractFilter* filter);
-
+  void blockRender(bool block);
   void dataImported();
 
 private:

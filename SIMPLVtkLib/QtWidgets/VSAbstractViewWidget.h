@@ -132,7 +132,6 @@ signals:
   void mapColorsChanged(VSFilterViewSettings*, Qt::CheckState);
   void alphaChanged(VSFilterViewSettings*, double);
   void showScalarBarChanged(VSFilterViewSettings*, bool);
-  void requiresRender();
 
 public slots:
   /**
@@ -159,6 +158,12 @@ public slots:
   * @brief Resets the visualization widget's camera
   */
   void resetCamera();
+
+  /**
+  * @brief Sets whether or not the render process should be blocked
+  * @param block
+  */
+  void setBlockRender(bool block);
 
 protected slots:
   /**
@@ -286,4 +291,5 @@ private:
   VSFilterViewSettings* m_ActiveFilterSettings = nullptr;
   VSFilterViewSettings::Map m_FilterViewSettings;
   VSController* m_Controller = nullptr;
+  bool m_BlockRender = false;
 };

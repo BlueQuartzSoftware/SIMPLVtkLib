@@ -45,7 +45,7 @@
 //
 // -----------------------------------------------------------------------------
 VSConcurrentImport::VSConcurrentImport(VSController* controller)
-: QObject()
+: QThread(controller)
 , m_Controller(controller)
 , m_ImportDataContainerOrderLock(1)
 , m_UnappliedDataFilterLock(1)
@@ -99,11 +99,12 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
   m_ImportDataContainerOrder = dca->getDataContainers();
 
   size_t threadCount = QThreadPool::globalInstance()->maxThreadCount();
-  if(threadCount > 1)
+  if(threadCount > 2)
   {
-    threadCount--;
+    threadCount -= 2;
   }
 
+  emit blockRender(true);
   m_FilterLock.tryAcquire();
   for(int i = 0; i < threadCount; i++)
   {
@@ -114,8 +115,10 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
   while(m_FilterLock.tryAcquire() == false)
   {
     // Do nothing
-    QThread::currentThread()->wait();
+    //this->wait(10);
   }
+  emit blockRender(false);
+  this->wait(1 * 1000);
   for(int i = 0; i < threadCount; i++)
   {
     QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::applyDataFilters);
@@ -140,7 +143,6 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
       if(wrappedDc)
       {
         importWrappedDataContainer(fileFilter, wrappedDc);
-        QThread::currentThread()->wait();
       }
     }
   }
@@ -157,7 +159,7 @@ void VSConcurrentImport::importWrappedDataContainer(VSFileNameFilter* fileFilter
   emit importedFilter(filter);
   while(m_UnappliedDataFilterLock.tryAcquire() == false)
   {
-    QThread::currentThread()->wait();
+    //QThread::currentThread()->wait(10);
   }
   m_UnappliedDataFilters.push_back(filter);
   m_UnappliedDataFilterLock.release();
@@ -204,7 +206,7 @@ void VSConcurrentImport::applyDataFilters()
 
       filter->apply();
 
-      QThread::currentThread()->wait();
+      //QThread::currentThread()->wait(10);
     }
   }
 }
