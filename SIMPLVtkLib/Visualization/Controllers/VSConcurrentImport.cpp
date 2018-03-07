@@ -117,11 +117,11 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
   }
 
   addDataFilters();
-  QThread::currentThread()->wait(1 * 1000);
-  for(int i = 0; i < threadCount; i++)
-  {
-    QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::applyDataFilters);
-  }
+  //QThread::currentThread()->wait(1 * 1000);
+  //for(int i = 0; i < threadCount; i++)
+  //{
+  //  QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::applyDataFilters);
+  //}
 }
 
 // -----------------------------------------------------------------------------
@@ -138,7 +138,8 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
 
       m_ImportDataContainerOrderLock.release();
 
-      SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapGeometryPtr(dc);
+      //SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapGeometryPtr(dc);
+      SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
       if(wrappedDc)
       {
         importWrappedDataContainer(fileFilter, wrappedDc);

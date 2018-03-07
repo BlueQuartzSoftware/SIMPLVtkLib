@@ -301,17 +301,18 @@ void SIMPLVtkBridge::FinishWrappingDataContainerStruct(WrappedDataContainerPtr w
         pointDataSet = cell2Point->GetOutput();
         break;
       }
+
+      vtkPointData* pointData = pointDataSet->GetPointData();
+      if(pointData->GetNumberOfArrays() > 0)
+      {
+        pointData->SetActiveScalars(pointData->GetArray(0)->GetName());
+      }
       dataSet->DeepCopy(pointDataSet);
 
       // Set the active cell / point data scalars
       if(cellData->GetNumberOfArrays() > 0)
       {
         cellData->SetActiveScalars(cellData->GetArray(0)->GetName());
-      }
-      vtkPointData* pointData = dataSet->GetPointData();
-      if(pointData->GetNumberOfArrays() > 0)
-      {
-        pointData->SetActiveScalars(pointData->GetArray(0)->GetName());
       }
     }
   }

@@ -700,6 +700,7 @@ void VSFilterViewSettings::setupDataSetActors()
 
   vtkDataSetMapper* mapper = vtkDataSetMapper::New();
   mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
+  mapper->ReleaseDataFlagOn();
 
   vtkActor* actor = vtkActor::New();
   actor->SetMapper(mapper);
