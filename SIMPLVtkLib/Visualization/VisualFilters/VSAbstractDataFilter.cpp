@@ -83,3 +83,11 @@ VSAbstractFilter::dataType_t VSAbstractDataFilter::getOutputType()
     return dataType_t::INVALID_DATA;
   }
 }
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractDataFilter::reloadData()
+{
+
+}

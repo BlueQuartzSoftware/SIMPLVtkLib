@@ -65,6 +65,11 @@ public:
   */
   dataType_t getOutputType() override;
 
+  /**
+   * @brief Reloads the data in the item
+   */
+  virtual void reloadData();
+
 protected:
   /**
   * @brief This method is empty as there should never be a case where a VSAbstractDataFilter
@@ -72,4 +77,7 @@ protected:
   * @param filter
   */
   void updateAlgorithmInput(VSAbstractFilter* filter) override;
+
+signals:
+    void filterReloaded(VSAbstractFilter* filter);
 };

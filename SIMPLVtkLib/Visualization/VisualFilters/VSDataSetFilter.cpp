@@ -132,6 +132,56 @@ void VSDataSetFilter::writeJson(QJsonObject &json)
 // -----------------------------------------------------------------------------
 void VSDataSetFilter::createFilter()
 {
+  readDataSet();
+
+  if(m_DataSet != nullptr)
+  {
+    updateDisplayName();
+
+    m_DataSet->ComputeBounds();
+
+    m_TrivialProducer = VTK_PTR(vtkTrivialProducer)::New();
+    m_TrivialProducer->SetOutput(m_DataSet);
+
+    emit updatedOutputPort(this);
+  }
+  else
+  {
+    setText("Invalid Import File");
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSDataSetFilter::updateDisplayName()
+{
+  dataType_t outputType = getOutputType();
+  switch(outputType)
+  {
+  case dataType_t::IMAGE_DATA:
+    setText("Image Data");
+    break;
+  case dataType_t::POINT_DATA:
+    setText("Point Data");
+    break;
+  case dataType_t::POLY_DATA:
+    setText("Poly Data");
+    break;
+  case dataType_t::UNSTRUCTURED_GRID:
+    setText("Unstructured Grid Data");
+    break;
+  default:
+    setText("Other Data");
+    break;
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSDataSetFilter::readDataSet()
+{
   QFileInfo fi(m_FilePath);
   QString ext = fi.completeSuffix().toLower();
 
@@ -152,35 +202,23 @@ void VSDataSetFilter::createFilter()
   {
     readSTLFile();
   }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSDataSetFilter::reloadData()
+{
+  readDataSet();
 
   if(m_DataSet != nullptr)
   {
-    dataType_t outputType = getOutputType();
-    switch(outputType)
-    {
-    case dataType_t::IMAGE_DATA:
-      setText("Image Data");
-      break;
-    case dataType_t::POINT_DATA:
-      setText("Point Data");
-      break;
-    case dataType_t::POLY_DATA:
-      setText("Poly Data");
-      break;
-    case dataType_t::UNSTRUCTURED_GRID:
-      setText("Unstructured Grid Data");
-      break;
-    default:
-      setText("Other Data");
-      break;
-    }
+    updateDisplayName();
 
     m_DataSet->ComputeBounds();
 
     m_TrivialProducer = VTK_PTR(vtkTrivialProducer)::New();
     m_TrivialProducer->SetOutput(m_DataSet);
-
-    emit updatedOutputPort(this);
   }
   else
   {

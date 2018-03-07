@@ -208,9 +208,16 @@ protected slots:
   virtual void setCurrentFilter(VSAbstractFilter* filter);
 
   /**
-  * @brief
-  */
+   * @brief deleteFilter
+   * @param filter
+   */
   virtual void deleteFilter(VSAbstractFilter* filter);
+
+  /**
+   * @brief reloadFilter
+   * @param filter
+   */
+  virtual void reloadFilter(VSAbstractDataFilter* filter);
 
   /**
   * @brief Connects a new VSAbstractViewWidget to the main widget

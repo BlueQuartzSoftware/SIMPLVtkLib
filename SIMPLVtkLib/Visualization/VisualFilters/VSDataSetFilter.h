@@ -112,6 +112,11 @@ public:
   void writeJson(QJsonObject &json) override;
 
   /**
+   * @brief reloadData
+   */
+  void reloadData() override;
+
+  /**
    * @brief getUuid
    * @return
    */
@@ -127,6 +132,16 @@ private:
   QString m_FilePath;
   VTK_PTR(vtkDataSet) m_DataSet = nullptr;
   VTK_PTR(vtkTrivialProducer) m_TrivialProducer = nullptr;
+
+  /**
+   * @brief readDataSet
+   */
+  void readDataSet();
+
+  /**
+   * @brief updateDisplayName
+   */
+  void updateDisplayName();
 
   /**
    * @brief readImage

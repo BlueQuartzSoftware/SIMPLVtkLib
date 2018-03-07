@@ -35,6 +35,10 @@
 
 #include "VSFilterView.h"
 
+#include <QtWidgets/QMenu>
+
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractDataFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSFileNameFilter.h"
 #include "SIMPLVtkLib/Visualization/Controllers/VSFilterModel.h"
 
 // -----------------------------------------------------------------------------
@@ -54,6 +58,7 @@ void VSFilterView::setupGui()
 {
   setHeaderHidden(true);
   setSelectionMode(QAbstractItemView::SingleSelection);
+  setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 // -----------------------------------------------------------------------------
@@ -204,6 +209,79 @@ void VSFilterView::setCurrentItem(const QModelIndex& current, const QModelIndex&
 void VSFilterView::connectSlots()
 {
   connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(itemClicked(const QModelIndex&)));
+
+  connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(requestContextMenu(const QPoint&)));
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterView::requestContextMenu(const QPoint& pos)
+{
+  activateWindow();
+
+  QModelIndex index = indexAt(pos);
+
+  QPoint mapped;
+  if(index.isValid())
+  {
+    // Note: We must map the point to global from the viewport to
+    // account for the header.
+    mapped = viewport()->mapToGlobal(pos);
+  }
+  else
+  {
+    index = QModelIndex();
+    mapped = mapToGlobal(pos);
+  }
+
+  QMenu menu;
+  if(index.isValid())
+  {
+    VSAbstractFilter* filter = getFilterFromIndex(index);
+    if (filter != nullptr)
+    {
+      VSAbstractDataFilter* dataFilter = dynamic_cast<VSAbstractDataFilter*>(filter);
+      VSFileNameFilter* fileNameFilter = dynamic_cast<VSFileNameFilter*>(filter);
+      if (dataFilter != nullptr)
+      {
+        QAction* reloadAction = new QAction("Reload Data");
+        connect(reloadAction, &QAction::triggered, [=] {
+          emit reloadFilterRequested(dataFilter);
+        });
+        menu.addAction(reloadAction);
+
+        {
+          QAction* separator = new QAction(this);
+          separator->setSeparator(true);
+          menu.addAction(separator);
+        }
+      }
+      else if (fileNameFilter != nullptr)
+      {
+        QAction* reloadAction = new QAction("Reload File");
+        connect(reloadAction, &QAction::triggered, [=] {
+//          emit reloadFilterRequested(dataFilter);
+        });
+        menu.addAction(reloadAction);
+
+        {
+          QAction* separator = new QAction(this);
+          separator->setSeparator(true);
+          menu.addAction(separator);
+        }
+      }
+
+      QAction* deleteAction = new QAction("Delete");
+      connect(deleteAction, &QAction::triggered, [=] {
+        VSAbstractFilter* filter = getFilterFromIndex(index);
+        emit deleteFilterRequested(filter);
+      });
+      menu.addAction(deleteAction);
+    }
+
+    menu.exec(mapped);
+  }
 }
 
 // -----------------------------------------------------------------------------

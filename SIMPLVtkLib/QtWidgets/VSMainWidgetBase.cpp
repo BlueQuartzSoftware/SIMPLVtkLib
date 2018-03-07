@@ -99,6 +99,11 @@ void VSMainWidgetBase::connectViewWidget(VSAbstractViewWidget* viewWidget)
 
   connect(viewWidget, SIGNAL(markActive(VSAbstractViewWidget*)),
     this, SLOT(setActiveView(VSAbstractViewWidget*)));
+
+  if (m_FilterView)
+  {
+    connect(this, SIGNAL(reloadFilterRequested(VSAbstractDataFilter*)), viewWidget, SLOT());
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -141,6 +146,8 @@ void VSMainWidgetBase::setFilterView(VSFilterView* view)
   if(m_FilterView)
   {
     disconnect(m_FilterView, SIGNAL(filterClicked(VSAbstractFilter*)));
+    disconnect(m_FilterView, SIGNAL(deleteFilterRequested(VSAbstractFilter*)));
+    disconnect(m_FilterView, SIGNAL(reloadFilterRequested(VSAbstractDataFilter*)));
     disconnect(this, SIGNAL(changedActiveView(VSAbstractViewWidget*)), view, SLOT(setViewWidget(VSAbstractViewWidget*)));
     disconnect(this, SIGNAL(changedActiveFilter(VSAbstractFilter*, VSAbstractFilterWidget*)),
       view, SLOT(setActiveFilter(VSAbstractFilter*, VSAbstractFilterWidget*)));
@@ -149,6 +156,8 @@ void VSMainWidgetBase::setFilterView(VSFilterView* view)
   view->setController(m_Controller);
 
   m_FilterView = view;
+  connect(view, SIGNAL(deleteFilterRequested(VSAbstractFilter*)), this, SLOT(deleteFilter(VSAbstractFilter*)));
+  connect(view, SIGNAL(reloadFilterRequested(VSAbstractDataFilter*)), this, SLOT(reloadFilter(VSAbstractDataFilter*)));
   connect(view, SIGNAL(filterClicked(VSAbstractFilter*)), this, SLOT(setCurrentFilter(VSAbstractFilter*)));
   connect(this, SIGNAL(changedActiveView(VSAbstractViewWidget*)), view, SLOT(setViewWidget(VSAbstractViewWidget*)));
   connect(this, SIGNAL(changedActiveFilter(VSAbstractFilter*, VSAbstractFilterWidget*)),
@@ -564,6 +573,24 @@ void VSMainWidgetBase::deleteFilter(VSAbstractFilter* filter)
   }
 
   m_Controller->getFilterModel()->removeFilter(filter);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidgetBase::reloadFilter(VSAbstractDataFilter* filter)
+{
+  filter->reloadData();
+
+  QVector<VSAbstractViewWidget*> viewWidgets = getAllViewWidgets();
+  for (int i = 0; i < viewWidgets.size(); i++)
+  {
+    VSAbstractViewWidget* viewWidget = viewWidgets[i];
+    VSFilterViewSettings* viewSettings = viewWidget->getFilterViewSettings(filter);
+    viewSettings->updateConnections();
+  }
+
+  emit filter->updatedOutputPort(filter);
 }
 
 // -----------------------------------------------------------------------------
