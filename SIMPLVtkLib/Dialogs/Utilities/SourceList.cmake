@@ -6,7 +6,6 @@ set(${PROJECT_NAME}_Dialogs_Utilities_Moc_HDRS
   )
 # --------------------------------------------------------------------
 # Run Qts automoc program to generate some source files that get compiled
-QT5_WRAP_CPP( ${PROJECT_NAME}_Dialogs_Utilities_Generated_MOC_SRCS ${${PROJECT_NAME}_Dialogs_Utilities_Moc_HDRS})
 set_source_files_properties( ${${PROJECT_NAME}_Dialogs_Utilities_Generated_MOC_SRCS} PROPERTIES GENERATED TRUE)
 set_source_files_properties( ${${PROJECT_NAME}_Dialogs_Utilities_Generated_MOC_SRCS} PROPERTIES HEADER_FILE_ONLY TRUE)
 

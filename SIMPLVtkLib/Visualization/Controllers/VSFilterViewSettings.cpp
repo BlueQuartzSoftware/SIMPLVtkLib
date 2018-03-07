@@ -669,7 +669,7 @@ void VSFilterViewSettings::setupImageActors()
   vtkImageSliceMapper* mapper = vtkImageSliceMapper::New();
   mapper->SetInputConnection(m_Filter->getOutputPort());
   mapper->SliceAtFocalPointOn();
-  mapper->SliceFacesCameraOn();
+  mapper->SliceFacesCameraOff();
 
   vtkImageSlice* actor = vtkImageSlice::New();
   actor->SetMapper(mapper);
