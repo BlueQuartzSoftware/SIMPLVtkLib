@@ -98,10 +98,15 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 
   m_ImportDataContainerOrder = dca->getDataContainers();
 
+  size_t threadsUsed = 3;
   size_t threadCount = QThreadPool::globalInstance()->maxThreadCount();
-  if(threadCount > 2)
+  if(threadCount > threadsUsed)
   {
-    threadCount -= 2;
+    threadCount -= threadsUsed;
+  }
+  else
+  {
+    threadCount = 1;
   }
 
   emit blockRender(true);
@@ -111,14 +116,8 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
     QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::importDataContainer, fileFilter);
   }
 
-  //addDataFilters();
-  while(m_FilterLock.tryAcquire() == false)
-  {
-    // Do nothing
-    //this->wait(10);
-  }
-  emit blockRender(false);
-  this->wait(1 * 1000);
+  addDataFilters();
+  QThread::currentThread()->wait(1 * 1000);
   for(int i = 0; i < threadCount; i++)
   {
     QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::applyDataFilters);
@@ -159,7 +158,7 @@ void VSConcurrentImport::importWrappedDataContainer(VSFileNameFilter* fileFilter
   emit importedFilter(filter);
   while(m_UnappliedDataFilterLock.tryAcquire() == false)
   {
-    //QThread::currentThread()->wait(10);
+    QThread::currentThread()->wait(1);
   }
   m_UnappliedDataFilters.push_back(filter);
   m_UnappliedDataFilterLock.release();
@@ -173,22 +172,16 @@ void VSConcurrentImport::addDataFilters()
   while(m_FilterLock.tryAcquire() == false)
   {
     // Do nothing
+    QThread::currentThread()->wait(1);
   }
 
-  for(VSSIMPLDataContainerFilter* filter : m_UnappliedDataFilters)
-  {
-    m_Controller->getFilterModel()->addFilter(filter);
-  }
+  //for(VSSIMPLDataContainerFilter* filter : m_UnappliedDataFilters)
+  //{
+  //  //m_Controller->getFilterModel()->addFilter(filter);
+  //  emit importedFilter(filter);
+  //}
 
-  size_t threadCount = QThreadPool::globalInstance()->maxThreadCount();
-  if(threadCount > 1)
-  {
-    threadCount--;
-  }
-  for(int i = 0; i < threadCount; i++)
-  {
-    QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::applyDataFilters);
-  }
+  emit blockRender(false);
 }
 
 // -----------------------------------------------------------------------------

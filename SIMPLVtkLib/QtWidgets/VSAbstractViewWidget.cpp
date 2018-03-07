@@ -594,9 +594,17 @@ void VSAbstractViewWidget::setBlockRender(bool block)
 {
   m_BlockRender = block;
 
-  if(false == block)
+  if(getVisualizationWidget() && getVisualizationWidget()->getRenderer())
   {
-    renderView();
+    if(block)
+    {
+      getVisualizationWidget()->getRenderer()->DrawOff();
+    }
+    else
+    {
+      getVisualizationWidget()->getRenderer()->DrawOn();
+      renderView();
+    }
   }
 }
 
