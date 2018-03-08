@@ -132,6 +132,8 @@ void VSDataSetFilter::writeJson(QJsonObject &json)
 // -----------------------------------------------------------------------------
 void VSDataSetFilter::createFilter()
 {
+  m_TrivialProducer = VTK_PTR(vtkTrivialProducer)::New();
+
   readDataSet();
 
   if(m_DataSet != nullptr)
@@ -139,9 +141,6 @@ void VSDataSetFilter::createFilter()
     updateDisplayName();
 
     m_DataSet->ComputeBounds();
-
-    m_TrivialProducer = VTK_PTR(vtkTrivialProducer)::New();
-    m_TrivialProducer->SetOutput(m_DataSet);
 
     emit updatedOutputPort(this);
   }
@@ -217,8 +216,7 @@ void VSDataSetFilter::reloadData()
 
     m_DataSet->ComputeBounds();
 
-    m_TrivialProducer = VTK_PTR(vtkTrivialProducer)::New();
-    m_TrivialProducer->SetOutput(m_DataSet);
+    emit updatedOutputPort(this);
   }
   else
   {
@@ -240,7 +238,10 @@ void VSDataSetFilter::readImage()
     imageReader->SetFileName(m_FilePath.toLatin1().data());
     imageReader->Update();
 
-    m_DataSet = imageReader->GetOutput();
+    VTK_PTR(vtkDataSet) newDataSet = imageReader->GetOutput();
+    m_TrivialProducer->SetOutput(newDataSet);
+    m_TrivialProducer->Update();
+    m_DataSet = newDataSet;
   }
   else if (mimeType.inherits("image/png"))
   {
@@ -248,7 +249,10 @@ void VSDataSetFilter::readImage()
     imageReader->SetFileName(m_FilePath.toLatin1().data());
     imageReader->Update();
 
-    m_DataSet = imageReader->GetOutput();
+    VTK_PTR(vtkDataSet) newDataSet = imageReader->GetOutput();
+    m_TrivialProducer->SetOutput(newDataSet);
+    m_TrivialProducer->Update();
+    m_DataSet = newDataSet;
   }
   else if (mimeType.inherits("image/tiff"))
   {
@@ -256,7 +260,10 @@ void VSDataSetFilter::readImage()
     imageReader->SetFileName(m_FilePath.toLatin1().data());
     imageReader->Update();
 
-    m_DataSet = imageReader->GetOutput();
+    VTK_PTR(vtkDataSet) newDataSet = imageReader->GetOutput();
+    m_TrivialProducer->SetOutput(newDataSet);
+    m_TrivialProducer->Update();
+    m_DataSet = newDataSet;
   }
   else if(mimeType.inherits("image/bmp"))
   {
@@ -264,7 +271,10 @@ void VSDataSetFilter::readImage()
     imageReader->SetFileName(m_FilePath.toLatin1().data());
     imageReader->Update();
 
-    m_DataSet = imageReader->GetOutput();
+    VTK_PTR(vtkDataSet) newDataSet = imageReader->GetOutput();
+    m_TrivialProducer->SetOutput(newDataSet);
+    m_TrivialProducer->Update();
+    m_DataSet = newDataSet;
   }
 }
 
@@ -282,7 +292,10 @@ void VSDataSetFilter::readVTKFile()
     vtkReader->SetFileName(m_FilePath.toLatin1().data());
     vtkReader->Update();
 
-    m_DataSet = vtkDataSet::SafeDownCast(vtkReader->GetOutput());
+    VTK_PTR(vtkDataSet) newDataSet = vtkDataSet::SafeDownCast(vtkReader->GetOutput());
+    m_TrivialProducer->SetOutput(newDataSet);
+    m_TrivialProducer->Update();
+    m_DataSet = newDataSet;
   }
   else if (ext == "vti")
   {
@@ -290,7 +303,10 @@ void VSDataSetFilter::readVTKFile()
     vtkReader->SetFileName(m_FilePath.toLatin1().data());
     vtkReader->Update();
 
-    m_DataSet = vtkReader->GetOutput();
+    VTK_PTR(vtkDataSet) newDataSet = vtkReader->GetOutput();
+    m_TrivialProducer->SetOutput(newDataSet);
+    m_TrivialProducer->Update();
+    m_DataSet = newDataSet;
   }
   else if (ext == "vtp")
   {
@@ -298,7 +314,10 @@ void VSDataSetFilter::readVTKFile()
     vtkReader->SetFileName(m_FilePath.toLatin1().data());
     vtkReader->Update();
 
-    m_DataSet = vtkReader->GetOutput();
+    VTK_PTR(vtkDataSet) newDataSet = vtkReader->GetOutput();
+    m_TrivialProducer->SetOutput(newDataSet);
+    m_TrivialProducer->Update();
+    m_DataSet = newDataSet;
   }
   else if (ext == "vtr")
   {
@@ -306,7 +325,10 @@ void VSDataSetFilter::readVTKFile()
     vtkReader->SetFileName(m_FilePath.toLatin1().data());
     vtkReader->Update();
 
-    m_DataSet = vtkReader->GetOutput();
+    VTK_PTR(vtkDataSet) newDataSet = vtkReader->GetOutput();
+    m_TrivialProducer->SetOutput(newDataSet);
+    m_TrivialProducer->Update();
+    m_DataSet = newDataSet;
   }
   else if (ext == "vts")
   {
@@ -314,7 +336,10 @@ void VSDataSetFilter::readVTKFile()
     vtkReader->SetFileName(m_FilePath.toLatin1().data());
     vtkReader->Update();
 
-    m_DataSet = vtkReader->GetOutput();
+    VTK_PTR(vtkDataSet) newDataSet = vtkReader->GetOutput();
+    m_TrivialProducer->SetOutput(newDataSet);
+    m_TrivialProducer->Update();
+    m_DataSet = newDataSet;
   }
   else if (ext == "vtu")
   {
@@ -322,7 +347,10 @@ void VSDataSetFilter::readVTKFile()
     vtkReader->SetFileName(m_FilePath.toLatin1().data());
     vtkReader->Update();
 
-    m_DataSet = vtkReader->GetOutput();
+    VTK_PTR(vtkDataSet) newDataSet = vtkReader->GetOutput();
+    m_TrivialProducer->SetOutput(newDataSet);
+    m_TrivialProducer->Update();
+    m_DataSet = newDataSet;
   }
 }
 
@@ -335,7 +363,10 @@ void VSDataSetFilter::readSTLFile()
   reader->SetFileName(m_FilePath.toLatin1().data());
   reader->Update();
 
-  m_DataSet = reader->GetOutput();
+  VTK_PTR(vtkDataSet) newDataSet = reader->GetOutput();
+  m_TrivialProducer->SetOutput(newDataSet);
+  m_TrivialProducer->Update();
+  m_DataSet = newDataSet;
 }
 
 // -----------------------------------------------------------------------------

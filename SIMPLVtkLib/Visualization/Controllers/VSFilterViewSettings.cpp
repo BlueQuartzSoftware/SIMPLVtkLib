@@ -657,14 +657,6 @@ bool VSFilterViewSettings::isFlatImage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSFilterViewSettings::updateConnections()
-{
-  setupActors();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void VSFilterViewSettings::setupImageActors()
 {
   vtkImageSliceMapper* mapper = vtkImageSliceMapper::New();

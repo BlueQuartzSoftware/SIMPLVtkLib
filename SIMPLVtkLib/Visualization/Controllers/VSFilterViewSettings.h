@@ -204,11 +204,6 @@ public:
   */
   void copySettings(VSFilterViewSettings* other);
 
-  /**
-   * @brief updateConnections
-   */
-  void updateConnections();
-
 public slots:
   /**
   * @brief Displays the vtkActor for this view

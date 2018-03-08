@@ -582,15 +582,13 @@ void VSMainWidgetBase::reloadFilter(VSAbstractDataFilter* filter)
 {
   filter->reloadData();
 
-  QVector<VSAbstractViewWidget*> viewWidgets = getAllViewWidgets();
-  for (int i = 0; i < viewWidgets.size(); i++)
-  {
-    VSAbstractViewWidget* viewWidget = viewWidgets[i];
-    VSFilterViewSettings* viewSettings = viewWidget->getFilterViewSettings(filter);
-    viewSettings->updateConnections();
-  }
-
-  emit filter->updatedOutputPort(filter);
+//  QVector<VSAbstractViewWidget*> viewWidgets = getAllViewWidgets();
+//  for (int i = 0; i < viewWidgets.size(); i++)
+//  {
+//    VSAbstractViewWidget* viewWidget = viewWidgets[i];
+//    VSFilterViewSettings* viewSettings = viewWidget->getFilterViewSettings(filter);
+//    viewSettings->updateConnections();
+//  }
 }
 
 // -----------------------------------------------------------------------------
