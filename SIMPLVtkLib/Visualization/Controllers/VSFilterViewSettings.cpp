@@ -747,7 +747,7 @@ void VSFilterViewSettings::updateInputPort(VSAbstractFilter* filter)
   }
   else
   {
-    m_Mapper->SetInputConnection(filter->getTransformedOutputPort());
+    m_Mapper->SetInputConnection(filter->getOutputPort());
   }
   emit requiresRender();
 }
