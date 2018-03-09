@@ -675,7 +675,6 @@ void VSFilterViewSettings::setupImageActors()
   m_ActorType = ActorType::Image2D;
 
   updateTransform();
-  //emit requiresRender();
 }
 
 // -----------------------------------------------------------------------------
