@@ -61,11 +61,16 @@ public:
 
   void run();
 
+signals:
+  void wrappedDataContainer(VSFileNameFilter* parent, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
+
+protected slots:
+  void importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
+
 protected:
   void addDataContainerArray(DcaFilePair wrappedFileDc);
   void importDataContainerArray(DcaFilePair filePair);
   void importDataContainer(VSFileNameFilter* fileFilter);
-  void importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
 
 private:
   VSController* m_Controller;
@@ -75,5 +80,4 @@ private:
   QSemaphore m_ImportDataContainerOrderLock;
   QVector< QSharedPointer<QFutureWatcher<void>> > m_ImportDataContainerWatchers;
   int m_NumOfFinishedImportDataContainerThreads = 0;
-
 };
