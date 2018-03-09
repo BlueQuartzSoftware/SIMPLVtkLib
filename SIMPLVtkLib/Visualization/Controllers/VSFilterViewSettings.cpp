@@ -784,7 +784,6 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
   {
     disconnect(m_Filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
     disconnect(m_Filter, SIGNAL(transformChanged()), this, SLOT(updateTransform()));
-    disconnect(filter->getTransform(), SIGNAL(valuesChanged()), this, SLOT(updateTransform()));
   }
 
   m_Filter = filter;
@@ -792,7 +791,6 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
   {
     connect(filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
     connect(filter, SIGNAL(transformChanged()), this, SLOT(updateTransform()));
-    connect(filter->getTransform(), SIGNAL(valuesChanged()), this, SLOT(updateTransform()));
 
     if(filter->getArrayNames().size() < 1)
     {
