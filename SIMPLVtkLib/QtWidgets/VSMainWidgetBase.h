@@ -167,7 +167,6 @@ public slots:
 signals:
   void changedActiveView(VSAbstractViewWidget* viewWidget);
   void changedActiveFilter(VSAbstractFilter* filter, VSAbstractFilterWidget* filterWidget);
-
   void proxyFromFilePathGenerated(DataContainerArrayProxy proxy, const QString &filePath);
 
 protected:

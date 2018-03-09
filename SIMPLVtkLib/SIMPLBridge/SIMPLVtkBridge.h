@@ -224,6 +224,9 @@ public:
   }
 
 protected:
+  /**
+  * @brief Constructor
+  */
   SIMPLVtkBridge();
 
 private:

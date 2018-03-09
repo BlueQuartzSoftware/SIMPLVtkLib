@@ -48,6 +48,10 @@
 
 class VSController;
 
+/**
+* @class VSConcurrentImport VSConcurrentImport.h SIMPLVtkLib/Visualization/Controllers/VSConcurrentImport.h
+* @brief This class handles the multithreaded import process for VSSIMPLDataContainerFilters.
+*/
 class SIMPLVtkLib_EXPORT VSConcurrentImport : public QObject
 {
   Q_OBJECT
@@ -55,22 +59,51 @@ class SIMPLVtkLib_EXPORT VSConcurrentImport : public QObject
 public:
   using DcaFilePair = std::pair<VSFileNameFilter*, DataContainerArray::Pointer>;
 
+  /**
+  * @brief Constructor
+  * @param parent
+  */
   VSConcurrentImport(VSController* parent);
 
+  /**
+  * @brief Add a DataContainerArray with the given file path to the list items to import
+  * @param filePath
+  * @param dca
+  */
   void addDataContainerArray(QString filePath, DataContainerArray::Pointer dca);
 
+  /**
+  * @brief Performs the import process on as many threads as are available.
+  * This process is performed one file path at a time, meaning that many small files will 
+  * be slower to import than a single large file if the amount of data is the same.
+  */
   void run();
 
-signals:
-  void wrappedDataContainer(VSFileNameFilter* parent, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
-
-protected slots:
-  void importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
-
 protected:
+  /**
+  * @brief Adds the DcaFilePair value to the list of files and DataContainerArrays to wrap
+  * @param wrappedFileDc
+  */
   void addDataContainerArray(DcaFilePair wrappedFileDc);
+
+  /**
+  * @brief Begins importing the given DataContainerArray and file path pair
+  * @param filePair
+  */
   void importDataContainerArray(DcaFilePair filePair);
+
+  /**
+  * @brief Wraps the DataContainers in vtkDataSets and prepares to add the generated filters to the filter model
+  * @param fileFilter
+  */
   void importDataContainer(VSFileNameFilter* fileFilter);
+
+  /**
+  * @brief Given a VSFileNameFilter and wrapped data container, create and add a VSSIMPLDataContainerFilter to the filter model
+  * @param fileFilter
+  * @param wrappedDc
+  */
+  void importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
 
 private:
   VSController* m_Controller;

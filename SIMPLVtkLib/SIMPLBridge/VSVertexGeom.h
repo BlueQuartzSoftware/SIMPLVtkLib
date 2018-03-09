@@ -152,6 +152,9 @@ public:
   void ReplaceCell(vtkIdType cellId, int npts, vtkIdType *pts);
 
 protected:
+  /**
+  * @brief Constructor
+  */
   VSVertexGeom();
 
 private:

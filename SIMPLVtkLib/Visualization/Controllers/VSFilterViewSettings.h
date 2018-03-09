@@ -196,6 +196,10 @@ public:
   */
   int getRepresentationi();
 
+  /**
+  * @brief Returns the actor property representation as an enum
+  * @return
+  */
   ActorType getActorType();
 
   /**
@@ -281,6 +285,9 @@ public slots:
   */
   void updateInputPort(VSAbstractFilter* filter);
 
+  /**
+  * @brief Updates the transformation for 2D image data
+  */
   void updateTransform();
 
 signals:
@@ -300,18 +307,44 @@ protected:
   */
   void setupActors();
 
+  /**
+  * @brief Performs initial setup commands for vtkImageSlice props used in the view settings
+  */
   void setupImageActors();
 
+  /**
+  * @brief Performs initial setup commands for vtkActor props used in the view settings
+  */
   void setupDataSetActors();
 
+  /**
+  * @brief Returns the vtkDataSetMapper if one exists for this filter view
+  * @return
+  */
   vtkDataSetMapper* getDataSetMapper();
 
+  /**
+  * @brief Returns the vtkActor if one exists for this filter view
+  * @return
+  */
   vtkActor* getDataSetActor();
 
+  /**
+  * @brief Returns the vtkImageSliceMapper if one exists for this filter view
+  * @return
+  */
   vtkImageSliceMapper* getImageMapper();
 
+  /**
+  * @brief Returns the vtkImageSlice actor if one exists for this filter view
+  * @return
+  */
   vtkImageSlice* getImageSliceActor();
 
+  /**
+  * @brief Returns true if the incoming vtkDataSet is flat. Returns false otherwise.
+  * @return
+  */
   bool isFlatImage();
 
   /**
