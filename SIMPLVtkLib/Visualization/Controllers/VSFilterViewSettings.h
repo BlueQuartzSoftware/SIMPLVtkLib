@@ -281,6 +281,8 @@ public slots:
   */
   void updateInputPort(VSAbstractFilter* filter);
 
+  void updateTransform();
+
 signals:
   void visibilityChanged(VSFilterViewSettings*, bool);
   void representationChanged(VSFilterViewSettings*, Representation);
