@@ -58,19 +58,6 @@ class SIMPLVtkLib_EXPORT VSAbstractViewWidget : public QFrame
 
 public:
   /**
-  * @brief Constructor
-  * @param parent
-  * @param windowFlags
-  */
-  VSAbstractViewWidget(QWidget* parent = nullptr, Qt::WindowFlags windowFlags = Qt::WindowFlags());
-
-  /**
-  * @brief Copy constructor
-  * @param other
-  */
-  VSAbstractViewWidget(const VSAbstractViewWidget& other);
-
-  /**
   * @brief Deconstructor
   */
   virtual ~VSAbstractViewWidget() = default;
@@ -244,6 +231,19 @@ protected slots:
   virtual void mousePressed();
 
 protected:
+  /**
+  * @brief Constructor
+  * @param parent
+  * @param windowFlags
+  */
+  VSAbstractViewWidget(QWidget* parent = nullptr, Qt::WindowFlags windowFlags = Qt::WindowFlags());
+
+  /**
+  * @brief Copy constructor
+  * @param other
+  */
+  VSAbstractViewWidget(const VSAbstractViewWidget& other);
+
   /**
   * @brief Clears the filters from the view widget
   */

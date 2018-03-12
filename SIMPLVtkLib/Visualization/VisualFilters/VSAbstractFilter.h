@@ -94,11 +94,6 @@ public:
   SIMPL_BOOL_PROPERTY(Initialized)
 
   /**
-  * @brief Constructor
-  */
-  VSAbstractFilter();
-
-  /**
   * @brief Deconstructor
   */
   virtual ~VSAbstractFilter() = default;
@@ -275,6 +270,11 @@ protected slots:
 
 protected:
   /**
+  * @brief Constructor
+  */
+  VSAbstractFilter();
+
+  /**
   * @brief code to setup the vtkAlgorithm for the filter
   */
   virtual void createFilter() = 0;
@@ -314,8 +314,23 @@ protected:
   */
   void readTransformJson(QJsonObject& json);
 
-  bool m_ConnectedInput = false;
-  VTK_PTR(vtkAlgorithmOutput) m_InputPort;
+  /**
+  * @brief Returns true if the filter algorithm is connected. Returns false otherwise.
+  * @return
+  */
+  bool getConnectedInput();
+
+  /**
+  * @brief Returns the VTK input port
+  * @return
+  */
+  VTK_PTR(vtkAlgorithmOutput) getInputPort();
+
+  /**
+  * @brief Sets the VTK input port
+  * @param inputPort
+  */
+  void setInputPort(VTK_PTR(vtkAlgorithmOutput) inputPort);
 
 private:
   /**
@@ -332,6 +347,8 @@ private:
 
   std::shared_ptr<VSTransform> m_Transform;
   VTK_PTR(vtkTransformFilter) m_TransformFilter;
+  bool m_ConnectedInput = false;
+  VTK_PTR(vtkAlgorithmOutput) m_InputPort;
 };
 
 #ifdef __clang__
