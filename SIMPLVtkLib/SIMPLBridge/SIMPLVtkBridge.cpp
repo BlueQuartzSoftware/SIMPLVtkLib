@@ -82,13 +82,6 @@ SIMPLVtkBridge::SIMPLVtkBridge()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-SIMPLVtkBridge::~SIMPLVtkBridge()
-{
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 SIMPLVtkBridge::WrappedDataContainerPtrCollection SIMPLVtkBridge::WrapDataContainerArrayAsStruct(DataContainerArray::Pointer dca, AttributeMatrix::Types types)
 {
   SIMPLVtkBridge::WrappedDataContainerPtrCollection wrappedDataContainers;

@@ -57,7 +57,8 @@ class SIMPLVtkLib_EXPORT VSSliceFilterWidget : public VSAbstractFilterWidget
 public:
   /**
   * @brief Constructor
-  * @param parentWidget
+  * @param filter
+  * @param interactor
   * @param parent
   */
   VSSliceFilterWidget(VSSliceFilter* filter, vtkRenderWindowInteractor* interactor, QWidget* parent = nullptr);
@@ -65,7 +66,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  ~VSSliceFilterWidget();
+  virtual ~VSSliceFilterWidget() = default;
 
   /**
   * @brief Sets the filter's bounds
@@ -90,7 +91,7 @@ public:
   void setRenderingEnabled(bool enabled) override;
 
   /**
-  * @brief setInteractor
+  * @brief Sets the vtkRenderWindowInteractor for the filter widget
   * @param interactor
   */
   void setInteractor(vtkRenderWindowInteractor* interactor) override;

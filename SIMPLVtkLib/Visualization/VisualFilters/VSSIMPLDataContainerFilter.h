@@ -58,10 +58,15 @@ class SIMPLVtkLib_EXPORT VSSIMPLDataContainerFilter : public VSAbstractDataFilte
 public:
   /**
   * @brief Constuctor
-  * @param parentWidget
-  * @param dataSetStruct
+  * @param wrappedDataContainer
+  * @param parent
   */
   VSSIMPLDataContainerFilter(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDataContainer, VSAbstractFilter* parent = nullptr);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSSIMPLDataContainerFilter() = default;
 
   /**
   * @brief Returns the bounds of the vtkDataSet

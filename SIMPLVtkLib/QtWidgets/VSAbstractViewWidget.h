@@ -60,14 +60,20 @@ public:
   /**
   * @brief Constructor
   * @param parent
+  * @param windowFlags
   */
-  VSAbstractViewWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+  VSAbstractViewWidget(QWidget* parent = nullptr, Qt::WindowFlags windowFlags = Qt::WindowFlags());
 
   /**
   * @brief Copy constructor
   * @param other
   */
   VSAbstractViewWidget(const VSAbstractViewWidget& other);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSAbstractViewWidget() = default;
 
   /**
   * @brief Returns a pointer to the active VSFilterViewSettings

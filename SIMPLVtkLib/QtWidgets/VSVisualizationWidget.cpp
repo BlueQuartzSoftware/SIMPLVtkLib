@@ -73,11 +73,6 @@ VSVisualizationWidget::VSVisualizationWidget(QWidget* parent, unsigned int numLa
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSVisualizationWidget::~VSVisualizationWidget() = default;
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void VSVisualizationWidget::setupGui()
 {
   initializeRendererAndAxes();

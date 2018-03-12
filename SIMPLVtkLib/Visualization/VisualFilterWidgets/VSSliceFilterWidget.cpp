@@ -84,13 +84,6 @@ VSSliceFilterWidget::VSSliceFilterWidget(VSSliceFilter* filter, vtkRenderWindowI
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSSliceFilterWidget::~VSSliceFilterWidget()
-{
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void VSSliceFilterWidget::setBounds(double* bounds)
 {
   if(nullptr == bounds)

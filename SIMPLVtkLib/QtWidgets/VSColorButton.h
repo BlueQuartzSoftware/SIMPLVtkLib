@@ -53,6 +53,11 @@ public:
   VSColorButton(QWidget* parent);
 
   /**
+  * @brief Deconstructor
+  */
+  virtual ~VSColorButton() = default;
+
+  /**
   * @brief Returns the current color
   */
   QColor getColor();

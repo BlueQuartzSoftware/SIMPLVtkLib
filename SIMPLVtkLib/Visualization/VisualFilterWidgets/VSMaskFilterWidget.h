@@ -56,7 +56,8 @@ class SIMPLVtkLib_EXPORT VSMaskFilterWidget : public VSAbstractFilterWidget
 public:
   /**
   * @brief Constructor
-  * @param parentWidget
+  * @param filter
+  * @param interactor
   * @param parent
   */
   VSMaskFilterWidget(VSMaskFilter* filter, vtkRenderWindowInteractor* interactor, QWidget* parent);
@@ -64,7 +65,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  ~VSMaskFilterWidget();
+  virtual ~VSMaskFilterWidget() = default;
 
   /**
   * @brief Sets the filter's bounds

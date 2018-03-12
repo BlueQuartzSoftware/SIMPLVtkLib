@@ -58,8 +58,14 @@ class VSTransform : public QObject
 public:
   /**
   * @brief Constructor
+  * @param parent
   */
   VSTransform(VSTransform* parent = nullptr);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSTransform() = default;
 
   /**
   * @brief Sets the parent transform
@@ -153,6 +159,7 @@ public:
 
   /**
   * @brief Localizes the given normals from global space
+  * @param normals
   */
   void localizeNormals(vtkDataArray* normals);
 
@@ -194,6 +201,7 @@ public:
 
   /**
   * @brief Globalizes the given normals to put them in global space
+  * @param normals
   */
   void globalizeNormals(vtkDataArray* normals);
 

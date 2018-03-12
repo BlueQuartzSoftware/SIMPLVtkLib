@@ -56,6 +56,11 @@ public:
   VSTransformWidget(QWidget* parent);
 
   /**
+  * @brief Deconstructor
+  */
+  virtual ~VSTransformWidget() = default;
+
+  /**
   * @brief Returns the VSTransform used by the widget
   * @return
   */

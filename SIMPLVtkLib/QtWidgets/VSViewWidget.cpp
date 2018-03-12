@@ -53,8 +53,8 @@ public:
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSViewWidget::VSViewWidget(QWidget* parent, Qt::WindowFlags f)
-  : VSAbstractViewWidget(parent, f)
+VSViewWidget::VSViewWidget(QWidget* parent, Qt::WindowFlags windowFlags)
+  : VSAbstractViewWidget(parent, windowFlags)
   , m_Internals(new VSInternals())
 {
   m_Internals->setupUi(this);

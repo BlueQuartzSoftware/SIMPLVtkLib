@@ -88,13 +88,6 @@ VSFilterViewSettings::VSFilterViewSettings(const VSFilterViewSettings& copy)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSFilterViewSettings::~VSFilterViewSettings()
-{
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 VSAbstractFilter* VSFilterViewSettings::getFilter()
 {
   return m_Filter;

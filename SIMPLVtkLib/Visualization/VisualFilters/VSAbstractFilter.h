@@ -101,7 +101,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  virtual ~VSAbstractFilter();
+  virtual ~VSAbstractFilter() = default;
 
   /**
   * @brief Deletes the item and removes it from the model

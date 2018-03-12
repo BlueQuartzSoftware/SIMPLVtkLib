@@ -74,14 +74,6 @@ VSClipFilter::VSClipFilter(VSAbstractFilter* parent)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSClipFilter::~VSClipFilter()
-{
-
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 VSClipFilter* VSClipFilter::Create(QJsonObject &json, VSAbstractFilter* parent)
 {
   VSClipFilter* filter = new VSClipFilter(parent);

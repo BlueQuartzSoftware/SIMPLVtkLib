@@ -61,10 +61,14 @@ class SIMPLVtkLib_EXPORT VSCropFilter : public VSAbstractFilter
 public:
   /**
   * @brief Constructor
-  * @param parentWidget
   * @param parent
   */
   VSCropFilter(VSAbstractFilter* parent);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSCropFilter() = default;
 
   /**
    * @brief Create

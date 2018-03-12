@@ -72,13 +72,6 @@ VSAbstractFilter::VSAbstractFilter()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSAbstractFilter::~VSAbstractFilter()
-{
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void VSAbstractFilter::deleteFilter()
 {
   if(getParentFilter())
@@ -405,6 +398,30 @@ void VSAbstractFilter::saveFile(QString fileName)
   writer->SetFileName(fileName.toStdString().c_str());
   writer->SetInputData(output);
   writer->Write();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool VSAbstractFilter::getConnectedInput()
+{
+  return m_ConnectedInput;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+VTK_PTR(vtkAlgorithmOutput) VSAbstractFilter::getInputPort()
+{
+  return m_InputPort;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSAbstractFilter::setInputPort(VTK_PTR(vtkAlgorithmOutput) inputPort)
+{
+  m_InputPort = inputPort;
 }
 
 // -----------------------------------------------------------------------------

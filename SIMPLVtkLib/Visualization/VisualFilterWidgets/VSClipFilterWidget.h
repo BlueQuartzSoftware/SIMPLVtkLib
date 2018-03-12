@@ -60,7 +60,7 @@ class SIMPLVtkLib_EXPORT VSClipFilterWidget : public VSAbstractFilterWidget
 
 public:
   /**
-   * @brief VSClipFilterWidget
+   * @brief Constructor
    * @param filter
    * @param interactor
    * @param widget
@@ -70,7 +70,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  ~VSClipFilterWidget();
+  virtual ~VSClipFilterWidget();
 
   /**
   * @brief Sets the visualization filter's bounds
@@ -95,7 +95,7 @@ public:
   void setRenderingEnabled(bool enabled) override;
 
   /**
-   * @brief setInteractor
+   * @brief Sets the vtkRenderWindowInteractor for the filter widget
    * @param interactor
    */
   void setInteractor(vtkRenderWindowInteractor* interactor) override;

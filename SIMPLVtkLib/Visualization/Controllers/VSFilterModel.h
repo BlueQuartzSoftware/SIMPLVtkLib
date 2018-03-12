@@ -58,8 +58,14 @@ public:
   VSFilterModel(QObject* parent = nullptr);
 
   /**
+  * @brief Deconstructor
+  */
+  virtual ~VSFilterModel() = default;
+
+  /**
   * @brief Adds a filter to the model
   * @param filter
+  * @param currentFilter
   */
   void addFilter(VSAbstractFilter* filter, bool currentFilter = true);
 

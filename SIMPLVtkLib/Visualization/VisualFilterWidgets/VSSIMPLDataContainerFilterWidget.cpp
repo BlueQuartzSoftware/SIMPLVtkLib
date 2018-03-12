@@ -70,14 +70,6 @@ VSSIMPLDataContainerFilterWidget::VSSIMPLDataContainerFilterWidget(VSSIMPLDataCo
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSSIMPLDataContainerFilterWidget::~VSSIMPLDataContainerFilterWidget()
-{
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void VSSIMPLDataContainerFilterWidget::setBounds(double* bounds)
 {
-
 }

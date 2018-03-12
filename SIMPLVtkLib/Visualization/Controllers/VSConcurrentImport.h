@@ -66,6 +66,11 @@ public:
   VSConcurrentImport(VSController* parent);
 
   /**
+  * @brief Deconstructor
+  */
+  virtual ~VSConcurrentImport() = default;
+
+  /**
   * @brief Add a DataContainerArray with the given file path to the list items to import
   * @param filePath
   * @param dca

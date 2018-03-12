@@ -103,7 +103,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  virtual ~VSFilterViewSettings();
+  virtual ~VSFilterViewSettings() = default;
 
   /**
   * @brief Returns a pointer to the VSAbstractFilter

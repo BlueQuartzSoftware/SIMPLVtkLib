@@ -64,6 +64,11 @@ public:
   VSMainWidgetBase(QWidget* parent = nullptr);
 
   /**
+  * @brief Deconstructor
+  */
+  virtual ~VSMainWidgetBase() = default;
+
+  /**
   * @brief Returns the VSController for the widget
   */
   VSController* getController();
@@ -207,7 +212,9 @@ protected slots:
   virtual void setCurrentFilter(VSAbstractFilter* filter);
 
   /**
-  * @brief
+  * @brief Deletes the given filter and its children from the model and
+  * removes them from the view widgets
+  * @param filter
   */
   virtual void deleteFilter(VSAbstractFilter* filter);
 
@@ -224,10 +231,11 @@ protected slots:
   virtual void setFilterVisibility(VSFilterViewSettings* viewSettings, bool visible);
 
   /**
-   * @brief
+   * @brief Adds a filter to the model and sets it as the selected filter if requested
    * @param filter
+   * @param currentFilter
    */
-  void filterAdded(VSAbstractFilter* filter, bool currentFilter);
+  void filterAdded(VSAbstractFilter* filter, bool currentFilter = true);
 
   /**
    * @brief Removes filter from the FilterToFilterWidget map

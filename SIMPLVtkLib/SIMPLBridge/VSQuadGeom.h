@@ -153,7 +153,7 @@ public:
 
 protected:
   /**
-  * @brief Constructor
+  * @brief Default constructor
   */
   VSQuadGeom();
 
