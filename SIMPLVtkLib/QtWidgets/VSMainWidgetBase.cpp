@@ -304,7 +304,7 @@ void VSMainWidgetBase::importFiles(QStringList filePaths)
     {
       openDREAM3DFile(filePath);
     }
-    else if (mimeType.inherits("image/png") || mimeType.inherits("image/tiff") || mimeType.inherits("image/jpeg"))
+    else if (mimeType.inherits("image/png") || mimeType.inherits("image/tiff") || mimeType.inherits("image/jpeg") || mimeType.inherits("image/bmp"))
     {
       m_Controller->importData(filePath);
     }

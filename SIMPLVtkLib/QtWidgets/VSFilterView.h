@@ -59,6 +59,11 @@ public:
   VSFilterView(QWidget* parent = nullptr);
 
   /**
+  * @brief Deconstructor
+  */
+  virtual ~VSFilterView() = default;
+
+  /**
   * @brief Sets the VSController to use and interact with through the tree view
   * @param controller
   */

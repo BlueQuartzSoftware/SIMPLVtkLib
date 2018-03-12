@@ -52,13 +52,19 @@ public:
   /**
   * @brief Constructor
   * @param parent
+  * @param windowFlags
   */
-  VSViewWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+  VSViewWidget(QWidget* parent = nullptr, Qt::WindowFlags windowFlags = Qt::WindowFlags());
 
   /**
   * @brief Copy constructor
   */
   VSViewWidget(const VSViewWidget& other);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSViewWidget() = default;
 
   /**
   * @brief Clones the widget and its view controller

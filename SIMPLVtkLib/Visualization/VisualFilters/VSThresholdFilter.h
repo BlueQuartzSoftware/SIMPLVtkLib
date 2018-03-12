@@ -59,10 +59,14 @@ class SIMPLVtkLib_EXPORT VSThresholdFilter : public VSAbstractFilter
 public:
   /**
   * @brief Consructor
-  * @param parentWidget
   * @param parent
   */
   VSThresholdFilter(VSAbstractFilter* parent);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSThresholdFilter() = default;
 
   /**
    * @brief Create
@@ -119,7 +123,7 @@ public:
   /**
   * @brief Returns true if this filter type can be added as a child of
   * the given filter.  Returns false otherwise.
-  * @param
+  * @param filter
   * @return
   */
   static bool compatibleWithParent(VSAbstractFilter* filter);
@@ -150,13 +154,13 @@ public:
 
   /**
   * @brief Sets the last minimum value for thresholding
-  * @return
+  * @param lastMinValue
   */
   void setLastMinValue(double lastMinValue);
 
   /**
   * @brief Sets the last maximum value for thresholding
-  * @return
+  * @param lastMaxValue
   */
   void setLastMaxValue(double lastMaxValue);
 

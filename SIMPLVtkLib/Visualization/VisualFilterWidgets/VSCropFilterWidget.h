@@ -58,10 +58,16 @@ class SIMPLVtkLib_EXPORT VSCropFilterWidget : public VSAbstractFilterWidget
 public:
   /**
   * @brief Constructor
-  * @param parentWidget
-  * @param parent
+  * @param filter
+  * @param interactor
+  * @param widget
   */
   VSCropFilterWidget(VSCropFilter* filter, vtkRenderWindowInteractor* interactor, QWidget* widget = nullptr);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSCropFilterWidget() = default;
 
   /**
   * @brief Sets the visualization filter's bounds

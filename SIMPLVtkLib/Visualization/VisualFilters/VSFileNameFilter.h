@@ -52,10 +52,15 @@ class SIMPLVtkLib_EXPORT VSFileNameFilter : public VSTextFilter
 public:
   /**
   * @brief Constructor
-  * @param parentFilter
   * @param filePath
+  * @param parent
   */
   VSFileNameFilter(QString filePath, VSAbstractFilter* parent = nullptr);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSFileNameFilter() = default;
 
   /**
    * @brief Create

@@ -92,7 +92,10 @@ public:
   using WrappedDataContainerPtr = std::shared_ptr<WrappedDataContainer>;
   using WrappedDataContainerPtrCollection = std::vector<WrappedDataContainerPtr>;
 
-  virtual ~SIMPLVtkBridge();
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~SIMPLVtkBridge() = default;
 
   /**
   * @brief Wraps the DataContainers from SIMPLib's DataContainerArray in vtkDataSets where applicable 
@@ -240,6 +243,9 @@ public:
   }
 
 protected:
+  /**
+  * @brief Constructor
+  */
   SIMPLVtkBridge();
 
 private:

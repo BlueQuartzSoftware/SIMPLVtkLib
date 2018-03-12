@@ -39,14 +39,37 @@
 
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSTransform.h"
 
+/**
+* @class VSTransformWidget VSTransformWidget.h SIMPLVtkLib/QtWidgets/VSTransformWidget.h
+* @brief This class displays the global transformation values for a VSTransform
+* and allows the user to edit the local transformation.
+*/
 class VSTransformWidget : public QWidget
 {
   Q_OBJECT
 
 public:
+  /**
+  * @brief Constructor
+  * @param parent
+  */
   VSTransformWidget(QWidget* parent);
 
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSTransformWidget() = default;
+
+  /**
+  * @brief Returns the VSTransform used by the widget
+  * @return
+  */
   VSTransform* getTransform();
+
+  /**
+  * @brief Sets the VSTransform used by the widget
+  * @param transform
+  */
   void setTransform(VSTransform* transform);
   
 protected slots:
@@ -67,20 +90,26 @@ protected slots:
 
   /**
   * @brief Updates the translation labels to match the transformation's global values
+  * @param position
   */
   void updateTranslationLabels(double* position);
 
   /**
   * @brief Updates the rotation labels to match the transformation's global values
+  * @param rotation
   */
   void updateRotationLabels(double* rotation);
 
   /**
   * @brief Updates the scale labels to match the transformation's global values
+  * @param scale
   */
   void updateScaleLabels(double* scale);
 
 protected:
+  /**
+  * @brief Performs any initial setup required for the GUI
+  */
   void setupGui();
 
 private:

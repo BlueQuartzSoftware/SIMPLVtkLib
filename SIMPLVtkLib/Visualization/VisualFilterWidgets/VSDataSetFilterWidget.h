@@ -54,15 +54,15 @@ class SIMPLVtkLib_EXPORT VSDataSetFilterWidget : public VSAbstractFilterWidget
 public:
   /**
   * @brief Constuctor
-  * @param parentWidget
-  * @param dataSetStruct
+  * @param filter
+  * @param widget
   */
-  VSDataSetFilterWidget(VSDataSetFilter* filter, QWidget *widget = nullptr);
+  VSDataSetFilterWidget(VSDataSetFilter* filter, QWidget* widget = nullptr);
 
   /**
   * @brief Deconstructor
   */
-  ~VSDataSetFilterWidget();
+  virtual ~VSDataSetFilterWidget() = default;
 
   /**
   * @brief Sets the filter's bounds

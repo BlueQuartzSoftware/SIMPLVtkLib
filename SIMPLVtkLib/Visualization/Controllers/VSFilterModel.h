@@ -59,6 +59,11 @@ public:
   VSFilterModel(QObject* parent = nullptr);
 
   /**
+  * @brief Deconstructor
+  */
+  virtual ~VSFilterModel() = default;
+
+  /**
   * @brief Returns the visual filter stored at the given index
   * @param index
   * @return

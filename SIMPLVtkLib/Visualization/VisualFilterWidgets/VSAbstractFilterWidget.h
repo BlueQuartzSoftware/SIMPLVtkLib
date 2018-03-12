@@ -60,11 +60,10 @@ class SIMPLVtkLib_EXPORT VSAbstractFilterWidget : public QWidget
   Q_OBJECT
 
 public:
-
   /**
   * @brief Deconstructor
   */
-  ~VSAbstractFilterWidget();
+  virtual ~VSAbstractFilterWidget() = default;
 
   /**
   * @brief Applies changes to the filter and updates the output
@@ -84,17 +83,18 @@ public:
 
   /**
   * @brief Returns whether the filter widget is rendered
+  * @return
   */
   bool getRenderingEnabled();
 
   /**
-   * @brief setInteractor
+   * @brief Sets the vtkRenderWindowInteractor for the filter widget
    * @param interactor
    */
   virtual void setInteractor(vtkRenderWindowInteractor* interactor);
 
   /**
-  * @brief Returns true if there are unapplied changes waiting and false otherwise
+  * @brief Returns true if there are unapplied changes waiting. Returns false otherwise.
   * @return
   */
   bool hasChanges();
@@ -105,6 +105,7 @@ signals:
 protected:
   /**
   * @brief Constructor
+  * @param parent
   */
   VSAbstractFilterWidget(QWidget *parent = nullptr);
 

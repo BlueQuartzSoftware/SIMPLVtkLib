@@ -82,13 +82,6 @@ SIMPLVtkBridge::SIMPLVtkBridge()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-SIMPLVtkBridge::~SIMPLVtkBridge()
-{
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 SIMPLVtkBridge::WrappedDataContainerPtrCollection SIMPLVtkBridge::WrapDataContainerArrayAsStruct(DataContainerArray::Pointer dca, AttributeMatrix::Types types)
 {
   SIMPLVtkBridge::WrappedDataContainerPtrCollection wrappedDataContainers;
@@ -516,17 +509,16 @@ VTK_PTR(vtkDataSet) SIMPLVtkBridge::WrapGeometry(VertexGeom::Pointer geom)
 // -----------------------------------------------------------------------------
 VTK_PTR(vtkDataSet) SIMPLVtkBridge::WrapGeometry(ImageGeom::Pointer image)
 {
-  size_t dims[3] = {0, 0, 0};
   float res[3] = {0.0f, 0.0f, 0.0f};
   float origin[3] = {0.0f, 0.0f, 0.0f};
 
-  image->getDimensions(dims);
+  std::tuple<size_t, size_t, size_t> dims = image->getDimensions();
   image->getResolution(res);
   image->getOrigin(origin);
 
   VTK_NEW(vtkImageData, vtkImage);
-  vtkImage->SetExtent(0, dims[0], 0, dims[1], 0, dims[2]);
-  vtkImage->SetDimensions(dims[0] + 1, dims[1] + 1, dims[2] + 1);
+  vtkImage->SetExtent(0, std::get<0>(dims), 0, std::get<1>(dims), 0, std::get<2>(dims));
+  vtkImage->SetDimensions(std::get<0>(dims) + 1, std::get<1>(dims) + 1, std::get<2>(dims) + 1);
   vtkImage->SetSpacing(res[0], res[1], res[2]);
   vtkImage->SetOrigin(origin[0], origin[1], origin[2]);
 

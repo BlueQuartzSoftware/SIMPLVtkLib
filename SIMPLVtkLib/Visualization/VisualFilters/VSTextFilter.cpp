@@ -216,7 +216,7 @@ void VSTextFilter::updateAlgorithmInput(VSAbstractFilter* filter)
     return;
   }
 
-  m_InputPort = filter->getOutputPort();
+  setInputPort(filter->getOutputPort());
 
   emit updatedOutputPort(filter);
 }

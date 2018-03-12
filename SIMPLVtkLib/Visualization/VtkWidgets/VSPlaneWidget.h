@@ -71,7 +71,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  ~VSPlaneWidget();
+  virtual ~VSPlaneWidget();
 
   /**
   * @brief Copies the normals into the double array passed in
@@ -112,7 +112,7 @@ public:
   void setOrigin(double origin[3]);
 
   /**
-   * @brief setInteractor
+   * @brief Sets the vtkRenderWindowInteractor for the filter widget
    * @param interactor
    */
   void setInteractor(vtkRenderWindowInteractor* interactor) override;

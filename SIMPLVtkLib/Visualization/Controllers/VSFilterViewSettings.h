@@ -104,7 +104,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  virtual ~VSFilterViewSettings();
+  virtual ~VSFilterViewSettings() = default;
 
   /**
   * @brief Returns a pointer to the VSAbstractFilter
@@ -198,7 +198,7 @@ public:
   int getRepresentationi();
 
   /**
-  * @brief Returns the current actor type
+  * @brief Returns the actor property representation as an enum
   * @return
   */
   ActorType getActorType();
@@ -289,6 +289,11 @@ public slots:
   * @param filter
   */
   void updateInputPort(VSAbstractFilter* filter);
+
+  /**
+  * @brief Updates the transformation for 2D image data
+  */
+  void updateTransform();
 
 signals:
   void visibilityChanged(VSFilterViewSettings*, bool);

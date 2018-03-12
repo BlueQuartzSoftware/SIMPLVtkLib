@@ -64,7 +64,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  virtual ~VSVisualizationWidget();
+  virtual ~VSVisualizationWidget() = default;
 
   /**
   * @brief Saves a screenshot to a given file path
@@ -74,6 +74,7 @@ public:
 
   /**
   * @brief Performs a deep copy based on another visualization widget
+  * @param other
   */
   void copy(VSVisualizationWidget* other);
 
@@ -156,7 +157,8 @@ protected:
   void getCameraFocalPointAndDistance(double* focalPoint, double& distance);
 
   /**
-  * @brief overrides the mousePressEvent
+  * @brief Overrides the mousePressEvent
+  * @param event
   */
   virtual void mousePressEvent(QMouseEvent* event) override;
 

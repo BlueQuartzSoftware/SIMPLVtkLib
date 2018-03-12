@@ -60,7 +60,8 @@ class SIMPLVtkLib_EXPORT VSThresholdFilterWidget : public VSAbstractFilterWidget
 public:
   /**
   * @brief Consructor
-  * @param parentWidget
+  * @param filter
+  * @param interactor
   * @param parent
   */
   VSThresholdFilterWidget(VSThresholdFilter* filter, vtkRenderWindowInteractor* interactor, QWidget* parent = nullptr);
@@ -68,7 +69,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  ~VSThresholdFilterWidget();
+  virtual ~VSThresholdFilterWidget() = default;
 
   /**
   * @brief Sets the filter bounds
@@ -152,11 +153,13 @@ protected:
   /**
   * @brief Returns the dataArray with the given name
   * @param name
+  * @return
   */
   vtkDataArray* getDataArray(QString name);
 
   /**
   * @brief Updates the range based on the current selected data array
+  * @param arrayName
   */
   void updateRange(QString arrayName = "");
 

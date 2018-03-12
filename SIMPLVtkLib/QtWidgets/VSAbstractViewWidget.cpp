@@ -42,8 +42,8 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSAbstractViewWidget::VSAbstractViewWidget(QWidget* parent, Qt::WindowFlags f)
-  : QFrame(parent, f)
+VSAbstractViewWidget::VSAbstractViewWidget(QWidget* parent, Qt::WindowFlags windowFlags)
+  : QFrame(parent, windowFlags)
 {
 }
 
@@ -53,7 +53,6 @@ VSAbstractViewWidget::VSAbstractViewWidget(QWidget* parent, Qt::WindowFlags f)
 VSAbstractViewWidget::VSAbstractViewWidget(const VSAbstractViewWidget& other)
   : QFrame(nullptr)
 {
-  
 }
 
 // -----------------------------------------------------------------------------

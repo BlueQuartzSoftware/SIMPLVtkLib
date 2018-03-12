@@ -54,15 +54,15 @@ class SIMPLVtkLib_EXPORT VSSIMPLDataContainerFilterWidget : public VSAbstractFil
 public:
   /**
   * @brief Constuctor
-  * @param parentWidget
-  * @param dataSetStruct
+  * @param filter
+  * @param widget
   */
   VSSIMPLDataContainerFilterWidget(VSSIMPLDataContainerFilter* filter, QWidget *widget = nullptr);
 
   /**
   * @brief Deconstructor
   */
-  ~VSSIMPLDataContainerFilterWidget();
+  virtual ~VSSIMPLDataContainerFilterWidget() = default;
 
   /**
   * @brief Sets the filter's bounds

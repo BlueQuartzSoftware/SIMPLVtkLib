@@ -51,9 +51,9 @@ class SIMPLVtkLib_EXPORT VSAbstractDataFilter : public VSAbstractFilter
 
 public:
   /**
-  * @brief Constructor
+  * @brief Deconstructor
   */
-  VSAbstractDataFilter();
+  virtual ~VSAbstractDataFilter() = default;
 
   /**
   * @brief Returns the required input data type
@@ -71,6 +71,11 @@ signals:
   void dataImported();
 
 protected:
+  /**
+  * @brief Constructor
+  */
+  VSAbstractDataFilter();
+
   /**
   * @brief This method is empty as there should never be a case where a VSAbstractDataFilter
   * takes input from another filter.

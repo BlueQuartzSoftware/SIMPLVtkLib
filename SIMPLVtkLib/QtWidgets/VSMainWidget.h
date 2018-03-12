@@ -61,6 +61,11 @@ public:
   VSMainWidget(QWidget* parent = nullptr);
 
   /**
+  * @brief Deconstructor
+  */
+  virtual ~VSMainWidget() = default;
+
+  /**
   * @brief Returns a QMenu with all the Add Filter actions
   * @return
   */
