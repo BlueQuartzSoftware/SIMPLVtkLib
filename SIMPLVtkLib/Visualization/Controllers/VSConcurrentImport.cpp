@@ -112,7 +112,12 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
   m_ImportDataContainerOrder = dca->getDataContainers();
 
   emit blockRender(true);
-  m_FilterLock.tryAcquire();
+  // Wait for the filter lock
+  while(m_FilterLock.tryAcquire() == false)
+  {
+    QThread::currentThread()->wait(1);
+  }
+
   m_ThreadsRemaining = m_ThreadCount;
   for(int i = 0; i < m_ThreadCount; i++)
   {
@@ -134,16 +139,27 @@ void VSConcurrentImport::partialWrappingThreadFinished()
     {
       VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, m_FileNameFilter);
       m_Controller->getFilterModel()->addFilter(filter, false);
+
+      // Attempting to run applyDataFilters requires the QSemaphore to lock when modifying this vector
+      while(m_UnappliedDataFilterLock.tryAcquire() == false)
+      {
+        QThread::currentThread()->wait(1);
+      }
       m_UnappliedDataFilters.push_back(filter);
+      m_UnappliedDataFilterLock.release();
     }
     emit blockRender(false);
     m_WrappedDataContainers.clear();
     m_FilterLock.release();
 
-    // Apply filters on multiple threads
-    for(int i = 0; i < m_ThreadCount; i++)
+    // Apply the filters only after all DataContainers for all files have been wrapped
+    if(m_WrappedList.size() == 0)
     {
-      QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::applyDataFilters);
+      // Apply filters on multiple threads
+      for(int i = 0; i < m_ThreadCount; i++)
+      {
+        QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::applyDataFilters);
+      }
     }
   }
 }

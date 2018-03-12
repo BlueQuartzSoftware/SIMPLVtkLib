@@ -127,7 +127,6 @@ private:
   QSemaphore m_UnappliedDataFilterLock;
   QSemaphore m_FilterLock;
   QSemaphore m_WrappedDcLock;
-  QVector< QSharedPointer<QFutureWatcher<void>> > m_ImportDataContainerWatchers;
   int m_NumOfFinishedImportDataContainerThreads = 0;
   std::list<SIMPLVtkBridge::WrappedDataContainerPtr> m_WrappedDataContainers;
   VSFileNameFilter* m_FileNameFilter = nullptr;
