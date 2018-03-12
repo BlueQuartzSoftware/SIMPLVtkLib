@@ -124,7 +124,7 @@ void VSClipFilter::createFilter()
 {
   m_ClipAlgorithm = vtkSmartPointer<vtkTableBasedClipDataSet>::New();
   m_ClipAlgorithm->SetInputConnection(getParentFilter()->getOutputPort());
-  m_ConnectedInput = true;
+  setConnectedInput(true);
 }
 
 // -----------------------------------------------------------------------------
@@ -215,7 +215,7 @@ QUuid VSClipFilter::GetUuid()
 // -----------------------------------------------------------------------------
 vtkAlgorithmOutput* VSClipFilter::getOutputPort()
 {
-  if(m_ConnectedInput && m_ClipAlgorithm)
+  if(getConnectedInput() && m_ClipAlgorithm)
   {
     return m_ClipAlgorithm->GetOutputPort();
   }
@@ -232,7 +232,7 @@ vtkAlgorithmOutput* VSClipFilter::getOutputPort()
 // -----------------------------------------------------------------------------
 VTK_PTR(vtkDataSet) VSClipFilter::getOutput()
 {
-  if(m_ConnectedInput && m_ClipAlgorithm)
+  if(getConnectedInput() && m_ClipAlgorithm)
   {
     return m_ClipAlgorithm->GetOutput();
   }
@@ -254,9 +254,9 @@ void VSClipFilter::updateAlgorithmInput(VSAbstractFilter* filter)
     return;
   }
 
-  m_InputPort = filter->getOutputPort();
+  setInputPort(filter->getOutputPort());
 
-  if(m_ConnectedInput && m_ClipAlgorithm)
+  if(getConnectedInput() && m_ClipAlgorithm)
   {
     m_ClipAlgorithm->SetInputConnection(filter->getOutputPort());
   }

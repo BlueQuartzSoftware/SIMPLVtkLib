@@ -97,7 +97,7 @@ void VSSliceFilter::createFilter()
 {
   m_SliceAlgorithm = vtkSmartPointer<vtkCutter>::New();
   m_SliceAlgorithm->SetInputConnection(getParentFilter()->getOutputPort());
-  m_ConnectedInput = true;
+  setConnectedInput(true);
 }
 
 // -----------------------------------------------------------------------------
@@ -178,7 +178,7 @@ void VSSliceFilter::writeJson(QJsonObject &json)
 // -----------------------------------------------------------------------------
 vtkAlgorithmOutput* VSSliceFilter::getOutputPort()
 {
-  if(m_ConnectedInput && m_SliceAlgorithm)
+  if(getConnectedInput() && m_SliceAlgorithm)
   {
     return m_SliceAlgorithm->GetOutputPort();
   }
@@ -195,7 +195,7 @@ vtkAlgorithmOutput* VSSliceFilter::getOutputPort()
 // -----------------------------------------------------------------------------
 VTK_PTR(vtkDataSet) VSSliceFilter::getOutput()
 {
-  if(m_ConnectedInput && m_SliceAlgorithm)
+  if(getConnectedInput() && m_SliceAlgorithm)
   {
     return m_SliceAlgorithm->GetOutput();
   }
@@ -217,9 +217,9 @@ void VSSliceFilter::updateAlgorithmInput(VSAbstractFilter* filter)
     return;
   }
 
-  m_InputPort = filter->getOutputPort();
+  setInputPort(filter->getOutputPort());
 
-  if(m_ConnectedInput && m_SliceAlgorithm)
+  if(getConnectedInput() && m_SliceAlgorithm)
   {
     m_SliceAlgorithm->SetInputConnection(filter->getOutputPort());
   }

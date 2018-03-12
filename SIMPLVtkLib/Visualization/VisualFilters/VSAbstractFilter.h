@@ -321,6 +321,12 @@ protected:
   bool getConnectedInput();
 
   /**
+  * @brief Sets whether or not the filter algorithm is connected.
+  * @param connected
+  */
+  void setConnectedInput(bool connected);
+
+  /**
   * @brief Returns the VTK input port
   * @return
   */

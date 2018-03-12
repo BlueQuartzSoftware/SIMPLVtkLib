@@ -105,7 +105,7 @@ void VSCropFilter::createFilter()
   m_CropAlgorithm->IncludeBoundaryOn();
   m_CropAlgorithm->SetInputConnection(getParentFilter()->getOutputPort());
 
-  m_ConnectedInput = true;
+  setConnectedInput(true);
 }
 
 // -----------------------------------------------------------------------------
@@ -190,7 +190,7 @@ QString VSCropFilter::getToolTip() const
 // -----------------------------------------------------------------------------
 vtkAlgorithmOutput* VSCropFilter::getOutputPort()
 {
-  if(m_ConnectedInput && m_CropAlgorithm)
+  if(getConnectedInput() && m_CropAlgorithm)
   {
     return m_CropAlgorithm->GetOutputPort();
   }
@@ -207,7 +207,7 @@ vtkAlgorithmOutput* VSCropFilter::getOutputPort()
 // -----------------------------------------------------------------------------
 VTK_PTR(vtkDataSet) VSCropFilter::getOutput()
 {
-  if(m_ConnectedInput && m_CropAlgorithm)
+  if(getConnectedInput() && m_CropAlgorithm)
   {
     return m_CropAlgorithm->GetOutput();
   }
@@ -229,9 +229,9 @@ void VSCropFilter::updateAlgorithmInput(VSAbstractFilter* filter)
     return;
   }
 
-  m_InputPort = filter->getOutputPort();
+  setInputPort(filter->getOutputPort());
 
-  if(m_ConnectedInput && m_CropAlgorithm)
+  if(getConnectedInput() && m_CropAlgorithm)
   {
     m_CropAlgorithm->SetInputConnection(filter->getOutputPort());
   }

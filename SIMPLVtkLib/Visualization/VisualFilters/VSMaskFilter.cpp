@@ -76,7 +76,7 @@ void VSMaskFilter::createFilter()
 {
   m_MaskAlgorithm = VTK_PTR(vtkThreshold)::New();
   m_MaskAlgorithm->SetInputConnection(getParentFilter()->getOutputPort());
-  m_ConnectedInput = true;
+  setConnectedInput(true);
 }
 
 // -----------------------------------------------------------------------------
@@ -139,7 +139,7 @@ void VSMaskFilter::writeJson(QJsonObject &json)
 // -----------------------------------------------------------------------------
 vtkAlgorithmOutput* VSMaskFilter::getOutputPort()
 {
-  if(m_ConnectedInput && m_MaskAlgorithm)
+  if(getConnectedInput() && m_MaskAlgorithm)
   {
     return m_MaskAlgorithm->GetOutputPort();
   }
@@ -156,7 +156,7 @@ vtkAlgorithmOutput* VSMaskFilter::getOutputPort()
 // -----------------------------------------------------------------------------
 VTK_PTR(vtkDataSet) VSMaskFilter::getOutput()
 {
-  if(m_ConnectedInput && m_MaskAlgorithm)
+  if(getConnectedInput() && m_MaskAlgorithm)
   {
     return m_MaskAlgorithm->GetOutput();
   }
@@ -178,9 +178,9 @@ void VSMaskFilter::updateAlgorithmInput(VSAbstractFilter* filter)
     return;
   }
 
-  m_InputPort = filter->getOutputPort();
+  setInputPort(filter->getOutputPort());
 
-  if(m_ConnectedInput && m_MaskAlgorithm)
+  if(getConnectedInput() && m_MaskAlgorithm)
   {
     m_MaskAlgorithm->SetInputConnection(filter->getOutputPort());
   }

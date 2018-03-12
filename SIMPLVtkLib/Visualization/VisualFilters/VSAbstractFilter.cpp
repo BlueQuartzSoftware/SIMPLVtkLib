@@ -411,6 +411,14 @@ bool VSAbstractFilter::getConnectedInput()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSAbstractFilter::setConnectedInput(bool connected)
+{
+  m_ConnectedInput = connected;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 VTK_PTR(vtkAlgorithmOutput) VSAbstractFilter::getInputPort()
 {
   return m_InputPort;
