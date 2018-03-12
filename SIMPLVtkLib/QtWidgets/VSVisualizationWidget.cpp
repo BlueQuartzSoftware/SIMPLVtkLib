@@ -182,7 +182,6 @@ void VSVisualizationWidget::saveScreenshot(QString fileName)
 {
   VTK_NEW(vtkWindowToImageFilter, screenshotFilter);
   screenshotFilter->SetInput(m_Renderer->GetRenderWindow());
-  screenshotFilter->SetMagnification(1);
   screenshotFilter->SetInputBufferTypeToRGBA();
   screenshotFilter->ReadFrontBufferOff();
   screenshotFilter->Update();
