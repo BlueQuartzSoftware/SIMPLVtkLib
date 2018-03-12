@@ -80,7 +80,7 @@ VSController::~VSController()
 void VSController::importDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
 {
   m_ImportObject->addDataContainerArray(filePath, dca);
-  m_ImportObject->start();
+  m_ImportObject->run();
 }
 
 // -----------------------------------------------------------------------------
@@ -89,7 +89,7 @@ void VSController::importDataContainerArray(QString filePath, DataContainerArray
 void VSController::importDataContainerArray(DataContainerArray::Pointer dca)
 {
   m_ImportObject->addDataContainerArray("No File", dca);
-  m_ImportObject->start();
+  m_ImportObject->run();
 
   //emit dataImported();
 }

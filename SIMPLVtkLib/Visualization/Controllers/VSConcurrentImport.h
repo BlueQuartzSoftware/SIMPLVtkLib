@@ -54,7 +54,7 @@ class VSController;
 * @class VSConcurrentImport VSConcurrentImport.h SIMPLVtkLib/Visualization/Controllers/VSConcurrentImport.h
 * @brief This class handles the multithreaded import process for VSSIMPLDataContainerFilters.
 */
-class SIMPLVtkLib_EXPORT VSConcurrentImport : public QThread
+class SIMPLVtkLib_EXPORT VSConcurrentImport : public QObject
 {
   Q_OBJECT
 
@@ -89,6 +89,9 @@ public:
 signals:
   void importedFilter(VSAbstractFilter* filter, bool currentFilter = false);
   void blockRender(bool block = true);
+
+protected slots:
+  void partialWrappingThreadFinished();
 
 protected:
   /**
@@ -127,6 +130,10 @@ private:
   QSemaphore m_ImportDataContainerOrderLock;
   QSemaphore m_UnappliedDataFilterLock;
   QSemaphore m_FilterLock;
+  QSemaphore m_WrappedDcLock;
   QVector< QSharedPointer<QFutureWatcher<void>> > m_ImportDataContainerWatchers;
   int m_NumOfFinishedImportDataContainerThreads = 0;
+  std::list<SIMPLVtkBridge::WrappedDataContainerPtr> m_WrappedDataContainers;
+  VSFileNameFilter* m_FileNameFilter = nullptr;
+  int m_ThreadCount;
 };
