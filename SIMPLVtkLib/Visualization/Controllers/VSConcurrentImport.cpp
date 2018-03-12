@@ -42,8 +42,6 @@
 #include "SIMPLVtkLib/Visualization/Controllers/VSFilterModel.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
 
-int THREADS_REMAINING = 0;
-
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
@@ -115,21 +113,13 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 
   emit blockRender(true);
   m_FilterLock.tryAcquire();
-  THREADS_REMAINING = m_ThreadCount;
+  m_ThreadsRemaining = m_ThreadCount;
   for(int i = 0; i < m_ThreadCount; i++)
   {
     QFutureWatcher<void>* watcher = new QFutureWatcher<void>(this);
     connect(watcher, SIGNAL(finished()), this, SLOT(partialWrappingThreadFinished()));
     watcher->setFuture(QtConcurrent::run(this, &VSConcurrentImport::importDataContainer, m_FileNameFilter));
-    //watcher->setFuture(future);
   }
-
-  //addDataFilters();
-  //QThread::currentThread()->wait(1 * 1000);
-  //for(int i = 0; i < threadCount; i++)
-  //{
-  //  QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::applyDataFilters);
-  //}
 }
 
 // -----------------------------------------------------------------------------
@@ -137,19 +127,14 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 // -----------------------------------------------------------------------------
 void VSConcurrentImport::partialWrappingThreadFinished()
 {
-  THREADS_REMAINING--;
-  if(THREADS_REMAINING <= 0)
+  m_ThreadsRemaining--;
+  if(m_ThreadsRemaining <= 0)
   {
     for(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc : m_WrappedDataContainers)
     {
       VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, m_FileNameFilter);
       m_Controller->getFilterModel()->addFilter(filter, false);
-      //while(m_UnappliedDataFilterLock.tryAcquire() == false)
-      //{
-      //  QThread::currentThread()->wait(1);
-      //}
       m_UnappliedDataFilters.push_back(filter);
-      //m_UnappliedDataFilterLock.release();
     }
     emit blockRender(false);
     m_WrappedDataContainers.clear();
@@ -178,7 +163,6 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
       m_ImportDataContainerOrderLock.release();
 
       SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapGeometryPtr(dc);
-      //SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
       if(wrappedDc)
       {
         while(m_WrappedDcLock.tryAcquire() == false)
@@ -186,50 +170,11 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
           QThread::currentThread()->wait(1);
         }
         m_WrappedDataContainers.push_back(wrappedDc);
-        //importWrappedDataContainer(fileFilter, wrappedDc);
 
         m_WrappedDcLock.release();
       }
     }
   }
-
-  //partialWrappingThreadFinished();
-  //m_FilterLock.release();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSConcurrentImport::importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc)
-{
-  VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, fileFilter);
-  emit importedFilter(filter);
-  while(m_UnappliedDataFilterLock.tryAcquire() == false)
-  {
-    QThread::currentThread()->wait(1);
-  }
-  m_UnappliedDataFilters.push_back(filter);
-  m_UnappliedDataFilterLock.release();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSConcurrentImport::addDataFilters()
-{
-  while(m_FilterLock.tryAcquire() == false)
-  {
-    // Do nothing
-    QThread::currentThread()->wait(1);
-  }
-
-  //for(VSSIMPLDataContainerFilter* filter : m_UnappliedDataFilters)
-  //{
-  //  //m_Controller->getFilterModel()->addFilter(filter);
-  //  emit importedFilter(filter);
-  //}
-
-  emit blockRender(false);
 }
 
 // -----------------------------------------------------------------------------
@@ -246,8 +191,6 @@ void VSConcurrentImport::applyDataFilters()
       m_UnappliedDataFilterLock.release();
 
       filter->apply();
-
-      //QThread::currentThread()->wait(10);
     }
   }
 }

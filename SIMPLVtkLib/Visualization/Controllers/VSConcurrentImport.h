@@ -113,12 +113,8 @@ protected:
   void importDataContainer(VSFileNameFilter* fileFilter);
 
   /**
-  * @brief Given a VSFileNameFilter and wrapped data container, create and add a VSSIMPLDataContainerFilter to the filter model
-  * @param fileFilter
-  * @param wrappedDc
+  * @brief Applies the unapplied DataContainer filters to finish the import process.
   */
-  void importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
-  void addDataFilters();
   void applyDataFilters();
 
 private:
@@ -136,4 +132,5 @@ private:
   std::list<SIMPLVtkBridge::WrappedDataContainerPtr> m_WrappedDataContainers;
   VSFileNameFilter* m_FileNameFilter = nullptr;
   int m_ThreadCount;
+  int m_ThreadsRemaining = 0;
 };
