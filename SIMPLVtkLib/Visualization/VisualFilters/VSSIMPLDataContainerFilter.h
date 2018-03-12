@@ -117,6 +117,11 @@ public:
   void writeJson(QJsonObject &json) override;
 
   /**
+   * @brief reloadData
+   */
+  void reloadData() override;
+
+  /**
   * @brief Returns true if this filter type can be added as a child of
   * the given filter.  Returns false otherwise.
   * @param
@@ -133,4 +138,9 @@ protected:
 private:
   SIMPLVtkBridge::WrappedDataContainerPtr m_WrappedDataContainer = nullptr;
   VTK_PTR(vtkTrivialProducer) m_TrivialProducer = nullptr;
+
+  /**
+   * @brief updateWrappedDataContainer
+   */
+  bool updateWrappedDataContainer();
 };

@@ -209,6 +209,91 @@ void VSSIMPLDataContainerFilter::createFilter()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSSIMPLDataContainerFilter::reloadData()
+{
+  if (updateWrappedDataContainer())
+  {
+    VTK_PTR(vtkDataSet) dataSet = m_WrappedDataContainer->m_DataSet;
+    dataSet->ComputeBounds();
+
+    vtkCellData* cellData = dataSet->GetCellData();
+    if(cellData)
+    {
+      vtkDataArray* dataArray = cellData->GetArray(0);
+      if(dataArray)
+      {
+        char* name = dataArray->GetName();
+        cellData->SetActiveScalars(name);
+      }
+    }
+
+    m_TrivialProducer->SetOutput(dataSet);
+
+    emit updatedOutputPort(this);
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+bool VSSIMPLDataContainerFilter::updateWrappedDataContainer()
+{
+  QString dcName = m_WrappedDataContainer->m_Name;
+
+  VSAbstractFilter* parentFilter = getParentFilter();
+  VSFileNameFilter* fileFilter = dynamic_cast<VSFileNameFilter*>(parentFilter);
+  if (fileFilter != nullptr)
+  {
+    QString filePath = fileFilter->getFilePath();
+
+    SIMPLH5DataReader reader;
+    connect(&reader, SIGNAL(errorGenerated(const QString &, const QString &, const int &)),
+            this, SIGNAL(errorGenerated(const QString &, const QString &, const int &)));
+
+    bool success = reader.openFile(filePath);
+    if (success)
+    {
+      int err = 0;
+      DataContainerArrayProxy dcaProxy = reader.readDataContainerArrayStructure(nullptr, err);
+      QStringList dcNames = dcaProxy.dataContainers.keys();
+      if (dcNames.contains(dcName))
+      {
+        DataContainerProxy dcProxy = dcaProxy.dataContainers.value(dcName);
+        dcProxy.flag = Qt::Checked;
+        dcaProxy.dataContainers[dcName] = dcProxy;
+
+        DataContainerArray::Pointer dca = reader.readSIMPLDataUsingProxy(dcaProxy, false);
+        if (dca.get() == nullptr)
+        {
+          // Error has already been sent via the reader, so simply return
+          return false;
+        }
+
+        DataContainer::Pointer dc = dca->getDataContainer(dcName);
+        m_WrappedDataContainer = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
+
+        return true;
+      }
+      else
+      {
+        QString ss = QObject::tr("Data Container '%1' could not be reloaded because it no longer exists in the underlying file '%2'.").arg(dcName).arg(filePath);
+        emit errorGenerated("Data Reload Error", ss, -3000);
+        return false;
+      }
+    }
+  }
+  else
+  {
+    QString ss = QObject::tr("Data Container '%1' could not be reloaded because it does not have a file filter parent.").arg(dcName);
+    emit errorGenerated("Data Reload Error", ss, -3001);
+  }
+
+  return false;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 const QString VSSIMPLDataContainerFilter::getFilterName()
 {
   return m_WrappedDataContainer->m_Name;
