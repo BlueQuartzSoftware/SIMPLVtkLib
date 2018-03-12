@@ -35,7 +35,9 @@
 
 #include "VSAbstractFilter.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QString>
+#include <QtCore/QThread>
 
 #include <vtkAlgorithm.h>
 #include <vtkCellData.h>
@@ -59,6 +61,9 @@ VSAbstractFilter::VSAbstractFilter()
 {
   setCheckable(true);
   setCheckState(Qt::Checked);
+
+  QThread* thread = QCoreApplication::instance()->thread();
+  m_Transform->moveToThread(thread);
 
   connect(this, SIGNAL(updatedOutputPort(VSAbstractFilter*)), 
     this, SLOT(connectTransformFilter(VSAbstractFilter*)));

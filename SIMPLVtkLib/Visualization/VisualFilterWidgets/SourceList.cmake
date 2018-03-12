@@ -31,7 +31,6 @@ foreach(VisFilterWidget ${VSVisualFilterWidgets})
     ${VS_VisualFilterWidgets_UIS}
     ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Visualization/VisualFilterWidgets/UI_Files/${VisFilterWidget}.ui
   )
-
 endforeach(VisFilterWidget)
 
 # --------------------------------------------------------------------
@@ -58,6 +57,9 @@ cmp_IDE_GENERATED_PROPERTIES("${PROJECT_NAME}/VisualFilterWidgets/UI_Files" "${V
 # --------------------------------------------------------------------
 # -- Run UIC on the necessary files
 QT5_WRAP_UI( ${PROJECT_NAME}_VisualFilterWidgets_Generated_UI_HDRS ${VS_VisualFilterWidgets_UIS} )
+foreach(h ${${PROJECT_NAME}_VisualFilterWidgets_Generated_UI_HDRS})
+  set_property(SOURCE ${h} PROPERTY SKIP_AUTOMOC ON)
+endforeach()
 
 cmp_IDE_SOURCE_PROPERTIES( "Generated/Qt_Uic" "${${PROJECT_NAME}_VisualFilterWidgets_Generated_UI_HDRS}" "" "0")
 

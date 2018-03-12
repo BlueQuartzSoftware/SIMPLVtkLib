@@ -10,7 +10,6 @@ set(${PROJECT_NAME}_${SUBDIR_NAME}_Moc_HDRS
   )
 # --------------------------------------------------------------------
 # Run Qts automoc program to generate some source files that get compiled
-QT5_WRAP_CPP( ${PROJECT_NAME}_${SUBDIR_NAME}_Generated_MOC_SRCS ${${PROJECT_NAME}_${SUBDIR_NAME}_Moc_HDRS})
 set_source_files_properties( ${${PROJECT_NAME}_${SUBDIR_NAME}_Generated_MOC_SRCS} PROPERTIES GENERATED TRUE)
 set_source_files_properties( ${${PROJECT_NAME}_${SUBDIR_NAME}_Generated_MOC_SRCS} PROPERTIES HEADER_FILE_ONLY TRUE)
 
@@ -31,6 +30,9 @@ cmp_IDE_GENERATED_PROPERTIES("${SUBDIR_NAME}/UI_Files" "${${PROJECT_NAME}_${SUBD
 
 # this will run uic on .ui files:
 QT5_WRAP_UI( ${PROJECT_NAME}_${SUBDIR_NAME}_Generated_UI_HDRS ${${PROJECT_NAME}_${SUBDIR_NAME}_UIS} )
+foreach(h ${${PROJECT_NAME}_${SUBDIR_NAME}_Generated_UI_HDRS})
+  set_property(SOURCE ${h} PROPERTY SKIP_AUTOMOC ON)
+endforeach()
 
 cmp_IDE_SOURCE_PROPERTIES( "${SUBDIR_NAME}" "${${PROJECT_NAME}_${SUBDIR_NAME}_HDRS};${${PROJECT_NAME}_${SUBDIR_NAME}_Moc_HDRS}" "${${PROJECT_NAME}_${SUBDIR_NAME}_SRCS}" "${PROJECT_INSTALL_HEADERS}")
 cmp_IDE_SOURCE_PROPERTIES( "Generated/${SUBDIR_NAME}" "" "${${PROJECT_NAME}_${SUBDIR_NAME}_Generated_MOC_SRCS}" "0")

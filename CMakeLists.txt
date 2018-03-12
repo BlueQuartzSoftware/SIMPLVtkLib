@@ -100,7 +100,7 @@ set(Project_SRCS
   ${SIMPLVtkLib_Generated_RC_SRCS}
 
   #---------------
- ${VS_SIMPLBridge_HDRS}
+  ${VS_SIMPLBridge_HDRS}
   ${VS_SIMPLBridge_SRCS}
   
   ${VS_VisualFilters_SRCS}
