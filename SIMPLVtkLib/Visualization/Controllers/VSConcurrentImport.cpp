@@ -148,8 +148,13 @@ void VSConcurrentImport::partialWrappingThreadFinished()
       m_UnappliedDataFilters.push_back(filter);
       m_UnappliedDataFilterLock.release();
     }
-    emit blockRender(false);
+    
+    // Select the last filter
+    m_Controller->selectFilter(m_UnappliedDataFilters.back());
+
+    m_AppliedFilterCount = 0;
     m_WrappedDataContainers.clear();
+    emit blockRender(false);
     m_FilterLock.release();
 
     // Apply the filters only after all DataContainers for all files have been wrapped
@@ -198,6 +203,7 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
 // -----------------------------------------------------------------------------
 void VSConcurrentImport::applyDataFilters()
 {
+  emit applyingDataFilters(m_UnappliedDataFilters.size());
   while(m_UnappliedDataFilters.size() > 0)
   {
     if(m_UnappliedDataFilterLock.tryAcquire() == true)
@@ -207,6 +213,7 @@ void VSConcurrentImport::applyDataFilters()
       m_UnappliedDataFilterLock.release();
 
       filter->apply();
+      emit dataFilterApplied(++m_AppliedFilterCount);
     }
   }
 }

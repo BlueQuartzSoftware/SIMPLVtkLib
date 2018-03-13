@@ -87,6 +87,8 @@ void VSMainWidgetBase::connectSlots()
     this, SLOT(filterRemoved(VSAbstractFilter*)));
   connect(m_Controller, SIGNAL(blockRender(bool)),
     this, SLOT(setBlockRender(bool)));
+  connect(m_Controller, SIGNAL(filterSelected(VSAbstractFilter*)),
+    this, SLOT(setCurrentFilter(VSAbstractFilter*)));
 
   connect(this, SIGNAL(proxyFromFilePathGenerated(DataContainerArrayProxy, const QString &)),
           this, SLOT(launchSIMPLSelectionDialog(DataContainerArrayProxy, const QString &)));

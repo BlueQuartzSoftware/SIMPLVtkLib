@@ -89,6 +89,8 @@ public:
 signals:
   void importedFilter(VSAbstractFilter* filter, bool currentFilter = false);
   void blockRender(bool block = true);
+  void applyingDataFilters(int count);
+  void dataFilterApplied(int num);
 
 protected slots:
   void partialWrappingThreadFinished();
@@ -132,4 +134,5 @@ private:
   VSFileNameFilter* m_FileNameFilter = nullptr;
   int m_ThreadCount;
   int m_ThreadsRemaining = 0;
+  int m_AppliedFilterCount = 0;
 };

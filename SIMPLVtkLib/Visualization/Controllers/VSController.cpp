@@ -63,7 +63,10 @@ VSController::VSController(QObject* parent)
 
   connect(m_FilterModel, SIGNAL(filterAdded(VSAbstractFilter*, bool)), this, SIGNAL(filterAdded(VSAbstractFilter*, bool)));
   connect(m_FilterModel, SIGNAL(filterRemoved(VSAbstractFilter*)), this, SIGNAL(filterRemoved(VSAbstractFilter*)));
+  
   connect(m_ImportObject, SIGNAL(blockRender(bool)), this, SIGNAL(blockRender(bool)));
+  connect(m_ImportObject, SIGNAL(applyingDataFilters(int)), this, SIGNAL(applyingDataFilters(int)));
+  connect(m_ImportObject, SIGNAL(dataFilterApplied(int)), this, SIGNAL(dataFilterApplied(int)));
 }
 
 // -----------------------------------------------------------------------------
@@ -128,6 +131,14 @@ void VSController::importData(const QString &filePath)
 
     emit dataImported();
   }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSController::selectFilter(VSAbstractFilter* filter)
+{
+  emit filterSelected(filter);
 }
 
 // -----------------------------------------------------------------------------
