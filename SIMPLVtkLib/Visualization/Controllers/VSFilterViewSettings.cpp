@@ -776,6 +776,7 @@ void VSFilterViewSettings::setupDataSetActors()
   {
     setMapColors(Qt::Unchecked);
     setScalarBarVisible(false);
+    m_HadNoArrays = true;
   }
 
   if(ActorType::Image2D == m_ActorType && isVisible())
@@ -841,11 +842,11 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
   if(m_Filter)
   {
     disconnect(m_Filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
-    disconnect(filter, SIGNAL(transformChanged()), this, SIGNAL(requiresRender()));
+    disconnect(m_Filter, SIGNAL(transformChanged()), this, SIGNAL(requiresRender()));
 
-    if(dynamic_cast<VSAbstractDataFilter*>(filter))
+    if(dynamic_cast<VSAbstractDataFilter*>(m_Filter))
     {
-      disconnect(filter, SIGNAL(dataImported()), this, SLOT(importedData()));
+      disconnect(m_Filter, SIGNAL(dataImported()), this, SLOT(importedData()));
     }
   }
 
