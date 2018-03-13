@@ -65,13 +65,8 @@ VSSIMPLDataContainerFilterWidget::VSSIMPLDataContainerFilterWidget(VSSIMPLDataCo
     reset();
     apply();
   }
-}
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-VSSIMPLDataContainerFilterWidget::~VSSIMPLDataContainerFilterWidget()
-{
+  changesWaiting();
 }
 
 // -----------------------------------------------------------------------------
@@ -79,5 +74,12 @@ VSSIMPLDataContainerFilterWidget::~VSSIMPLDataContainerFilterWidget()
 // -----------------------------------------------------------------------------
 void VSSIMPLDataContainerFilterWidget::setBounds(double* bounds)
 {
+}
 
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSSIMPLDataContainerFilterWidget::apply()
+{
+  m_DataContainerFilter->apply();
 }

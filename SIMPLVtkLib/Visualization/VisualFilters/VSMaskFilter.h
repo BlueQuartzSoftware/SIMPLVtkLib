@@ -57,10 +57,14 @@ class SIMPLVtkLib_EXPORT VSMaskFilter : public VSAbstractFilter
 public:
   /**
   * @brief Constructor
-  * @param parentWidget
   * @param parent
   */
   VSMaskFilter(VSAbstractFilter* parent);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSMaskFilter() = default;
 
   /**
    * @brief Create
@@ -84,6 +88,7 @@ public:
 
   /**
   * @brief Applies the mask filter on the specified array
+  * @param arrayName
   */
   void apply(QString arrayName);
 

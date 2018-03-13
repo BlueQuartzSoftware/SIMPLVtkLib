@@ -141,6 +141,7 @@ endif()
 # These are the required component libraries
 set(VtkComponents
 		vtkFiltersGeometry
+    vtkFiltersModeling
     vtkGUISupportQt
     vtkRenderingCore
     vtkRenderingFreeType

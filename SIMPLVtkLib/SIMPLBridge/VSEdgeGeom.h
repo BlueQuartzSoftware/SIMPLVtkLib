@@ -153,6 +153,9 @@ public:
   void ReplaceCell(vtkIdType cellId, int npts, vtkIdType *pts);
 
 protected:
+  /**
+  * @brief Default constructor
+  */
   VSEdgeGeom();
 
 private:

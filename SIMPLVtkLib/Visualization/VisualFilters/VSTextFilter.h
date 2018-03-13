@@ -53,8 +53,14 @@ public:
   * @brief Constructor
   * @param parent
   * @param text
+  * @param toolTip
   */
   VSTextFilter(VSAbstractFilter* parent, QString text, QString toolTip);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSTextFilter() = default;
 
   /**
    * @brief Create
@@ -72,6 +78,7 @@ public:
 
   /**
   * @brief Returns the filter's tooltip
+  * @return
   */
   virtual QString getToolTip() const override;
 
@@ -113,6 +120,7 @@ public:
 
   /**
   * @brief Returns the required incoming data type
+  * @return
   */
   static dataType_t getRequiredInputType();
 

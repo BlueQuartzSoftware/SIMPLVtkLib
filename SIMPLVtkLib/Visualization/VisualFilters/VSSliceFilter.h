@@ -58,10 +58,14 @@ class SIMPLVtkLib_EXPORT VSSliceFilter : public VSAbstractFilter
 public:
   /**
   * @brief Constructor
-  * @param parentWidget
   * @param parent
   */
   VSSliceFilter(VSAbstractFilter* parent);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSSliceFilter() = default;
 
   /**
    * @brief Create

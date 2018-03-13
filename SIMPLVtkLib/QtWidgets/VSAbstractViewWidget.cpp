@@ -42,8 +42,8 @@
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSAbstractViewWidget::VSAbstractViewWidget(QWidget* parent, Qt::WindowFlags f)
-  : QFrame(parent, f)
+VSAbstractViewWidget::VSAbstractViewWidget(QWidget* parent, Qt::WindowFlags windowFlags)
+  : QFrame(parent, windowFlags)
 {
 }
 
@@ -53,7 +53,6 @@ VSAbstractViewWidget::VSAbstractViewWidget(QWidget* parent, Qt::WindowFlags f)
 VSAbstractViewWidget::VSAbstractViewWidget(const VSAbstractViewWidget& other)
   : QFrame(nullptr)
 {
-  
 }
 
 // -----------------------------------------------------------------------------
@@ -251,6 +250,8 @@ VSFilterViewSettings* VSAbstractViewWidget::createFilterViewSettings(VSAbstractF
   connect(viewSettings, SIGNAL(showScalarBarChanged(VSFilterViewSettings*, bool)),
     this, SLOT(setFilterShowScalarBar(VSFilterViewSettings*, bool)));
   connect(viewSettings, SIGNAL(requiresRender()), this, SLOT(renderView()));
+  connect(viewSettings, SIGNAL(swappingActors(vtkProp3D*, vtkProp3D*)),
+    this, SLOT(swapActors(vtkProp3D*, vtkProp3D*)));
 
   m_FilterViewSettings[filter] = viewSettings;
 
@@ -318,6 +319,15 @@ void VSAbstractViewWidget::setFilterVisibility(VSFilterViewSettings* viewSetting
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSAbstractViewWidget::swapActors(vtkProp3D* oldProp, vtkProp3D* newProp)
+{
+  getVisualizationWidget()->getRenderer()->RemoveViewProp(oldProp);
+  getVisualizationWidget()->getRenderer()->AddViewProp(newProp);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSAbstractViewWidget::setFilterArrayIndex(VSFilterViewSettings* viewSettings, int index)
 {
   // Handle in subclasses
@@ -334,7 +344,7 @@ void VSAbstractViewWidget::setFilterComponentIndex(VSFilterViewSettings* viewSet
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSAbstractViewWidget::setFilterMapColors(VSFilterViewSettings* viewSettings, int mapColorState)
+void VSAbstractViewWidget::setFilterMapColors(VSFilterViewSettings* viewSettings, Qt::CheckState mapColorState)
 {
   renderView();
 }
@@ -579,8 +589,34 @@ void VSAbstractViewWidget::closeView()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSAbstractViewWidget::setBlockRender(bool block)
+{
+  m_BlockRender = block;
+
+  if(getVisualizationWidget() && getVisualizationWidget()->getRenderer())
+  {
+    if(block)
+    {
+      getVisualizationWidget()->getRenderer()->DrawOff();
+    }
+    else
+    {
+      getVisualizationWidget()->getRenderer()->DrawOn();
+      renderView();
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSAbstractViewWidget::renderView()
 {
+  if(m_BlockRender)
+  {
+    return;
+  }
+
   VSVisualizationWidget* visualizationWidget = getVisualizationWidget();
   if(visualizationWidget)
   {
@@ -593,6 +629,11 @@ void VSAbstractViewWidget::renderView()
 // -----------------------------------------------------------------------------
 void VSAbstractViewWidget::resetCamera()
 {
+  if(m_BlockRender)
+  {
+    return;
+  }
+
   VSVisualizationWidget* visualizationWidget = getVisualizationWidget();
   if(visualizationWidget && visualizationWidget->getRenderer())
   {

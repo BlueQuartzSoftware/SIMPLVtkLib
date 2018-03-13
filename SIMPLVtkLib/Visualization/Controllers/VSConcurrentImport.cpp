@@ -36,6 +36,7 @@
 #include "VSConcurrentImport.h"
 
 #include <QtConcurrent>
+#include <QtCore/QFutureWatcher>
 
 #include "SIMPLVtkLib/Visualization/Controllers/VSController.h"
 #include "SIMPLVtkLib/Visualization/Controllers/VSFilterModel.h"
@@ -45,10 +46,27 @@
 //
 // -----------------------------------------------------------------------------
 VSConcurrentImport::VSConcurrentImport(VSController* controller)
-: QObject()
+: QObject(controller)
 , m_Controller(controller)
 , m_ImportDataContainerOrderLock(1)
+, m_UnappliedDataFilterLock(1)
+, m_FilterLock(1)
+, m_WrappedDcLock(1)
 {
+  m_UnappliedDataFilters.clear();
+  connect(this, SIGNAL(importedFilter(VSAbstractFilter*, bool)),
+    controller->getFilterModel(), SLOT(addFilter(VSAbstractFilter*, bool)));
+
+  int threadsUsed = 2;
+  m_ThreadCount = QThreadPool::globalInstance()->maxThreadCount();
+  if(m_ThreadCount > threadsUsed)
+  {
+    m_ThreadCount -= threadsUsed;
+  }
+  else
+  {
+    m_ThreadCount = 1;
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -87,20 +105,67 @@ void VSConcurrentImport::run()
 // -----------------------------------------------------------------------------
 void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 {
-  VSFileNameFilter* fileFilter = filePair.first;
+  m_FileNameFilter = filePair.first;
   DataContainerArray::Pointer dca = filePair.second;
-  m_Controller->getFilterModel()->addFilter(fileFilter);
+  m_Controller->getFilterModel()->addFilter(m_FileNameFilter);
 
   m_ImportDataContainerOrder = dca->getDataContainers();
 
-  size_t threadCount = QThreadPool::globalInstance()->maxThreadCount();
-  if(threadCount > 1)
+  emit blockRender(true);
+  // Wait for the filter lock
+  while(m_FilterLock.tryAcquire() == false)
   {
-    threadCount--;
+    QThread::currentThread()->wait(1);
   }
-  for (int i = 0; i < threadCount; i++)
+
+  m_ThreadsRemaining = m_ThreadCount;
+  for(int i = 0; i < m_ThreadCount; i++)
   {
-    QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::importDataContainer, fileFilter);
+    QFutureWatcher<void>* watcher = new QFutureWatcher<void>(this);
+    connect(watcher, SIGNAL(finished()), this, SLOT(partialWrappingThreadFinished()));
+    watcher->setFuture(QtConcurrent::run(this, &VSConcurrentImport::importDataContainer, m_FileNameFilter));
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSConcurrentImport::partialWrappingThreadFinished()
+{
+  m_ThreadsRemaining--;
+  if(m_ThreadsRemaining <= 0)
+  {
+    for(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc : m_WrappedDataContainers)
+    {
+      VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, m_FileNameFilter);
+      m_Controller->getFilterModel()->addFilter(filter, false);
+
+      // Attempting to run applyDataFilters requires the QSemaphore to lock when modifying this vector
+      while(m_UnappliedDataFilterLock.tryAcquire() == false)
+      {
+        QThread::currentThread()->wait(1);
+      }
+      m_UnappliedDataFilters.push_back(filter);
+      m_UnappliedDataFilterLock.release();
+    }
+    
+    // Select the last filter
+    m_Controller->selectFilter(m_UnappliedDataFilters.back());
+
+    m_AppliedFilterCount = 0;
+    m_WrappedDataContainers.clear();
+    emit blockRender(false);
+    m_FilterLock.release();
+
+    // Apply the filters only after all DataContainers for all files have been wrapped
+    if(m_WrappedList.size() == 0)
+    {
+      // Apply filters on multiple threads
+      for(int i = 0; i < m_ThreadCount; i++)
+      {
+        QFuture<void> future = QtConcurrent::run(this, &VSConcurrentImport::applyDataFilters);
+      }
+    }
   }
 }
 
@@ -109,9 +174,6 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 // -----------------------------------------------------------------------------
 void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
 {
-  //connect(this, SIGNAL(wrappedDataContainer(VSFileNameFilter*, SIMPLVtkBridge::WrappedDataContainerPtr)),
-  //  this, SLOT(importWrappedDataContainer(VSFileNameFilter*, SIMPLVtkBridge::WrappedDataContainerPtr)), Qt::UniqueConnection);
-
   while (m_ImportDataContainerOrder.size() > 0)
   {
     if (m_ImportDataContainerOrderLock.tryAcquire() == true)
@@ -121,11 +183,16 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
 
       m_ImportDataContainerOrderLock.release();
 
-      SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
+      SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapGeometryPtr(dc);
       if(wrappedDc)
       {
-        //emit wrappedDataContainer(fileFilter, wrappedDc);
-        importWrappedDataContainer(fileFilter, wrappedDc);
+        while(m_WrappedDcLock.tryAcquire() == false)
+        {
+          QThread::currentThread()->wait(1);
+        }
+        m_WrappedDataContainers.push_back(wrappedDc);
+
+        m_WrappedDcLock.release();
       }
     }
   }
@@ -134,10 +201,19 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSConcurrentImport::importWrappedDataContainer(VSFileNameFilter* fileFilter, SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc)
+void VSConcurrentImport::applyDataFilters()
 {
-  VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, fileFilter);
-  QThread* thread =  QCoreApplication::instance()->thread();
-  filter->moveToThread(thread);
-  m_Controller->getFilterModel()->addFilter(filter);
+  emit applyingDataFilters(m_UnappliedDataFilters.size());
+  while(m_UnappliedDataFilters.size() > 0)
+  {
+    if(m_UnappliedDataFilterLock.tryAcquire() == true)
+    {
+      VSSIMPLDataContainerFilter* filter = m_UnappliedDataFilters.front();
+      m_UnappliedDataFilters.pop_front();
+      m_UnappliedDataFilterLock.release();
+
+      filter->apply();
+      emit dataFilterApplied(++m_AppliedFilterCount);
+    }
+  }
 }

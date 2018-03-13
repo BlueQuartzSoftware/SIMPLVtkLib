@@ -224,6 +224,7 @@ protected:
   */
   void update();
 
+private:
   std::vector<RgbPos_t> m_BaseRgbPosVector;
   std::vector<RgbPos_t> m_RgbPosVector;
   static std::vector<RgbPos_t> m_DefaultRgbPosVector;

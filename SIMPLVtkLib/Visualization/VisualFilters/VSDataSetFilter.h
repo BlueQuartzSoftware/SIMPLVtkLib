@@ -57,9 +57,21 @@ public:
   /**
    * @brief Constructor
    * @param filePath
+   * @param parent
    */
   VSDataSetFilter(const QString &filePath, VSAbstractFilter* parent = nullptr);
 
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSDataSetFilter() = default;
+
+  /**
+  * @brief Creates a new VSDataSetFilter from the given arguments
+  * @param filePath
+  * @param json
+  * @param parent
+  */
   static VSDataSetFilter* Create(const QString &filePath, QJsonObject &json, VSAbstractFilter *parent = nullptr);
 
   /**
@@ -76,6 +88,7 @@ public:
 
   /**
   * @brief Returns the output data for the filter
+  * @return
   */
   VTK_PTR(vtkDataSet) getOutput() override;
 
@@ -98,12 +111,6 @@ public:
   * @return
   */
   static bool compatibleWithParent(VSAbstractFilter* filter);
-
-  /**
-   * @brief Reads values from a json file into the filter
-   * @param json
-   */
-  void readJson(QJsonObject &json);
 
   /**
    * @brief Writes values to a json file from the filter

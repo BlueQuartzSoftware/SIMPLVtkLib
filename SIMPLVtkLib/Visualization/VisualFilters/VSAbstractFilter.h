@@ -44,11 +44,13 @@
 #include <vtkAlgorithmOutput.h>
 #include <vtkDataArray.h>
 #include <vtkDataSet.h>
+#include <vtkOutlineFilter.h>
 #include <vtkTransformFilter.h>
 #include <vtkTrivialProducer.h>
 
 #include <QtCore/QList>
 #include <QtCore/QObject>
+#include <QtCore/QSemaphore>
 #include <QtCore/QString>
 #include <QtCore/QVector>
 #include <QtCore/QJsonObject>
@@ -94,14 +96,9 @@ public:
   SIMPL_BOOL_PROPERTY(Initialized)
 
   /**
-  * @brief Constructor
-  */
-  VSAbstractFilter();
-
-  /**
   * @brief Deconstructor
   */
-  virtual ~VSAbstractFilter();
+  virtual ~VSAbstractFilter() = default;
 
   /**
   * @brief Deletes the item and removes it from the model
@@ -195,6 +192,12 @@ public:
   virtual VTK_PTR(vtkDataSet) getOutput() = 0;
 
   /**
+  * @brief Returns the outline data port for the filter
+  * @return
+  */
+  vtkAlgorithmOutput* getOutlinePort();
+
+  /**
   * @brief Returns the output port for the transformed filtered data
   * @return
   */
@@ -252,6 +255,7 @@ public:
 
 signals:
   void updatedOutputPort(VSAbstractFilter* filter);
+  void updatedOutput();
   void transformChanged();
 
   void errorGenerated(const QString &title, const QString &msg, const int &errorCode);
@@ -262,13 +266,13 @@ protected slots:
   * connected to its own algorithm, it propogates the update signal to its children.
   * @param filter
   */
-  void connectToOutuput(VSAbstractFilter* filter);
-  
+  void connectToOutput(VSAbstractFilter* filter);
+
   /**
-  * @brief Forms connections with the given filter's VSTransform
+  * @brief Forms connections with additional output filters
   * @param filter
   */
-  void connectTransformFilter(VSAbstractFilter* filter);
+  void connectAdditionalOutputFilters(VSAbstractFilter* filter);
 
   /**
   * @brief Updates the transform used by the transform filter
@@ -276,6 +280,11 @@ protected slots:
   void updateTransformFilter();
 
 protected:
+  /**
+  * @brief Constructor
+  */
+  VSAbstractFilter();
+
   /**
   * @brief code to setup the vtkAlgorithm for the filter
   */
@@ -316,8 +325,29 @@ protected:
   */
   void readTransformJson(QJsonObject& json);
 
-  bool m_ConnectedInput = false;
-  VTK_PTR(vtkAlgorithmOutput) m_InputPort;
+  /**
+  * @brief Returns true if the filter algorithm is connected. Returns false otherwise.
+  * @return
+  */
+  bool getConnectedInput();
+
+  /**
+  * @brief Sets whether or not the filter algorithm is connected.
+  * @param connected
+  */
+  void setConnectedInput(bool connected);
+
+  /**
+  * @brief Returns the VTK input port
+  * @return
+  */
+  VTK_PTR(vtkAlgorithmOutput) getInputPort();
+
+  /**
+  * @brief Sets the VTK input port
+  * @param inputPort
+  */
+  void setInputPort(VTK_PTR(vtkAlgorithmOutput) inputPort);
 
 private:
   /**
@@ -334,6 +364,11 @@ private:
 
   std::shared_ptr<VSTransform> m_Transform;
   VTK_PTR(vtkTransformFilter) m_TransformFilter;
+  VTK_PTR(vtkOutlineFilter) m_OutlineFilter;
+  //VTK_PTR(vtkTransformFilter) m_OutlineTransformFilter;
+  QSemaphore m_ChildLock;
+  bool m_ConnectedInput = false;
+  VTK_PTR(vtkAlgorithmOutput) m_InputPort;
 };
 
 #ifdef __clang__

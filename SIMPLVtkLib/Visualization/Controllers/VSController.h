@@ -61,6 +61,7 @@ class SIMPLVtkLib_EXPORT VSController : public QObject
 public:
   /**
   * @brief Constructor
+  * @param parent
   */
   VSController(QObject* parent = nullptr);
 
@@ -137,12 +138,21 @@ public:
   */
   VSFilterModel* getFilterModel();
 
+  /**
+  * @brief Alert the VSMainWidgetBase, if available, that the given filter should be selected.
+  * @param filter
+  */
+  void selectFilter(VSAbstractFilter* filter);
+
 signals:
   void filterAdded(VSAbstractFilter*, bool currentFilter);
   void filterRemoved(VSAbstractFilter*);
   void filterCheckStateChanged(VSAbstractFilter* filter);
-
+  void blockRender(bool block);
   void dataImported();
+  void filterSelected(VSAbstractFilter* filter);
+  void applyingDataFilters(int count);
+  void dataFilterApplied(int num);
 
 private:
   VSFilterModel* m_FilterModel;

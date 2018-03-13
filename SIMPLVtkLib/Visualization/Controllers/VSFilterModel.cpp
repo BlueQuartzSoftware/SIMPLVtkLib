@@ -35,11 +35,14 @@
 
 #include "VSFilterModel.h"
 
+#include <QtCore/QThread>
+
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
 VSFilterModel::VSFilterModel(QObject* parent)
   : QStandardItemModel(parent)
+  , m_ModelLock(1)
 {
 }
 
@@ -55,7 +58,13 @@ void VSFilterModel::addFilter(VSAbstractFilter* filter, bool currentFilter)
 
   if(nullptr == filter->getParentFilter())
   {
+    while(false == m_ModelLock.tryAcquire())
+    {
+      QThread::currentThread()->wait();
+    }
+
     appendRow(filter);
+    m_ModelLock.release();
   }
 
   emit filterAdded(filter, currentFilter);

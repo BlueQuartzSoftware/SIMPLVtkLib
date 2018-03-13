@@ -61,6 +61,11 @@ public:
   VSMainWidget(QWidget* parent = nullptr);
 
   /**
+  * @brief Deconstructor
+  */
+  virtual ~VSMainWidget() = default;
+
+  /**
   * @brief Returns a QMenu with all the Add Filter actions
   * @return
   */
@@ -129,6 +134,20 @@ protected slots:
   * @brief Resets all render view cameras
   */
   void resetCamera();
+
+  /**
+  * @brief Sets the progress bar's maximum value based on the
+  * number of filters being imported.
+  * @param max
+  */
+  void importNumFilters(int max);
+
+  /**
+  * @brief Sets the progress bar's current value based on the
+  * number of filters already imported.
+  * @param value
+  */
+  void importedFilterNum(int value);
 
 private:
   class vsInternals;

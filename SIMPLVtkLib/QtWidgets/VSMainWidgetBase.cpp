@@ -40,6 +40,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QFile>
+#include <QtCore/QThread>
 #include <QtCore/QUuid>
 
 #include <QtWidgets/QMessageBox>
@@ -84,6 +85,10 @@ void VSMainWidgetBase::connectSlots()
     this, SLOT(filterAdded(VSAbstractFilter*, bool)));
   connect(m_Controller, SIGNAL(filterRemoved(VSAbstractFilter*)), 
     this, SLOT(filterRemoved(VSAbstractFilter*)));
+  connect(m_Controller, SIGNAL(blockRender(bool)),
+    this, SLOT(setBlockRender(bool)));
+  connect(m_Controller, SIGNAL(filterSelected(VSAbstractFilter*)),
+    this, SLOT(setCurrentFilter(VSAbstractFilter*)));
 
   connect(this, SIGNAL(proxyFromFilePathGenerated(DataContainerArrayProxy, const QString &)),
           this, SLOT(launchSIMPLSelectionDialog(DataContainerArrayProxy, const QString &)));
@@ -485,6 +490,10 @@ void VSMainWidgetBase::setActiveView(VSAbstractViewWidget* viewWidget)
 // -----------------------------------------------------------------------------
 void VSMainWidgetBase::setFilterVisibility(VSFilterViewSettings* viewSettings, bool visible)
 {
+  if(false == (viewSettings && viewSettings->getFilter()))
+  {
+    return;
+  }
   if(nullptr == m_ActiveViewWidget)
   {
     return;
@@ -724,5 +733,18 @@ void VSMainWidgetBase::renderAllViews()
   for(VSAbstractViewWidget* viewWidget : getAllViewWidgets())
   {
     viewWidget->renderView();
+  }
+
+  //QThread::currentThread()->wait(1);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidgetBase::setBlockRender(bool block)
+{
+  for(VSAbstractViewWidget* viewWidget : getAllViewWidgets())
+  {
+    viewWidget->setBlockRender(block);
   }
 }

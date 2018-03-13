@@ -74,11 +74,12 @@ public:
   enum class Representation : int
   {
     Invalid = -1,
-    Points = 0,
-    Wireframe = 1,
-    Surface = 2,
-    SurfaceWithEdges = 3,
-    Default = Surface
+    Outline,
+    Points,
+    Wireframe,
+    Surface,
+    SurfaceWithEdges,
+    Default = Outline
   };
 
   enum class ActorType : int
@@ -103,7 +104,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  virtual ~VSFilterViewSettings();
+  virtual ~VSFilterViewSettings() = default;
 
   /**
   * @brief Returns a pointer to the VSAbstractFilter
@@ -196,6 +197,10 @@ public:
   */
   int getRepresentationi();
 
+  /**
+  * @brief Returns the actor property representation as an enum
+  * @return
+  */
   ActorType getActorType();
 
   /**
@@ -276,16 +281,29 @@ public slots:
   void setRepresentation(Representation type);
 
   /**
+  * @brief Checks the imported data type, changes the representation, and renders the changes
+  */
+  void importedData();
+
+  /**
+  * @brief Updates the actors for the current data type and renders the changes
+  */
+  void checkDataType();
+
+  /**
   * @brief Updates the input connection for the vtkMapper
   * @param filter
   */
   void updateInputPort(VSAbstractFilter* filter);
 
+  /**
+  * @brief Updates the transformation for 2D image data
+  */
   void updateTransform();
 
 signals:
   void visibilityChanged(VSFilterViewSettings*, bool);
-  void representationChanged(VSFilterViewSettings*, Representation);
+  void representationChanged(VSFilterViewSettings*, VSFilterViewSettings::Representation);
   void solidColorChanged(VSFilterViewSettings*, double*);
   void activeArrayIndexChanged(VSFilterViewSettings*, int);
   void activeComponentIndexChanged(VSFilterViewSettings*, int);
@@ -293,26 +311,63 @@ signals:
   void alphaChanged(VSFilterViewSettings*, double);
   void showScalarBarChanged(VSFilterViewSettings*, bool);
   void requiresRender();
+  void swappingActors(vtkProp3D* oldProp, vtkProp3D* newProp);
 
 protected:
   /**
   * @brief Performs initial setup commands for any actors used in the view settings
   */
-  void setupActors();
+  void setupActors(bool outline = true);
 
+  /**
+  * @brief Creates a vtkImageSliceMapper and vtkImageSlice for displaying 2D Image data
+  */
   void setupImageActors();
 
+  /**
+  * @brief Creates a vtkDataSetMapper and vtkActor for displaying generic vtkDataSets
+  */
   void setupDataSetActors();
 
+  /**
+  * @brief Returns the vtkDataSetMapper if the ActorType is DataSet and the settings are valid.
+  * Returns nullptr otherwise.
+  * @return
+  */
   vtkDataSetMapper* getDataSetMapper();
 
+  /**
+  * @brief Returns the vtkActor if the ActorType is DataSet and the settings are valid.
+  * Returns nullptr otherwise.
+  * @return
+  */
   vtkActor* getDataSetActor();
 
+  /**
+  * @brief Returns the vtkImageSliceMapper if the ActorType is Image2D and the settings are valid.
+  * Returns nullptr otherwise.
+  * @return
+  */
   vtkImageSliceMapper* getImageMapper();
 
+  /**
+  * @brief Returns the vtkImageSlice if the ActorType is Image2D and the settings are valid.
+  * Returns nullptr otherwise.
+  * @return
+  */
   vtkImageSlice* getImageSliceActor();
 
+  /**
+  * @brief Returns true if data set is a 2D image.  Returns false otherwise.
+  * @return
+  */
   bool isFlatImage();
+
+  /**
+  * @brief Returns true if there is only a single array in the filter output's point data.
+  * Returns false if there are no arrays or more than one.
+  */
+  bool hasSinglePointArray();
 
   /**
   * @brief Updates the alpha for DataSet actors
@@ -362,6 +417,7 @@ private:
   int m_ActiveArray = 0;
   int m_ActiveComponent = -1;
   Qt::CheckState m_MapColors = Qt::Checked;
+  Representation m_Representation = Representation::Default;
   VTK_PTR(vtkAbstractMapper3D) m_Mapper = nullptr;
   VTK_PTR(vtkProp3D) m_Actor = nullptr;
   bool m_ShowScalarBar = true;
@@ -369,6 +425,7 @@ private:
   double m_Alpha = 1.0;
   VTK_PTR(vtkScalarBarActor) m_ScalarBarActor = nullptr;
   VTK_PTR(vtkScalarBarWidget) m_ScalarBarWidget = nullptr;
+  bool m_HadNoArrays = false;
 
   static double* NULL_COLOR;
 };

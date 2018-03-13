@@ -261,7 +261,7 @@ void VSInfoWidget::connectFilterViewSettings(VSFilterViewSettings* settings)
     disconnect(settings, SIGNAL(activeArrayIndexChanged(VSFilterViewSettings*, int)),
       this, SLOT(listenArrayIndex(VSFilterViewSettings*, int)));
     disconnect(settings, SIGNAL(activeComponentIndexChanged(VSFilterViewSettings*, int)),
-      this, SLOT(listenComponentIndex(VSFilterViewSettings, int)));
+      this, SLOT(listenComponentIndex(VSFilterViewSettings*, int)));
     disconnect(settings, SIGNAL(mapColorsChanged(VSFilterViewSettings*, Qt::CheckState)),
       this, SLOT(listenMapColors(VSFilterViewSettings*, Qt::CheckState)));
     disconnect(settings, SIGNAL(alphaChanged(VSFilterViewSettings*, double)),
@@ -281,7 +281,7 @@ void VSInfoWidget::connectFilterViewSettings(VSFilterViewSettings* settings)
     connect(settings, SIGNAL(activeArrayIndexChanged(VSFilterViewSettings*, int)),
       this, SLOT(listenArrayIndex(VSFilterViewSettings*, int)));
     connect(settings, SIGNAL(activeComponentIndexChanged(VSFilterViewSettings*, int)),
-      this, SLOT(listenComponentIndex(VSFilterViewSettings, int)));
+      this, SLOT(listenComponentIndex(VSFilterViewSettings*, int)));
     connect(settings, SIGNAL(mapColorsChanged(VSFilterViewSettings*, Qt::CheckState)),
       this, SLOT(listenMapColors(VSFilterViewSettings*, Qt::CheckState)));
     connect(settings, SIGNAL(alphaChanged(VSFilterViewSettings*, double)),

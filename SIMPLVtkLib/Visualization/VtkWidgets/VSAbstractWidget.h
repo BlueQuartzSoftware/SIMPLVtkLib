@@ -64,12 +64,9 @@ class SIMPLVtkLib_EXPORT VSAbstractWidget : public QWidget
 
 public:
   /**
-  * @brief Constructor
-  * @param parent
-  * @param bounds
-  * @param iren
+  * @brief Deconstructor
   */
-  VSAbstractWidget(QWidget* parent, VSTransform* transform, double bounds[6], vtkRenderWindowInteractor* iren);
+  virtual ~VSAbstractWidget() = default;
 
   /**
   * @brief Copies the vtkWidget bounds
@@ -100,13 +97,13 @@ public:
   virtual void disable() = 0;
 
   /**
-  * @brief Returns the vtkRenderWindowInteractor 
+  * @brief Returns the vtkRenderWindowInteractor used by the widget
   * @return
   */
   vtkRenderWindowInteractor* getInteractor();
 
   /**
-  * @brief Sets the vtkRenderWindowInteractor to render to
+  * @brief Sets the vtkRenderWindowInteractor to render to and interact with
   * @param interactor
   */
   virtual void setInteractor(vtkRenderWindowInteractor* interactor);
@@ -133,6 +130,14 @@ protected slots:
   virtual void updateGlobalSpace() = 0;
 
 protected:
+  /**
+  * @brief Constructor
+  * @param parent
+  * @param bounds
+  * @param iren
+  */
+  VSAbstractWidget(QWidget* parent, VSTransform* transform, double bounds[6], vtkRenderWindowInteractor* iren);
+
   /**
   * @brief Updates the widget bounds
   */
@@ -162,7 +167,7 @@ protected:
   const double MIN_SIZE = 6.0;
 
 private:
-  vtkRenderWindowInteractor * m_RenderWindowInteractor;
+  vtkRenderWindowInteractor* m_RenderWindowInteractor;
   VSTransform* m_Transform;
   double m_Bounds[6];
 };

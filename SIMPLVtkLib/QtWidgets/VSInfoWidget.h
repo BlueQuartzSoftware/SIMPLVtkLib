@@ -63,6 +63,11 @@ public:
   */
   VSInfoWidget(QWidget* parent = nullptr);
 
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSInfoWidget() = default;
+
 signals:
   void filterDeleted(VSAbstractFilter* filter);
 

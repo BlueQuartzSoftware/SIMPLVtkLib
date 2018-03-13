@@ -58,16 +58,9 @@ class SIMPLVtkLib_EXPORT VSAbstractViewWidget : public QFrame
 
 public:
   /**
-  * @brief Constructor
-  * @param parent
+  * @brief Deconstructor
   */
-  VSAbstractViewWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
-
-  /**
-  * @brief Copy constructor
-  * @param other
-  */
-  VSAbstractViewWidget(const VSAbstractViewWidget& other);
+  virtual ~VSAbstractViewWidget() = default;
 
   /**
   * @brief Returns a pointer to the active VSFilterViewSettings
@@ -132,7 +125,6 @@ signals:
   void mapColorsChanged(VSFilterViewSettings*, Qt::CheckState);
   void alphaChanged(VSFilterViewSettings*, double);
   void showScalarBarChanged(VSFilterViewSettings*, bool);
-  void requiresRender();
 
 public slots:
   /**
@@ -160,6 +152,12 @@ public slots:
   */
   void resetCamera();
 
+  /**
+  * @brief Sets whether or not the render process should be blocked
+  * @param block
+  */
+  void setBlockRender(bool block);
+
 protected slots:
   /**
   * @brief Connect a new visual filter's VSFilterViewSettings
@@ -179,6 +177,13 @@ protected slots:
   * @param filterVisible
   */
   void setFilterVisibility(VSFilterViewSettings* viewSettings, bool filterVisible);
+
+  /**
+  * @brief Removes the old prop from the renderer if applicable and adds the new one
+  * @param oldProp
+  * @param newProp
+  */
+  void swapActors(vtkProp3D* oldProp, vtkProp3D* newProp);
 
   /**
   * @brief Change the active filter's array index
@@ -223,7 +228,7 @@ protected slots:
   * @param viewSettings
   * @param mapColors
   */
-  virtual void setFilterMapColors(VSFilterViewSettings* viewSettings, int mapColorState);
+  virtual void setFilterMapColors(VSFilterViewSettings* viewSettings, Qt::CheckState mapColorState);
 
   /**
   * @brief ScalarBar visibility changed for filter
@@ -238,6 +243,19 @@ protected slots:
   virtual void mousePressed();
 
 protected:
+  /**
+  * @brief Constructor
+  * @param parent
+  * @param windowFlags
+  */
+  VSAbstractViewWidget(QWidget* parent = nullptr, Qt::WindowFlags windowFlags = Qt::WindowFlags());
+
+  /**
+  * @brief Copy constructor
+  * @param other
+  */
+  VSAbstractViewWidget(const VSAbstractViewWidget& other);
+
   /**
   * @brief Clears the filters from the view widget
   */
@@ -284,4 +302,5 @@ private:
   VSFilterViewSettings* m_ActiveFilterSettings = nullptr;
   VSFilterViewSettings::Map m_FilterViewSettings;
   VSController* m_Controller = nullptr;
+  bool m_BlockRender = false;
 };

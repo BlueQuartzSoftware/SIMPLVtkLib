@@ -72,12 +72,8 @@ public:
     BOX = 1
   };
 
-  //static const QString PlaneClipTypeString;
-  //static const QString BoxClipTypeString;
-
   /**
   * @brief Constructor
-  * @param parentWidget
   * @param parent
   */
   VSClipFilter(VSAbstractFilter* parent);
@@ -85,7 +81,7 @@ public:
   /**
   * @brief Deconstructor
   */
-  ~VSClipFilter();
+  virtual ~VSClipFilter() = default;
 
   /**
    * @brief Create

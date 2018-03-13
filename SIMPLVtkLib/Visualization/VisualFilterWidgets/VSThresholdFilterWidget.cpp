@@ -83,13 +83,6 @@ VSThresholdFilterWidget::VSThresholdFilterWidget(VSThresholdFilter* filter, vtkR
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSThresholdFilterWidget::~VSThresholdFilterWidget()
-{
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void VSThresholdFilterWidget::setBounds(double* bounds)
 {
   if(nullptr == bounds)

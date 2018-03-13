@@ -324,6 +324,16 @@ QString VSSIMPLDataContainerFilter::getToolTip() const
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSSIMPLDataContainerFilter::apply()
+{
+  SIMPLVtkBridge::FinishWrappingDataContainerStruct(m_WrappedDataContainer);
+  m_TrivialProducer->SetOutput(m_WrappedDataContainer->m_DataSet);
+  emit dataImported();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 SIMPLVtkBridge::WrappedDataContainerPtr VSSIMPLDataContainerFilter::getWrappedDataContainer()
 {
   return m_WrappedDataContainer;

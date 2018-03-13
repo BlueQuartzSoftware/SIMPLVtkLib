@@ -37,6 +37,10 @@
 
 #include <QtWidgets/QPushButton>
 
+/**
+* @class VSColorButton VSColorButton.h SIMPLVtkLib/QtWidgets/VSColorButton.h
+* @brief This class allows the user to pick a color through the user interface.
+*/
 class VSColorButton : public QPushButton
 {
   Q_OBJECT
@@ -47,6 +51,11 @@ public:
   * @param parent
   */
   VSColorButton(QWidget* parent);
+
+  /**
+  * @brief Deconstructor
+  */
+  virtual ~VSColorButton() = default;
 
   /**
   * @brief Returns the current color

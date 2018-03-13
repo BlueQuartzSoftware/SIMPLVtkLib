@@ -91,7 +91,7 @@ void VSThresholdFilter::createFilter()
   m_ThresholdAlgorithm->SetInputConnection(getParentFilter()->getOutputPort());
   VTK_PTR(vtkDataArray) dataArray = getParentFilter()->getOutput()->GetCellData()->GetScalars();
 
-  m_ConnectedInput = true;
+  setConnectedInput(true);
 }
 
 // -----------------------------------------------------------------------------
@@ -166,7 +166,7 @@ QUuid VSThresholdFilter::GetUuid()
 // -----------------------------------------------------------------------------
 vtkAlgorithmOutput* VSThresholdFilter::getOutputPort()
 {
-  if(m_ConnectedInput && m_ThresholdAlgorithm)
+  if(getConnectedInput() && m_ThresholdAlgorithm)
   {
     return m_ThresholdAlgorithm->GetOutputPort();
   }
@@ -183,7 +183,7 @@ vtkAlgorithmOutput* VSThresholdFilter::getOutputPort()
 // -----------------------------------------------------------------------------
 VTK_PTR(vtkDataSet) VSThresholdFilter::getOutput()
 {
-  if(m_ConnectedInput && m_ThresholdAlgorithm)
+  if(getConnectedInput() && m_ThresholdAlgorithm)
   {
     return m_ThresholdAlgorithm->GetOutput();
   }
@@ -205,9 +205,9 @@ void VSThresholdFilter::updateAlgorithmInput(VSAbstractFilter* filter)
     return;
   }
 
-  m_InputPort = filter->getOutputPort();
+  setInputPort(filter->getOutputPort());
 
-  if(m_ConnectedInput && m_ThresholdAlgorithm)
+  if(getConnectedInput() && m_ThresholdAlgorithm)
   {
     m_ThresholdAlgorithm->SetInputConnection(filter->getOutputPort());
   }

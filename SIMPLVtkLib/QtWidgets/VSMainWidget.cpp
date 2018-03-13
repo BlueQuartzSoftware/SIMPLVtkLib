@@ -97,6 +97,8 @@ void VSMainWidget::connectSlots()
 
   connect(getController(), &VSController::filterAdded, this, [=] { renderAll(); });
   connect(getController(), &VSController::dataImported, this, [=] { resetCamera(); });
+  connect(getController(), SIGNAL(applyingDataFilters(int)), this, SLOT(importNumFilters(int)));
+  connect(getController(), SIGNAL(dataFilterApplied(int)), this, SLOT(importedFilterNum(int)));
 }
 
 // -----------------------------------------------------------------------------
@@ -318,4 +320,28 @@ void VSMainWidget::createFilterMenu()
   m_FilterMenu->addSeparator();
 
   m_FilterMenu->addAction(m_ActionAddText);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidget::importNumFilters(int max)
+{
+  m_Internals->progressBar->setMaximum(max);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidget::importedFilterNum(int value)
+{
+  int maxValue = m_Internals->progressBar->maximum();
+  if(value == maxValue)
+  {
+    m_Internals->progressBar->setValue(0);
+  }
+  else
+  {
+    m_Internals->progressBar->setValue(value);
+  }
 }
