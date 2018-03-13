@@ -355,9 +355,6 @@ void VSMainWidgetBase::openDREAM3DFile(const QString &filePath)
       return;
     }
 
-    bool containsCellAttributeMatrices = false;
-    bool containsValidArrays = false;
-
     QStringList dcNames = proxy.dataContainers.keys();
     for (int i = 0; i < dcNames.size(); i++)
     {
@@ -382,15 +379,6 @@ void VSMainWidgetBase::openDREAM3DFile(const QString &filePath)
           {
             dcProxy.attributeMatricies.remove(amName);
             proxy.dataContainers[dcName] = dcProxy;
-          }
-          else
-          {
-            containsCellAttributeMatrices = true;
-
-            if (amProxy.dataArrays.size() > 0)
-            {
-              containsValidArrays = true;
-            }
           }
         }
       }
