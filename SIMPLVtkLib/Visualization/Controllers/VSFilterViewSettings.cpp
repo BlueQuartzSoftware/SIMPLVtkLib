@@ -296,13 +296,12 @@ void VSFilterViewSettings::setVisible(bool visible)
 // -----------------------------------------------------------------------------
 vtkDataArray* VSFilterViewSettings::getArrayAtIndex(int index)
 {
-  vtkDataSetMapper* dataMapper = getDataSetMapper();
-  if(nullptr == dataMapper)
+  vtkDataSet* dataSet = m_Filter->getOutput();
+  if(nullptr == dataSet)
   {
     return nullptr;
   }
 
-  vtkDataSet* dataSet = dataMapper->GetInput();
   if(dataSet && dataSet->GetCellData())
   {
     return dataSet->GetCellData()->GetArray(index);
@@ -604,13 +603,18 @@ void VSFilterViewSettings::setupActors(bool outline)
     return;
   }
 
-  if(isFlatImage())
+  if(isFlatImage() && hasSinglePointArray())
   {
     setupImageActors();
   }
   else
   {
     setupDataSetActors();
+    
+    if(isFlatImage())
+    {
+      setScalarBarVisible(false);
+    }
   }
 
   if(outline)
@@ -636,11 +640,6 @@ bool VSFilterViewSettings::isFlatImage()
     return false;
   }
 
-  if(imageData->GetPointData()->GetNumberOfArrays() != 1)
-  {
-    return false;
-  }
-
   // Check extents
   int* extent = imageData->GetExtent();
   for(int i = 0; i < 3; i++)
@@ -657,18 +656,48 @@ bool VSFilterViewSettings::isFlatImage()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+bool VSFilterViewSettings::hasSinglePointArray()
+{
+  VTK_PTR(vtkDataSet) outputData = m_Filter->getOutput();
+  if(nullptr == outputData)
+  {
+    return false;
+  }
+
+  if(outputData->GetPointData()->GetNumberOfArrays() != 1)
+  {
+    return false;
+  }
+
+  return true;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSFilterViewSettings::setupImageActors()
 {
-  vtkImageSliceMapper* mapper = vtkImageSliceMapper::New();
-  mapper->SetInputConnection(m_Filter->getOutputPort());
-  mapper->SliceAtFocalPointOn();
-  mapper->SliceFacesCameraOff();
+  vtkImageSliceMapper* mapper;
+  vtkImageSlice* actor;
+  if(ActorType::DataSet == m_ActorType || nullptr == m_Actor)
+  {
+    mapper = vtkImageSliceMapper::New();
+    mapper->SliceAtFocalPointOn();
+    mapper->SliceFacesCameraOff();
 
-  vtkImageSlice* actor = vtkImageSlice::New();
-  actor->SetMapper(mapper);
-  
-  setMapColors(Qt::Unchecked);
-  setScalarBarVisible(false);
+    actor = vtkImageSlice::New();
+    actor->SetMapper(mapper);
+
+    setMapColors(Qt::Unchecked);
+    setScalarBarVisible(false);
+  }
+  else
+  {
+    mapper = vtkImageSliceMapper::SafeDownCast(m_Mapper);
+    actor = vtkImageSlice::SafeDownCast(m_Actor);
+  }
+
+  mapper->SetInputConnection(m_Filter->getOutputPort());
 
   if(ActorType::DataSet == m_ActorType && isVisible())
   {
@@ -688,42 +717,60 @@ void VSFilterViewSettings::setupDataSetActors()
 {
   VTK_PTR(vtkDataSet) outputData = m_Filter->getOutput();
 
-  m_DataSetFilter = VTK_PTR(vtkDataSetSurfaceFilter)::New();
-  m_DataSetFilter->SetInputConnection(m_Filter->getTransformedOutputPort());
+  vtkDataSetMapper* mapper;
+  vtkActor* actor;
+  if(ActorType::Image2D == m_ActorType || nullptr == m_Actor)
+  {
+    m_DataSetFilter = VTK_PTR(vtkDataSetSurfaceFilter)::New();
+    mapper = vtkDataSetMapper::New();
+    mapper->ReleaseDataFlagOn();
+    actor = vtkActor::New();
 
-  vtkDataSetMapper* mapper = vtkDataSetMapper::New();
-  mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
-  mapper->ReleaseDataFlagOn();
+    m_LookupTable = new VSLookupTableController();
+    mapper->SetLookupTable(m_LookupTable->getColorTransferFunction());
 
-  vtkActor* actor = vtkActor::New();
-  actor->SetMapper(mapper);
+    m_ScalarBarActor = VTK_PTR(vtkScalarBarActor)::New();
+    m_ScalarBarActor->SetLookupTable(mapper->GetLookupTable());
+    m_ScalarBarWidget = VTK_PTR(vtkScalarBarWidget)::New();
+    m_ScalarBarWidget->SetScalarBarActor(m_ScalarBarActor);
 
-  m_LookupTable = new VSLookupTableController();
-  mapper->SetLookupTable(m_LookupTable->getColorTransferFunction());
+    // Scalar Bar Title
+    vtkTextProperty* titleProperty = m_ScalarBarActor->GetTitleTextProperty();
+    titleProperty->SetJustificationToCentered();
+    titleProperty->SetFontSize(titleProperty->GetFontSize() * 1.5);
 
-  m_ScalarBarActor = VTK_PTR(vtkScalarBarActor)::New();
-  m_ScalarBarActor->SetLookupTable(mapper->GetLookupTable());
-  m_ScalarBarWidget = VTK_PTR(vtkScalarBarWidget)::New();
-  m_ScalarBarWidget->SetScalarBarActor(m_ScalarBarActor);
-
-  // Scalar Bar Title
-  vtkTextProperty* titleProperty = m_ScalarBarActor->GetTitleTextProperty();
-  titleProperty->SetJustificationToCentered();
-  titleProperty->SetFontSize(titleProperty->GetFontSize() * 1.5);
-
-  // Introduced in 7.1.0rc1, prevents resizing title to fill width
+    // Introduced in 7.1.0rc1, prevents resizing title to fill width
 #if VTK_MAJOR_VERSION > 7 || (VTK_MAJOR_VERSION == 7 && VTK_MINOR_VERSION >= 1)
-  m_ScalarBarActor->UnconstrainedFontSizeOn();
+    m_ScalarBarActor->UnconstrainedFontSizeOn();
 #endif
 
-  m_ScalarBarActor->SetTitleRatio(0.75);
+    m_ScalarBarActor->SetTitleRatio(0.75);
+  }
+  else
+  {
+    mapper = vtkDataSetMapper::SafeDownCast(m_Mapper);
+    actor = vtkActor::SafeDownCast(m_Actor);
+  }
+
+  m_DataSetFilter->SetInputConnection(m_Filter->getTransformedOutputPort());
+
+  mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
+  actor->SetMapper(mapper);
 
   // Set Mapper to use the active array and component
   if(outputData->GetCellData()->GetNumberOfArrays() > 0)
   {
-    int currentComponent = m_ActiveComponent;
-    setActiveArrayIndex(m_ActiveArray);
-    setActiveComponentIndex(m_ActiveComponent);
+    if(m_HadNoArrays)
+    {
+      setActiveArrayIndex(0);
+      m_HadNoArrays = false;
+    }
+    else
+    {
+      int currentComponent = m_ActiveComponent;
+      setActiveArrayIndex(m_ActiveArray);
+      setActiveComponentIndex(m_ActiveComponent);
+    }
   }
   else
   {
@@ -813,6 +860,11 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
       setScalarBarVisible(false);
       setMapColors(Qt::Unchecked);
       m_ActiveArray = -1;
+      m_HadNoArrays = true;
+    }
+    else
+    {
+      m_HadNoArrays = false;
     }
 
     if(dynamic_cast<VSAbstractDataFilter*>(filter))

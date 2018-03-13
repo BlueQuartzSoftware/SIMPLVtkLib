@@ -358,6 +358,12 @@ protected:
   bool isFlatImage();
 
   /**
+  * @brief Returns true if there is only a single array in the filter output's point data.
+  * Returns false if there are no arrays or more than one.
+  */
+  bool hasSinglePointArray();
+
+  /**
   * @brief Updates the alpha for DataSet actors
   */
   void updateDataSetAlpha();
@@ -413,6 +419,7 @@ private:
   double m_Alpha = 1.0;
   VTK_PTR(vtkScalarBarActor) m_ScalarBarActor = nullptr;
   VTK_PTR(vtkScalarBarWidget) m_ScalarBarWidget = nullptr;
+  bool m_HadNoArrays = false;
 
   static double* NULL_COLOR;
 };
