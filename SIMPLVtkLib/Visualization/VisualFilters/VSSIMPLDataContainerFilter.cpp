@@ -259,7 +259,21 @@ bool VSSIMPLDataContainerFilter::updateWrappedDataContainer()
       if (dcNames.contains(dcName))
       {
         DataContainerProxy dcProxy = dcaProxy.dataContainers.value(dcName);
-        dcProxy.flag = Qt::Checked;
+
+        dcProxy.setFlag(Qt::Checked);
+
+        for (QMap<QString, AttributeMatrixProxy>::iterator iter = dcProxy.attributeMatricies.begin(); iter != dcProxy.attributeMatricies.end(); iter++)
+        {
+          AttributeMatrixProxy amProxy = iter.value();
+          QString amProxyName = iter.key();
+
+          if (amProxy.amType == AttributeMatrix::Type::Cell)
+          {
+            amProxy.setFlag(Qt::Checked, true);
+            dcProxy.attributeMatricies[amProxyName] = amProxy;
+          }
+        }
+
         dcaProxy.dataContainers[dcName] = dcProxy;
 
         DataContainerArray::Pointer dca = reader.readSIMPLDataUsingProxy(dcaProxy, false);
@@ -277,7 +291,7 @@ bool VSSIMPLDataContainerFilter::updateWrappedDataContainer()
       else
       {
         QString ss = QObject::tr("Data Container '%1' could not be reloaded because it no longer exists in the underlying file '%2'.").arg(dcName).arg(filePath);
-        emit errorGenerated("Data Reload Error", ss, -3000);
+        emit errorGenerated("Data Reload Error", ss, -3001);
         return false;
       }
     }
@@ -285,7 +299,7 @@ bool VSSIMPLDataContainerFilter::updateWrappedDataContainer()
   else
   {
     QString ss = QObject::tr("Data Container '%1' could not be reloaded because it does not have a file filter parent.").arg(dcName);
-    emit errorGenerated("Data Reload Error", ss, -3001);
+    emit errorGenerated("Data Reload Error", ss, -3002);
   }
 
   return false;
