@@ -259,34 +259,33 @@ bool VSSIMPLDataContainerFilter::updateWrappedDataContainer()
       if (dcNames.contains(dcName))
       {
         DataContainerProxy dcProxy = dcaProxy.dataContainers.value(dcName);
-
-        dcProxy.setFlag(Qt::Checked);
-
-        for (QMap<QString, AttributeMatrixProxy>::iterator iter = dcProxy.attributeMatricies.begin(); iter != dcProxy.attributeMatricies.end(); iter++)
+        if (dcProxy.dcType != static_cast<unsigned int>(IGeometry::Type::Unknown))
         {
-          AttributeMatrixProxy amProxy = iter.value();
-          QString amProxyName = iter.key();
+          AttributeMatrixProxy::AMTypeFlags amFlags(AttributeMatrixProxy::AMTypeFlag::Cell_AMType);
+          DataArrayProxy::PrimitiveTypeFlags pFlags(DataArrayProxy::PrimitiveTypeFlag::Any_PType);
+          DataArrayProxy::CompDimsVector compDimsVector;
 
-          if (amProxy.amType == AttributeMatrix::Type::Cell)
+          dcProxy.setFlags(Qt::Checked, amFlags, pFlags, compDimsVector);
+          dcaProxy.dataContainers[dcProxy.name] = dcProxy;
+
+          DataContainerArray::Pointer dca = reader.readSIMPLDataUsingProxy(dcaProxy, false);
+          if (dca.get() == nullptr)
           {
-            amProxy.setFlag(Qt::Checked, true);
-            dcProxy.attributeMatricies[amProxyName] = amProxy;
+            // Error has already been sent via the reader, so simply return
+            return false;
           }
+
+          DataContainer::Pointer dc = dca->getDataContainer(dcName);
+          m_WrappedDataContainer = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
+
+          return true;
         }
-
-        dcaProxy.dataContainers[dcName] = dcProxy;
-
-        DataContainerArray::Pointer dca = reader.readSIMPLDataUsingProxy(dcaProxy, false);
-        if (dca.get() == nullptr)
+        else
         {
-          // Error has already been sent via the reader, so simply return
+          QString ss = QObject::tr("Data Container '%1' could not be reloaded because it has an unknown data container geometry.").arg(dcName).arg(filePath);
+          emit errorGenerated("Data Reload Error", ss, -3001);
           return false;
         }
-
-        DataContainer::Pointer dc = dca->getDataContainer(dcName);
-        m_WrappedDataContainer = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
-
-        return true;
       }
       else
       {
