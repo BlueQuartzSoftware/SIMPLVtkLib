@@ -54,8 +54,11 @@ VSConcurrentImport::VSConcurrentImport(VSController* controller)
 , m_WrappedDcLock(1)
 {
   m_UnappliedDataFilters.clear();
-  connect(this, SIGNAL(importedFilter(VSAbstractFilter*, bool)),
-    controller->getFilterModel(), SLOT(addFilter(VSAbstractFilter*, bool)));
+  if(controller && controller->getFilterModel())
+  {
+    connect(this, SIGNAL(importedFilter(VSAbstractFilter*, bool)),
+      controller->getFilterModel(), SLOT(addFilter(VSAbstractFilter*, bool)));
+  }
 
   int threadsUsed = 2;
   m_ThreadCount = QThreadPool::globalInstance()->maxThreadCount();
@@ -171,6 +174,11 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
   while (m_ImportDataContainerOrder.size() > 0)
   {
     m_ImportDataContainerOrderLock.acquire();
+    if(m_ImportDataContainerOrder.size() <= 0)
+    {
+      m_ImportDataContainerOrderLock.release();
+      break;
+    }
     DataContainer::Pointer dc = m_ImportDataContainerOrder.front();
     m_ImportDataContainerOrder.pop_front();
 
