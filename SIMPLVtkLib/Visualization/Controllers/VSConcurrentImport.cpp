@@ -163,6 +163,10 @@ void VSConcurrentImport::partialWrappingThreadFinished()
     emit blockRender(false);
     m_FilterLock.release();
 
+    m_UnappliedDataFilterLock.acquire();
+    emit applyingDataFilters(m_UnappliedDataFilters.size());
+    m_UnappliedDataFilterLock.release();
+
     // Apply the filters only after all DataContainers for all files have been wrapped
     if(m_WrappedList.size() == 0)
     {
@@ -208,7 +212,6 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
 void VSConcurrentImport::applyDataFilters()
 {
   m_UnappliedDataFilterLock.acquire();
-  emit applyingDataFilters(m_UnappliedDataFilters.size());
   while(m_UnappliedDataFilters.size() > 0)
   {
     VSSIMPLDataContainerFilter* filter = m_UnappliedDataFilters.front();
