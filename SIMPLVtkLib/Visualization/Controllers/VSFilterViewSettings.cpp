@@ -767,7 +767,7 @@ void VSFilterViewSettings::setupDataSetActors()
     }
     else
     {
-      int currentComponent = m_ActiveComponent;
+      //int currentComponent = m_ActiveComponent;
       setActiveArrayIndex(m_ActiveArray);
       setActiveComponentIndex(m_ActiveComponent);
     }

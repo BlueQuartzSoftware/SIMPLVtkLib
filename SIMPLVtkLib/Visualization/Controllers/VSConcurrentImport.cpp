@@ -52,6 +52,8 @@ VSConcurrentImport::VSConcurrentImport(VSController* controller)
 , m_UnappliedDataFilterLock(1)
 , m_FilterLock(1)
 , m_WrappedDcLock(1)
+, m_ThreadCountLock(1)
+, m_AppliedFilterCountLock(1)
 {
   m_UnappliedDataFilters.clear();
   if(controller && controller->getFilterModel())
@@ -118,7 +120,9 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
   // Wait for the filter lock
   m_FilterLock.acquire();
   
+  m_ThreadCountLock.acquire();
   m_ThreadsRemaining = m_ThreadCount;
+  m_ThreadCountLock.release();
   for(int i = 0; i < m_ThreadCount; i++)
   {
     QFutureWatcher<void>* watcher = new QFutureWatcher<void>(this);
@@ -132,9 +136,12 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 // -----------------------------------------------------------------------------
 void VSConcurrentImport::partialWrappingThreadFinished()
 {
+  // Threads remaining lock
+  m_ThreadCountLock.acquire();
   m_ThreadsRemaining--;
   if(m_ThreadsRemaining <= 0)
   {
+    m_ThreadCountLock.release();
     for(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc : m_WrappedDataContainers)
     {
       VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, m_FileNameFilter);
@@ -149,7 +156,9 @@ void VSConcurrentImport::partialWrappingThreadFinished()
     // Select the last filter
     m_Controller->selectFilter(m_UnappliedDataFilters.back());
 
+    m_AppliedFilterCountLock.acquire();
     m_AppliedFilterCount = 0;
+    m_AppliedFilterCountLock.release();
     m_WrappedDataContainers.clear();
     emit blockRender(false);
     m_FilterLock.release();
@@ -164,6 +173,7 @@ void VSConcurrentImport::partialWrappingThreadFinished()
       }
     }
   }
+  m_ThreadCountLock.release();
 }
 
 // -----------------------------------------------------------------------------
@@ -171,17 +181,11 @@ void VSConcurrentImport::partialWrappingThreadFinished()
 // -----------------------------------------------------------------------------
 void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
 {
+  m_ImportDataContainerOrderLock.acquire();
   while (m_ImportDataContainerOrder.size() > 0)
   {
-    m_ImportDataContainerOrderLock.acquire();
-    if(m_ImportDataContainerOrder.size() <= 0)
-    {
-      m_ImportDataContainerOrderLock.release();
-      break;
-    }
     DataContainer::Pointer dc = m_ImportDataContainerOrder.front();
     m_ImportDataContainerOrder.pop_front();
-
     m_ImportDataContainerOrderLock.release();
 
     SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc = SIMPLVtkBridge::WrapGeometryPtr(dc);
@@ -191,7 +195,11 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
       m_WrappedDataContainers.push_back(wrappedDc);
       m_WrappedDcLock.release();
     }
+
+    // Lock the semaphore before the while loop checks
+    m_ImportDataContainerOrderLock.acquire();
   }
+  m_ImportDataContainerOrderLock.release();
 }
 
 // -----------------------------------------------------------------------------
@@ -199,15 +207,22 @@ void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
 // -----------------------------------------------------------------------------
 void VSConcurrentImport::applyDataFilters()
 {
+  m_UnappliedDataFilterLock.acquire();
   emit applyingDataFilters(m_UnappliedDataFilters.size());
   while(m_UnappliedDataFilters.size() > 0)
   {
-    m_UnappliedDataFilterLock.acquire();
     VSSIMPLDataContainerFilter* filter = m_UnappliedDataFilters.front();
     m_UnappliedDataFilters.pop_front();
     m_UnappliedDataFilterLock.release();
 
     filter->apply();
+
+    m_AppliedFilterCountLock.acquire();
     emit dataFilterApplied(++m_AppliedFilterCount);
+    m_AppliedFilterCountLock.release();
+
+    // Lock semaphore before the while statement is checked again
+    m_UnappliedDataFilterLock.acquire();
   }
+  m_UnappliedDataFilterLock.release();
 }

@@ -129,6 +129,8 @@ private:
   QSemaphore m_UnappliedDataFilterLock;
   QSemaphore m_FilterLock;
   QSemaphore m_WrappedDcLock;
+  QSemaphore m_ThreadCountLock;
+  QSemaphore m_AppliedFilterCountLock;
   int m_NumOfFinishedImportDataContainerThreads = 0;
   std::list<SIMPLVtkBridge::WrappedDataContainerPtr> m_WrappedDataContainers;
   VSFileNameFilter* m_FileNameFilter = nullptr;
