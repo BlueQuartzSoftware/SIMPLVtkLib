@@ -35,6 +35,7 @@
 
 #pragma once
 
+#include <QtCore/QSemaphore>
 #include <QtWidgets/QWidget>
 
 #include <vtkTrivialProducer.h>
@@ -143,4 +144,5 @@ protected:
 private:
   SIMPLVtkBridge::WrappedDataContainerPtr m_WrappedDataContainer = nullptr;
   VTK_PTR(vtkTrivialProducer) m_TrivialProducer = nullptr;
+  QSemaphore m_ApplyLock;
 };

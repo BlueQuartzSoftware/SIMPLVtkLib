@@ -55,6 +55,7 @@
 VSSIMPLDataContainerFilter::VSSIMPLDataContainerFilter(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDataContainer, VSAbstractFilter *parent)
 : VSAbstractDataFilter()
 , m_WrappedDataContainer(wrappedDataContainer)
+, m_ApplyLock(1)
 {
   createFilter();
 
@@ -227,9 +228,15 @@ QString VSSIMPLDataContainerFilter::getToolTip() const
 // -----------------------------------------------------------------------------
 void VSSIMPLDataContainerFilter::apply()
 {
-  SIMPLVtkBridge::FinishWrappingDataContainerStruct(m_WrappedDataContainer);
-  m_TrivialProducer->SetOutput(m_WrappedDataContainer->m_DataSet);
-  emit dataImported();
+  // Do not lock the main thread trying to apply a filter that is already being applied.
+  if(m_ApplyLock.tryAcquire())
+  {
+    SIMPLVtkBridge::FinishWrappingDataContainerStruct(m_WrappedDataContainer);
+    m_TrivialProducer->SetOutput(m_WrappedDataContainer->m_DataSet);
+    m_ApplyLock.release();
+
+    emit dataImported();
+  }
 }
 
 // -----------------------------------------------------------------------------
