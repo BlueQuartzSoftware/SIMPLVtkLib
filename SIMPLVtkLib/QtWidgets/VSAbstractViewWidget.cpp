@@ -84,6 +84,7 @@ void VSAbstractViewWidget::copyFilters(VSFilterViewSettings::Map filters)
     connect(viewSettings, SIGNAL(showScalarBarChanged(VSFilterViewSettings*, bool)), 
       this, SLOT(setFilterShowScalarBar(VSFilterViewSettings*, bool)));
     connect(viewSettings, SIGNAL(requiresRender()), this, SLOT(renderView()));
+    connect(viewSettings, SIGNAL(actorsUpdated()), this, SLOT(updateScene()));
 
     checkFilterViewSetting(viewSettings);
   }
@@ -250,6 +251,7 @@ VSFilterViewSettings* VSAbstractViewWidget::createFilterViewSettings(VSAbstractF
   connect(viewSettings, SIGNAL(showScalarBarChanged(VSFilterViewSettings*, bool)),
     this, SLOT(setFilterShowScalarBar(VSFilterViewSettings*, bool)));
   connect(viewSettings, SIGNAL(requiresRender()), this, SLOT(renderView()));
+  connect(viewSettings, SIGNAL(actorsUpdated()), this, SLOT(updateScene()));
   connect(viewSettings, SIGNAL(swappingActors(vtkProp3D*, vtkProp3D*)),
     this, SLOT(swapActors(vtkProp3D*, vtkProp3D*)));
 
@@ -645,6 +647,15 @@ void VSAbstractViewWidget::resetCamera()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSAbstractViewWidget::updateScene()
+{
+  renderView();
+  resetCamera();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 VSController* VSAbstractViewWidget::getController() const
 {
   return m_Controller;
@@ -693,6 +704,7 @@ void VSAbstractViewWidget::setController(VSController* controller)
     connect(viewSettings, SIGNAL(showScalarBarChanged(VSFilterViewSettings*, bool)), 
       this, SLOT(setFilterShowScalarBar(VSFilterViewSettings*, bool)));
     connect(viewSettings, SIGNAL(requiresRender()), this, SLOT(renderView()));
+    connect(viewSettings, SIGNAL(actorsUpdated()), this, SLOT(updateScene()));
 
     // Check filter and scalar bar visibility
     checkFilterViewSetting(viewSettings);

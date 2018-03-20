@@ -104,11 +104,6 @@ void VSMainWidgetBase::connectViewWidget(VSAbstractViewWidget* viewWidget)
 
   connect(viewWidget, SIGNAL(markActive(VSAbstractViewWidget*)),
     this, SLOT(setActiveView(VSAbstractViewWidget*)));
-
-  if (m_FilterView)
-  {
-    connect(this, SIGNAL(reloadFilterRequested(VSAbstractDataFilter*)), viewWidget, SLOT());
-  }
 }
 
 // -----------------------------------------------------------------------------
@@ -153,6 +148,7 @@ void VSMainWidgetBase::setFilterView(VSFilterView* view)
     disconnect(m_FilterView, SIGNAL(filterClicked(VSAbstractFilter*)));
     disconnect(m_FilterView, SIGNAL(deleteFilterRequested(VSAbstractFilter*)));
     disconnect(m_FilterView, SIGNAL(reloadFilterRequested(VSAbstractDataFilter*)));
+    disconnect(m_FilterView, SIGNAL(reloadFileFilterRequested(VSFileNameFilter*)));
     disconnect(this, SIGNAL(changedActiveView(VSAbstractViewWidget*)), view, SLOT(setViewWidget(VSAbstractViewWidget*)));
     disconnect(this, SIGNAL(changedActiveFilter(VSAbstractFilter*, VSAbstractFilterWidget*)),
       view, SLOT(setActiveFilter(VSAbstractFilter*, VSAbstractFilterWidget*)));
@@ -163,6 +159,7 @@ void VSMainWidgetBase::setFilterView(VSFilterView* view)
   m_FilterView = view;
   connect(view, SIGNAL(deleteFilterRequested(VSAbstractFilter*)), this, SLOT(deleteFilter(VSAbstractFilter*)));
   connect(view, SIGNAL(reloadFilterRequested(VSAbstractDataFilter*)), this, SLOT(reloadFilter(VSAbstractDataFilter*)));
+  connect(view, SIGNAL(reloadFileFilterRequested(VSFileNameFilter*)), this, SLOT(reloadFileFilter(VSFileNameFilter*)));
   connect(view, SIGNAL(filterClicked(VSAbstractFilter*)), this, SLOT(setCurrentFilter(VSAbstractFilter*)));
   connect(this, SIGNAL(changedActiveView(VSAbstractViewWidget*)), view, SLOT(setViewWidget(VSAbstractViewWidget*)));
   connect(this, SIGNAL(changedActiveFilter(VSAbstractFilter*, VSAbstractFilterWidget*)),
@@ -577,15 +574,41 @@ void VSMainWidgetBase::deleteFilter(VSAbstractFilter* filter)
 // -----------------------------------------------------------------------------
 void VSMainWidgetBase::reloadFilter(VSAbstractDataFilter* filter)
 {
-  filter->reloadData();
+  std::vector<VSAbstractDataFilter*> filters;
+  filters.push_back(filter);
 
-//  QVector<VSAbstractViewWidget*> viewWidgets = getAllViewWidgets();
-//  for (int i = 0; i < viewWidgets.size(); i++)
-//  {
-//    VSAbstractViewWidget* viewWidget = viewWidgets[i];
-//    VSFilterViewSettings* viewSettings = viewWidget->getFilterViewSettings(filter);
-//    viewSettings->updateConnections();
-//  }
+  QtConcurrent::run(this, &VSMainWidgetBase::reloadFilters, filters);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidgetBase::reloadFileFilter(VSFileNameFilter* filter)
+{
+  QVector<VSAbstractFilter*> childFilters = filter->getChildren();
+  std::vector<VSAbstractDataFilter*> filters;
+  for (int i = 0; i < childFilters.size(); i++)
+  {
+    VSAbstractDataFilter* dataFilter = dynamic_cast<VSAbstractDataFilter*>(childFilters[i]);
+    if (dataFilter)
+    {
+      filters.push_back(dataFilter);
+    }
+  }
+
+  QtConcurrent::run(this, &VSMainWidgetBase::reloadFilters, filters);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSMainWidgetBase::reloadFilters(std::vector<VSAbstractDataFilter*> filters)
+{
+  for (size_t i = 0; i < filters.size(); i++)
+  {
+    VSAbstractDataFilter* filter = filters[i];
+    filter->reloadData();
+  }
 }
 
 // -----------------------------------------------------------------------------

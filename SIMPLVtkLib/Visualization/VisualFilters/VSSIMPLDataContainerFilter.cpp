@@ -35,6 +35,8 @@
 
 #include "VSSIMPLDataContainerFilter.h"
 
+#include <QtConcurrent>
+
 #include <QtCore/QUuid>
 
 #include <vtkAlgorithmOutput.h>
@@ -55,6 +57,8 @@
 VSSIMPLDataContainerFilter::VSSIMPLDataContainerFilter(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDataContainer, VSAbstractFilter *parent)
 : VSAbstractDataFilter()
 , m_WrappedDataContainer(wrappedDataContainer)
+, m_WrappingWatcher(this)
+, m_ReaderLock(1)
 {
   createFilter();
 
@@ -186,6 +190,8 @@ QUuid VSSIMPLDataContainerFilter::GetUuid()
 // -----------------------------------------------------------------------------
 void VSSIMPLDataContainerFilter::createFilter()
 {
+  connect(&m_WrappingWatcher, SIGNAL(finished()), this, SLOT(wrappingFinished()));
+
   VTK_PTR(vtkDataSet) dataSet = m_WrappedDataContainer->m_DataSet;
   dataSet->ComputeBounds();
   
@@ -211,33 +217,6 @@ void VSSIMPLDataContainerFilter::createFilter()
 // -----------------------------------------------------------------------------
 void VSSIMPLDataContainerFilter::reloadData()
 {
-  if (updateWrappedDataContainer())
-  {
-    VTK_PTR(vtkDataSet) dataSet = m_WrappedDataContainer->m_DataSet;
-    dataSet->ComputeBounds();
-
-    vtkCellData* cellData = dataSet->GetCellData();
-    if(cellData)
-    {
-      vtkDataArray* dataArray = cellData->GetArray(0);
-      if(dataArray)
-      {
-        char* name = dataArray->GetName();
-        cellData->SetActiveScalars(name);
-      }
-    }
-
-    m_TrivialProducer->SetOutput(dataSet);
-
-    emit updatedOutputPort(this);
-  }
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-bool VSSIMPLDataContainerFilter::updateWrappedDataContainer()
-{
   QString dcName = m_WrappedDataContainer->m_Name;
 
   VSAbstractFilter* parentFilter = getParentFilter();
@@ -246,21 +225,24 @@ bool VSSIMPLDataContainerFilter::updateWrappedDataContainer()
   {
     QString filePath = fileFilter->getFilePath();
 
-    SIMPLH5DataReader reader;
-    connect(&reader, SIGNAL(errorGenerated(const QString &, const QString &, const int &)),
+    SIMPLH5DataReader* reader = new SIMPLH5DataReader();
+    connect(reader, SIGNAL(errorGenerated(const QString &, const QString &, const int &)),
             this, SIGNAL(errorGenerated(const QString &, const QString &, const int &)));
 
-    bool success = reader.openFile(filePath);
+    bool success = reader->openFile(filePath);
     if (success)
     {
       int err = 0;
-      DataContainerArrayProxy dcaProxy = reader.readDataContainerArrayStructure(nullptr, err);
+      DataContainerArrayProxy dcaProxy = reader->readDataContainerArrayStructure(nullptr, err);
       QStringList dcNames = dcaProxy.dataContainers.keys();
       if (dcNames.contains(dcName))
       {
         DataContainerProxy dcProxy = dcaProxy.dataContainers.value(dcName);
         if (dcProxy.dcType != static_cast<unsigned int>(IGeometry::Type::Unknown))
         {
+          QString dcName = m_WrappedDataContainer->m_Name;
+          DataContainerProxy dcProxy = dcaProxy.dataContainers.value(dcName);
+
           AttributeMatrixProxy::AMTypeFlags amFlags(AttributeMatrixProxy::AMTypeFlag::Cell_AMType);
           DataArrayProxy::PrimitiveTypeFlags pFlags(DataArrayProxy::PrimitiveTypeFlag::Any_PType);
           DataArrayProxy::CompDimsVector compDimsVector;
@@ -268,30 +250,23 @@ bool VSSIMPLDataContainerFilter::updateWrappedDataContainer()
           dcProxy.setFlags(Qt::Checked, amFlags, pFlags, compDimsVector);
           dcaProxy.dataContainers[dcProxy.name] = dcProxy;
 
-          DataContainerArray::Pointer dca = reader.readSIMPLDataUsingProxy(dcaProxy, false);
-          if (dca.get() == nullptr)
-          {
-            // Error has already been sent via the reader, so simply return
-            return false;
-          }
-
+          DataContainerArray::Pointer dca = reader->readSIMPLDataUsingProxy(dcaProxy, false);
           DataContainer::Pointer dc = dca->getDataContainer(dcName);
-          m_WrappedDataContainer = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
 
-          return true;
+          m_WrappingWatcher.setFuture(QtConcurrent::run(this, &VSSIMPLDataContainerFilter::reloadData, dc));
         }
         else
         {
           QString ss = QObject::tr("Data Container '%1' could not be reloaded because it has an unknown data container geometry.").arg(dcName).arg(filePath);
           emit errorGenerated("Data Reload Error", ss, -3001);
-          return false;
+          return;
         }
       }
       else
       {
         QString ss = QObject::tr("Data Container '%1' could not be reloaded because it no longer exists in the underlying file '%2'.").arg(dcName).arg(filePath);
         emit errorGenerated("Data Reload Error", ss, -3001);
-        return false;
+        return;
       }
     }
   }
@@ -300,8 +275,39 @@ bool VSSIMPLDataContainerFilter::updateWrappedDataContainer()
     QString ss = QObject::tr("Data Container '%1' could not be reloaded because it does not have a file filter parent.").arg(dcName);
     emit errorGenerated("Data Reload Error", ss, -3002);
   }
+}
 
-  return false;
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSSIMPLDataContainerFilter::reloadData(DataContainer::Pointer dc)
+{
+  m_WrappedDataContainer = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSSIMPLDataContainerFilter::wrappingFinished()
+{
+  VTK_PTR(vtkDataSet) dataSet = m_WrappedDataContainer->m_DataSet;
+  dataSet->ComputeBounds();
+
+  vtkCellData* cellData = dataSet->GetCellData();
+  if(cellData)
+  {
+    vtkDataArray* dataArray = cellData->GetArray(0);
+    if(dataArray)
+    {
+      char* name = dataArray->GetName();
+      cellData->SetActiveScalars(name);
+    }
+  }
+
+  m_TrivialProducer->SetOutput(dataSet);
+
+  emit updatedOutputPort(this);
+  emit dataReloaded();
 }
 
 // -----------------------------------------------------------------------------

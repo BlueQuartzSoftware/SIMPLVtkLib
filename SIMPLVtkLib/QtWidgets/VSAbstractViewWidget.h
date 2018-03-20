@@ -153,6 +153,11 @@ public slots:
   void resetCamera();
 
   /**
+   * @brief Updates the scene by rendering the view and then resetting the camera
+   */
+  void updateScene();
+
+  /**
   * @brief Sets whether or not the render process should be blocked
   * @param block
   */

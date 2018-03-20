@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include <QtCore/QFutureWatcher>
+
 #include <QtWidgets/QWidget>
 
 #include <vtkTrivialProducer.h>
@@ -43,6 +45,8 @@
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractDataFilter.h"
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
+
+class SIMPLH5DataReader;
 
 /**
 * @class VSSIMPLDataContainerFilter VSSIMPLDataContainerFilter.h
@@ -132,6 +136,13 @@ public:
   void reloadData() override;
 
   /**
+   * @brief reloadData
+   * @param proxy
+   * @param reader
+   */
+  void reloadData(DataContainer::Pointer dc);
+
+  /**
   * @brief Returns true if this filter type can be added as a child of
   * the given filter.  Returns false otherwise.
   * @param
@@ -145,12 +156,16 @@ protected:
   */
   void createFilter() override;
 
+private slots:
+  /**
+   * @brief This slot is called when a data container is finished being wrapped on a separate thread
+   */
+  void wrappingFinished();
+
 private:
   SIMPLVtkBridge::WrappedDataContainerPtr m_WrappedDataContainer = nullptr;
   VTK_PTR(vtkTrivialProducer) m_TrivialProducer = nullptr;
+  QFutureWatcher<void> m_WrappingWatcher;
+  QSemaphore m_ReaderLock;
 
-  /**
-   * @brief updateWrappedDataContainer
-   */
-  bool updateWrappedDataContainer();
 };

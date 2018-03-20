@@ -231,6 +231,12 @@ protected slots:
   virtual void reloadFilter(VSAbstractDataFilter* filter);
 
   /**
+   * @brief reloadFileFilter
+   * @param filter
+   */
+  virtual void reloadFileFilter(VSFileNameFilter* filter);
+
+  /**
   * @brief Connects a new VSAbstractViewWidget to the main widget
   */
   virtual void connectViewWidget(VSAbstractViewWidget* viewWidget);
@@ -284,4 +290,22 @@ private:
    * @param instance
    */
   void openDREAM3DFile(const QString &filePath);
+
+  /**
+   * @brief reloadDREAM3DFile
+   * @param filter
+   */
+  void reloadDREAM3DFile(VSFileNameFilter* filter);
+
+  /**
+   * @brief reloadDataFile
+   * @param filter
+   */
+  void reloadDataFile(VSFileNameFilter* filter);
+
+  /**
+   * @brief reloadFilters
+   * @param filter
+   */
+  void reloadFilters(std::vector<VSAbstractDataFilter *> filter);
 };

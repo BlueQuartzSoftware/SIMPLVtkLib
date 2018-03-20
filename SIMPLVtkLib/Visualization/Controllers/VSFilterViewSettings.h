@@ -286,6 +286,11 @@ public slots:
   void importedData();
 
   /**
+   * @brief Updates the actors for the newly reloaded data type, resets the camera, and renders the changes
+   */
+  void reloadedData();
+
+  /**
   * @brief Updates the actors for the current data type and renders the changes
   */
   void checkDataType();
@@ -311,6 +316,7 @@ signals:
   void alphaChanged(VSFilterViewSettings*, double);
   void showScalarBarChanged(VSFilterViewSettings*, bool);
   void requiresRender();
+  void actorsUpdated();
   void swappingActors(vtkProp3D* oldProp, vtkProp3D* newProp);
 
 protected:

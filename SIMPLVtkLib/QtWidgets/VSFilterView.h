@@ -73,6 +73,7 @@ signals:
   void filterClicked(VSAbstractFilter* filter);
   void deleteFilterRequested(VSAbstractFilter* filter);
   void reloadFilterRequested(VSAbstractDataFilter* filter);
+  void reloadFileFilterRequested(VSFileNameFilter* filter);
 
 public slots:
   /**

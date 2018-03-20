@@ -75,6 +75,8 @@ public:
 signals:
   void dataImported();
 
+  void dataReloaded();
+
 protected:
   /**
   * @brief Constructor

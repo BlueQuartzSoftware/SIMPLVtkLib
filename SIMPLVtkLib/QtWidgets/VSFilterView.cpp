@@ -261,7 +261,7 @@ void VSFilterView::requestContextMenu(const QPoint& pos)
       {
         QAction* reloadAction = new QAction("Reload File");
         connect(reloadAction, &QAction::triggered, [=] {
-//          emit reloadFilterRequested(dataFilter);
+          emit reloadFileFilterRequested(fileNameFilter);
         });
         menu.addAction(reloadAction);
 

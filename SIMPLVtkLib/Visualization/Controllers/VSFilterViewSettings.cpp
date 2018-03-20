@@ -847,6 +847,7 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
     if(dynamic_cast<VSAbstractDataFilter*>(m_Filter))
     {
       disconnect(m_Filter, SIGNAL(dataImported()), this, SLOT(importedData()));
+      disconnect(m_Filter, SIGNAL(dataReloaded()), this, SLOT(reloadedData()));
     }
   }
 
@@ -871,6 +872,7 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
     if(dynamic_cast<VSAbstractDataFilter*>(filter))
     {
       connect(filter, SIGNAL(dataImported()), this, SLOT(importedData()));
+      connect(filter, SIGNAL(dataReloaded()), this, SLOT(reloadedData()));
     }
   }
 }
@@ -1004,6 +1006,15 @@ void VSFilterViewSettings::checkDataType()
 {
   setupActors(false);
   emit requiresRender();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::reloadedData()
+{
+  setupActors(false);
+  emit actorsUpdated();
 }
 
 // -----------------------------------------------------------------------------
