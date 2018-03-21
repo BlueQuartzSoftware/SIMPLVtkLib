@@ -58,7 +58,6 @@ VSSIMPLDataContainerFilter::VSSIMPLDataContainerFilter(SIMPLVtkBridge::WrappedDa
 : VSAbstractDataFilter()
 , m_WrappedDataContainer(wrappedDataContainer)
 , m_WrappingWatcher(this)
-, m_ReaderLock(1)
 {
   createFilter();
 
@@ -225,8 +224,8 @@ void VSSIMPLDataContainerFilter::reloadData()
   {
     QString filePath = fileFilter->getFilePath();
 
-    SIMPLH5DataReader* reader = new SIMPLH5DataReader();
-    connect(reader, SIGNAL(errorGenerated(const QString &, const QString &, const int &)),
+    QSharedPointer<SIMPLH5DataReader> reader = QSharedPointer<SIMPLH5DataReader>(new SIMPLH5DataReader());
+    connect(reader.data(), SIGNAL(errorGenerated(const QString &, const QString &, const int &)),
             this, SIGNAL(errorGenerated(const QString &, const QString &, const int &)));
 
     bool success = reader->openFile(filePath);
@@ -250,10 +249,7 @@ void VSSIMPLDataContainerFilter::reloadData()
           dcProxy.setFlags(Qt::Checked, amFlags, pFlags, compDimsVector);
           dcaProxy.dataContainers[dcProxy.name] = dcProxy;
 
-          DataContainerArray::Pointer dca = reader->readSIMPLDataUsingProxy(dcaProxy, false);
-          DataContainer::Pointer dc = dca->getDataContainer(dcName);
-
-          m_WrappingWatcher.setFuture(QtConcurrent::run(this, &VSSIMPLDataContainerFilter::reloadData, dc));
+          reloadData(dcaProxy, reader.data());
         }
         else
         {
@@ -275,6 +271,17 @@ void VSSIMPLDataContainerFilter::reloadData()
     QString ss = QObject::tr("Data Container '%1' could not be reloaded because it does not have a file filter parent.").arg(dcName);
     emit errorGenerated("Data Reload Error", ss, -3002);
   }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSSIMPLDataContainerFilter::reloadData(DataContainerArrayProxy proxy, SIMPLH5DataReader* reader)
+{
+  DataContainerArray::Pointer dca = reader->readSIMPLDataUsingProxy(proxy, false);
+  DataContainer::Pointer dc = dca->getDataContainer(m_WrappedDataContainer->m_Name);
+
+  m_WrappingWatcher.setFuture(QtConcurrent::run(this, &VSSIMPLDataContainerFilter::reloadData, dc));
 }
 
 // -----------------------------------------------------------------------------

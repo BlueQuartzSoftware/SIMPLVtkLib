@@ -136,13 +136,6 @@ public:
   void reloadData() override;
 
   /**
-   * @brief reloadData
-   * @param proxy
-   * @param reader
-   */
-  void reloadData(DataContainer::Pointer dc);
-
-  /**
   * @brief Returns true if this filter type can be added as a child of
   * the given filter.  Returns false otherwise.
   * @param
@@ -166,6 +159,19 @@ private:
   SIMPLVtkBridge::WrappedDataContainerPtr m_WrappedDataContainer = nullptr;
   VTK_PTR(vtkTrivialProducer) m_TrivialProducer = nullptr;
   QFutureWatcher<void> m_WrappingWatcher;
-  QSemaphore m_ReaderLock;
+
+  /**
+   * @brief reloadData
+   * @param proxy
+   * @param reader
+   */
+  void reloadData(DataContainerArrayProxy proxy, SIMPLH5DataReader* reader);
+
+  /**
+   * @brief reloadData
+   * @param proxy
+   * @param reader
+   */
+  void reloadData(DataContainer::Pointer dc);
 
 };

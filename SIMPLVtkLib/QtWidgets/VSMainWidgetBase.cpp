@@ -158,7 +158,7 @@ void VSMainWidgetBase::setFilterView(VSFilterView* view)
 
   m_FilterView = view;
   connect(view, SIGNAL(deleteFilterRequested(VSAbstractFilter*)), this, SLOT(deleteFilter(VSAbstractFilter*)));
-  connect(view, SIGNAL(reloadFilterRequested(VSAbstractDataFilter*)), this, SLOT(reloadFilter(VSAbstractDataFilter*)));
+  connect(view, SIGNAL(reloadFilterRequested(VSAbstractDataFilter*)), this, SLOT(reloadDataFilter(VSAbstractDataFilter*)));
   connect(view, SIGNAL(reloadFileFilterRequested(VSFileNameFilter*)), this, SLOT(reloadFileFilter(VSFileNameFilter*)));
   connect(view, SIGNAL(filterClicked(VSAbstractFilter*)), this, SLOT(setCurrentFilter(VSAbstractFilter*)));
   connect(this, SIGNAL(changedActiveView(VSAbstractViewWidget*)), view, SLOT(setViewWidget(VSAbstractViewWidget*)));
@@ -572,7 +572,7 @@ void VSMainWidgetBase::deleteFilter(VSAbstractFilter* filter)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSMainWidgetBase::reloadFilter(VSAbstractDataFilter* filter)
+void VSMainWidgetBase::reloadDataFilter(VSAbstractDataFilter* filter)
 {
   std::vector<VSAbstractDataFilter*> filters;
   filters.push_back(filter);
@@ -604,10 +604,34 @@ void VSMainWidgetBase::reloadFileFilter(VSFileNameFilter* filter)
 // -----------------------------------------------------------------------------
 void VSMainWidgetBase::reloadFilters(std::vector<VSAbstractDataFilter*> filters)
 {
-  for (size_t i = 0; i < filters.size(); i++)
+  if (filters.size() == 1)
   {
-    VSAbstractDataFilter* filter = filters[i];
+    // This is a single filter, so do a simple reload
+    VSAbstractDataFilter* filter = filters[0];
     filter->reloadData();
+  }
+  else if (filters.size() > 1 && dynamic_cast<VSSIMPLDataContainerFilter*>(filters[0]) != nullptr)
+  {
+    // This is from a file containing multiple SIMPL Data Containers, so we will use this block of code to optimize the file reading process
+    QSharedPointer<SIMPLH5DataReader> reader = QSharedPointer<SIMPLH5DataReader>(new SIMPLH5DataReader());
+    connect(reader.data(), SIGNAL(errorGenerated(const QString &, const QString &, const int &)),
+            this, SIGNAL(errorGenerated(const QString &, const QString &, const int &)));
+
+    VSSIMPLDataContainerFilter* simplFilter = dynamic_cast<VSSIMPLDataContainerFilter*>(filters[0]);
+    VSFileNameFilter* fileNameFilter = simplFilter->getParentFilter();
+    
+    bool success = reader->openFile(simplFilter->getFilterName());
+    if (success)
+    {
+      int err = 0;
+      DataContainerArrayProxy dcaProxy = reader->readDataContainerArrayStructure(nullptr, err);
+      QStringList dcNames = dcaProxy.dataContainers.keys();
+    }
+
+  }
+  else
+  {
+
   }
 }
 

@@ -228,7 +228,7 @@ protected slots:
    * @brief reloadFilter
    * @param filter
    */
-  virtual void reloadFilter(VSAbstractDataFilter* filter);
+  virtual void reloadDataFilter(VSAbstractDataFilter* filter);
 
   /**
    * @brief reloadFileFilter
@@ -290,22 +290,10 @@ private:
    * @param instance
    */
   void openDREAM3DFile(const QString &filePath);
-
-  /**
-   * @brief reloadDREAM3DFile
-   * @param filter
-   */
-  void reloadDREAM3DFile(VSFileNameFilter* filter);
-
-  /**
-   * @brief reloadDataFile
-   * @param filter
-   */
-  void reloadDataFile(VSFileNameFilter* filter);
-
   /**
    * @brief reloadFilters
    * @param filter
+   * @param fileFilter
    */
   void reloadFilters(std::vector<VSAbstractDataFilter *> filter);
 };
