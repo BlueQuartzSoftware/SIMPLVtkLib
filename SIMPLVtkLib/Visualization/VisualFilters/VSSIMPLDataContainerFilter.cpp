@@ -249,7 +249,10 @@ void VSSIMPLDataContainerFilter::reloadData()
           dcProxy.setFlags(Qt::Checked, amFlags, pFlags, compDimsVector);
           dcaProxy.dataContainers[dcProxy.name] = dcProxy;
 
-          reloadData(dcaProxy, reader.data());
+          DataContainerArray::Pointer dca = reader->readSIMPLDataUsingProxy(dcaProxy, false);
+          DataContainer::Pointer dc = dca->getDataContainer(m_WrappedDataContainer->m_Name);
+
+          m_WrappingWatcher.setFuture(QtConcurrent::run(this, &VSSIMPLDataContainerFilter::reloadData, dc));
         }
         else
         {
@@ -276,18 +279,15 @@ void VSSIMPLDataContainerFilter::reloadData()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSSIMPLDataContainerFilter::reloadData(DataContainerArrayProxy proxy, SIMPLH5DataReader* reader)
+void VSSIMPLDataContainerFilter::reloadData(DataContainer::Pointer dc)
 {
-  DataContainerArray::Pointer dca = reader->readSIMPLDataUsingProxy(proxy, false);
-  DataContainer::Pointer dc = dca->getDataContainer(m_WrappedDataContainer->m_Name);
-
-  m_WrappingWatcher.setFuture(QtConcurrent::run(this, &VSSIMPLDataContainerFilter::reloadData, dc));
+  m_WrappingWatcher.setFuture(QtConcurrent::run(this, &VSSIMPLDataContainerFilter::wrapDataContainer, dc));
 }
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSSIMPLDataContainerFilter::reloadData(DataContainer::Pointer dc)
+void VSSIMPLDataContainerFilter::wrapDataContainer(DataContainer::Pointer dc)
 {
   m_WrappedDataContainer = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
 }
@@ -349,6 +349,14 @@ void VSSIMPLDataContainerFilter::apply()
 SIMPLVtkBridge::WrappedDataContainerPtr VSSIMPLDataContainerFilter::getWrappedDataContainer()
 {
   return m_WrappedDataContainer;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSSIMPLDataContainerFilter::setWrappedDataContainer(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc)
+{
+  m_WrappedDataContainer = wrappedDc;
 }
 
 // -----------------------------------------------------------------------------

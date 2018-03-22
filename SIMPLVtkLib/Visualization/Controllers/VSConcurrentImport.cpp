@@ -75,6 +75,14 @@ VSConcurrentImport::VSConcurrentImport(VSController* controller)
 void VSConcurrentImport::addDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
 {
   VSFileNameFilter* fileFilter = new VSFileNameFilter(filePath);
+  addDataContainerArray(fileFilter, dca);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSConcurrentImport::addDataContainerArray(VSFileNameFilter* fileFilter, DataContainerArray::Pointer dca)
+{
   addDataContainerArray(std::make_pair(fileFilter, dca));
 }
 
@@ -107,20 +115,26 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 {
   m_FileNameFilter = filePair.first;
   DataContainerArray::Pointer dca = filePair.second;
-  m_Controller->getFilterModel()->addFilter(m_FileNameFilter);
+
+  if (m_LoadType == LoadType::Import)
+  {
+    m_Controller->getFilterModel()->addFilter(m_FileNameFilter);
+  }
 
   m_ImportDataContainerOrder = dca->getDataContainers();
 
   emit blockRender(true);
+
   // Wait for the filter lock
   m_FilterLock.acquire();
-  
+
   m_ThreadsRemaining = m_ThreadCount;
   for(int i = 0; i < m_ThreadCount; i++)
   {
-    QFutureWatcher<void>* watcher = new QFutureWatcher<void>(this);
+    QFutureWatcher<void>* watcher = new QFutureWatcher<void>();
     connect(watcher, SIGNAL(finished()), this, SLOT(partialWrappingThreadFinished()));
-    watcher->setFuture(QtConcurrent::run(this, &VSConcurrentImport::importDataContainer, m_FileNameFilter));
+
+    watcher->setFuture(QtConcurrent::run(this, &VSConcurrentImport::wrapDataContainer));
   }
 }
 
@@ -129,13 +143,37 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 // -----------------------------------------------------------------------------
 void VSConcurrentImport::partialWrappingThreadFinished()
 {
+  if (sender() != nullptr)
+  {
+    sender()->deleteLater();
+  }
+
   m_ThreadsRemaining--;
   if(m_ThreadsRemaining <= 0)
   {
     for(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc : m_WrappedDataContainers)
     {
-      VSSIMPLDataContainerFilter* filter = new VSSIMPLDataContainerFilter(wrappedDc, m_FileNameFilter);
-      m_Controller->getFilterModel()->addFilter(filter, false);
+      VSSIMPLDataContainerFilter* filter = nullptr;
+      if (m_LoadType == LoadType::Import)
+      {
+        filter = new VSSIMPLDataContainerFilter(wrappedDc, m_FileNameFilter);
+        m_Controller->getFilterModel()->addFilter(filter, false);
+      }
+      else
+      {
+        QVector<VSAbstractFilter*> childFilters = m_FileNameFilter->getChildren();
+        for (int i = 0; i < childFilters.size(); i++)
+        {
+          VSAbstractFilter* childFilter = childFilters[i];
+          if (childFilter->getFilterName() != wrappedDc->m_Name)
+          {
+            continue;
+          }
+
+          VSSIMPLDataContainerFilter* filter = dynamic_cast<VSSIMPLDataContainerFilter*>(childFilter);
+          filter->setWrappedDataContainer(wrappedDc);
+        }
+      }
 
       // Attempting to run applyDataFilters requires the QSemaphore to lock when modifying this vector
       m_UnappliedDataFilterLock.acquire();
@@ -166,11 +204,10 @@ void VSConcurrentImport::partialWrappingThreadFinished()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSConcurrentImport::importDataContainer(VSFileNameFilter* fileFilter)
+void VSConcurrentImport::wrapDataContainer()
 {
-  while (m_ImportDataContainerOrder.size() > 0)
+  while (m_ImportDataContainerOrder.size() > 0 && m_ImportDataContainerOrderLock.tryAcquire())
   {
-    m_ImportDataContainerOrderLock.acquire();
     DataContainer::Pointer dc = m_ImportDataContainerOrder.front();
     m_ImportDataContainerOrder.pop_front();
 
@@ -202,4 +239,12 @@ void VSConcurrentImport::applyDataFilters()
     filter->apply();
     emit dataFilterApplied(++m_AppliedFilterCount);
   }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSConcurrentImport::setLoadType(LoadType type)
+{
+  m_LoadType = type;
 }

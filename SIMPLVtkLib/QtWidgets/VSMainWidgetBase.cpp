@@ -615,24 +615,96 @@ void VSMainWidgetBase::reloadFilters(std::vector<VSAbstractDataFilter*> filters)
     // This is from a file containing multiple SIMPL Data Containers, so we will use this block of code to optimize the file reading process
     QSharedPointer<SIMPLH5DataReader> reader = QSharedPointer<SIMPLH5DataReader>(new SIMPLH5DataReader());
     connect(reader.data(), SIGNAL(errorGenerated(const QString &, const QString &, const int &)),
-            this, SIGNAL(errorGenerated(const QString &, const QString &, const int &)));
+            this, SLOT(generateError(const QString &, const QString &, const int &)));
 
     VSSIMPLDataContainerFilter* simplFilter = dynamic_cast<VSSIMPLDataContainerFilter*>(filters[0]);
-    VSFileNameFilter* fileNameFilter = simplFilter->getParentFilter();
+    VSFileNameFilter* fileNameFilter = dynamic_cast<VSFileNameFilter*>(simplFilter->getParentFilter());
+    if (fileNameFilter == nullptr)
+    {
+      QString ss = QObject::tr("Data Container filters could not be reloaded because they do not have a file filter parent.");
+      emit generateError("Data Reload Error", ss, -3002);
+    }
     
-    bool success = reader->openFile(simplFilter->getFilterName());
+    bool success = reader->openFile(fileNameFilter->getFilePath());
     if (success)
     {
       int err = 0;
       DataContainerArrayProxy dcaProxy = reader->readDataContainerArrayStructure(nullptr, err);
-      QStringList dcNames = dcaProxy.dataContainers.keys();
+
+      std::vector<VSSIMPLDataContainerFilter*> validFilters = validateDCFilters(dcaProxy, filters, fileNameFilter->getFilePath());
+      if (validFilters.size() > 0)
+      {
+        for (int i = 0; i < validFilters.size(); i++)
+        {
+          VSSIMPLDataContainerFilter* validFilter = validFilters[i];
+
+          DataContainerProxy dcProxy = dcaProxy.dataContainers.value(validFilter->getFilterName());
+
+          AttributeMatrixProxy::AMTypeFlags amFlags(AttributeMatrixProxy::AMTypeFlag::Cell_AMType);
+          DataArrayProxy::PrimitiveTypeFlags pFlags(DataArrayProxy::PrimitiveTypeFlag::Any_PType);
+          DataArrayProxy::CompDimsVector compDimsVector;
+
+          dcProxy.setFlags(Qt::Checked, amFlags, pFlags, compDimsVector);
+          dcaProxy.dataContainers[dcProxy.name] = dcProxy;
+        }
+
+        DataContainerArray::Pointer dca = reader->readSIMPLDataUsingProxy(dcaProxy, false);
+        m_Controller->reloadDataContainerArray(fileNameFilter, dca);
+      }
     }
 
   }
   else
   {
-
+    // This should not happen, so throw an error and bail!
   }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+std::vector<VSSIMPLDataContainerFilter*> VSMainWidgetBase::validateDCFilters(DataContainerArrayProxy dcaProxy, std::vector<VSAbstractDataFilter*> filters, const QString &filePath)
+{
+  QStringList dcNames = dcaProxy.dataContainers.keys();
+  std::vector<VSSIMPLDataContainerFilter*> filtersToReload;
+  QStringList problemFilterNames;
+  for (int i = 0; i < filters.size(); i++)
+  {
+    VSAbstractDataFilter* filter = filters[i];
+    VSSIMPLDataContainerFilter* simplFilter = dynamic_cast<VSSIMPLDataContainerFilter*>(filter);
+    if (simplFilter != nullptr && dcNames.contains(simplFilter->getFilterName()))
+    {
+      DataContainerProxy dcProxy = dcaProxy.dataContainers.value(simplFilter->getFilterName());
+      if (dcProxy.dcType == static_cast<unsigned int>(IGeometry::Type::Unknown))
+      {
+        problemFilterNames.push_back(simplFilter->getFilterName());
+      }
+      else
+      {
+        filtersToReload.push_back(simplFilter);
+      }
+    }
+    else
+    {
+      problemFilterNames.push_back(filter->getFilterName());
+    }
+  }
+
+  QMessageBox::StandardButton buttonPressed = QMessageBox::StandardButton::Yes;
+  if (problemFilterNames.isEmpty() == false)
+  {
+    QString problemFilterList = problemFilterNames.join(' ');
+    QString title = "File Reload Warning";
+    QString msg = tr("The filters\n\n<b>%1</b>\n\nhave an underlying data container that either no longer exists"
+                  "or has an unknown geometry in the file '%2'.").arg(problemFilterList).arg(filePath);
+    buttonPressed = QMessageBox::warning(this, title, msg, QMessageBox::StandardButton::No | QMessageBox::StandardButton::Yes, QMessageBox::StandardButton::No);
+    if (buttonPressed == QMessageBox::StandardButton::No)
+    {
+      return std::vector<VSSIMPLDataContainerFilter*>();
+    }
+  }
+
+  return filtersToReload;
 }
 
 // -----------------------------------------------------------------------------

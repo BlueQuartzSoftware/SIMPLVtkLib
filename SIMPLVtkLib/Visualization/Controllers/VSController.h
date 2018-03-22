@@ -96,6 +96,14 @@ public:
   /**
    * @brief Import data from a DataContainerArray and add any relevant DataContainers
    * as top-level VisualFilters
+   * @param fileFilter
+   * @param dca
+   */
+  void reloadDataContainerArray(VSFileNameFilter* fileFilter, DataContainerArray::Pointer dca);
+
+  /**
+   * @brief Import data from a DataContainerArray and add any relevant DataContainers
+   * as top-level VisualFilters
    * @param dca
    */
   void importDataContainerArray(DataContainerArray::Pointer dca);

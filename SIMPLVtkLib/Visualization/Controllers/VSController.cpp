@@ -82,7 +82,18 @@ VSController::~VSController()
 // -----------------------------------------------------------------------------
 void VSController::importDataContainerArray(QString filePath, DataContainerArray::Pointer dca)
 {
+  m_ImportObject->setLoadType(VSConcurrentImport::LoadType::Import);
   m_ImportObject->addDataContainerArray(filePath, dca);
+  m_ImportObject->run();
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSController::reloadDataContainerArray(VSFileNameFilter* fileFilter, DataContainerArray::Pointer dca)
+{
+  m_ImportObject->setLoadType(VSConcurrentImport::LoadType::Reload);
+  m_ImportObject->addDataContainerArray(fileFilter, dca);
   m_ImportObject->run();
 }
 
@@ -91,10 +102,9 @@ void VSController::importDataContainerArray(QString filePath, DataContainerArray
 // -----------------------------------------------------------------------------
 void VSController::importDataContainerArray(DataContainerArray::Pointer dca)
 {
+  m_ImportObject->setLoadType(VSConcurrentImport::LoadType::Import);
   m_ImportObject->addDataContainerArray("No File", dca);
   m_ImportObject->run();
-
-  //emit dataImported();
 }
 
 // -----------------------------------------------------------------------------

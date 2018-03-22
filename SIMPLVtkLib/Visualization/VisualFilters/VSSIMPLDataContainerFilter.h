@@ -119,6 +119,12 @@ public:
   SIMPLVtkBridge::WrappedDataContainerPtr getWrappedDataContainer();
 
   /**
+   * @brief Sets the WrappedDataContainerPtr used by the filter
+   * @param wrappedDc The WrappedDataContainerPtr
+   */
+  void setWrappedDataContainer(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc);
+
+  /**
    * @brief Creates a SIMPLDataContainer filter from the source .dream3d file and json object
    * @param json
    */
@@ -134,6 +140,12 @@ public:
    * @brief reloadData
    */
   void reloadData() override;
+
+  /**
+   * @brief reloadData
+   * @param dc
+   */
+  void reloadData(DataContainer::Pointer dc);
 
   /**
   * @brief Returns true if this filter type can be added as a child of
@@ -161,17 +173,8 @@ private:
   QFutureWatcher<void> m_WrappingWatcher;
 
   /**
-   * @brief reloadData
-   * @param proxy
-   * @param reader
+   * @brief wrapDataContainer
+   * @param dc
    */
-  void reloadData(DataContainerArrayProxy proxy, SIMPLH5DataReader* reader);
-
-  /**
-   * @brief reloadData
-   * @param proxy
-   * @param reader
-   */
-  void reloadData(DataContainer::Pointer dc);
-
+  void wrapDataContainer(DataContainer::Pointer dc);
 };

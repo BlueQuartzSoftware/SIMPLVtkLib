@@ -59,6 +59,12 @@ class SIMPLVtkLib_EXPORT VSConcurrentImport : public QObject
   Q_OBJECT
 
 public:
+  enum class LoadType : unsigned int
+  {
+    Import,
+    Reload
+  };
+
   using DcaFilePair = std::pair<VSFileNameFilter*, DataContainerArray::Pointer>;
 
   /**
@@ -80,11 +86,24 @@ public:
   void addDataContainerArray(QString filePath, DataContainerArray::Pointer dca);
 
   /**
+   * @brief Add a DataContainerArray with the given file filter to the list items to import
+   * @param fileFilter
+   * @param dca
+   */
+  void addDataContainerArray(VSFileNameFilter* fileFilter, DataContainerArray::Pointer dca);
+
+  /**
   * @brief Performs the import process on as many threads as are available.
   * This process is performed one file path at a time, meaning that many small files will 
   * be slower to import than a single large file if the amount of data is the same.
   */
   void run();
+
+  /**
+   * @brief setLoadType
+   * @param type
+   */
+  void setLoadType(LoadType type);
 
 signals:
   void importedFilter(VSAbstractFilter* filter, bool currentFilter = false);
@@ -109,10 +128,21 @@ protected:
   void importDataContainerArray(DcaFilePair filePair);
 
   /**
+  * @brief Begins reloading the given DataContainerArray into the given file name filter
+  * @param filePair
+  */
+  void reloadDataContainerArray(DcaFilePair filePair);
+
+  /**
   * @brief Wraps the DataContainers in vtkDataSets and prepares to add the generated filters to the filter model
+  */
+  void wrapDataContainer();
+
+  /**
+  * @brief Wraps the DataContainers in vtkDataSets and reloads the data into the filters in the filter model
   * @param fileFilter
   */
-  void importDataContainer(VSFileNameFilter* fileFilter);
+  void reloadDataContainer(VSFileNameFilter* fileFilter);
 
   /**
   * @brief Applies the unapplied DataContainer filters to finish the import process.
@@ -135,4 +165,6 @@ private:
   int m_ThreadCount;
   int m_ThreadsRemaining = 0;
   int m_AppliedFilterCount = 0;
+
+  LoadType m_LoadType = LoadType::Import;
 };
