@@ -110,6 +110,11 @@ public:
   void apply();
 
   /**
+  * @brief finishWrapping
+  */
+  void finishWrapping();
+
+  /**
   * @brief Returns the WrappedDataContainerPtr used by the filter
   * @return
   */

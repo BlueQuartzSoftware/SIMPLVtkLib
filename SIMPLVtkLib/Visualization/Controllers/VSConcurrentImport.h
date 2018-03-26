@@ -91,9 +91,19 @@ signals:
   void blockRender(bool block = true);
   void applyingDataFilters(int count);
   void dataFilterApplied(int num);
+  void finishedWrappingFilter(VSSIMPLDataContainerFilter* filter);
 
 protected slots:
+  /**
+  * @brief partialWrappingThreadFinished
+  */
   void partialWrappingThreadFinished();
+
+  /**
+  * @brief applyFilter
+  * @param filter
+  */
+  void applyDataFilter(VSSIMPLDataContainerFilter* filter);
 
 protected:
   /**
