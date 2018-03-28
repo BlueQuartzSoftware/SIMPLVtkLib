@@ -110,6 +110,7 @@ signals:
   void blockRender(bool block = true);
   void applyingDataFilters(int count);
   void dataFilterApplied(int num);
+  void finishedPartialWrapping();
 
 protected slots:
   void partialWrappingThreadFinished();

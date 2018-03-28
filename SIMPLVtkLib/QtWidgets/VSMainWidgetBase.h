@@ -296,16 +296,4 @@ private:
    * @param fileFilter
    */
   void reloadFilters(std::vector<VSAbstractDataFilter *> filter);
-
-  /**
-   * @brief Determines which filters have underlying data containers that exist in the given
-   * proxy, has a valid geometry in the proxy, and gives the user the option to continue
-   * reloading only the filters with valid data containers while skipping the ones that are invalid.
-   * @param dcaProxy The proxy that came from the file.  We use this to determine if the existing filters
-   * still have their underlying data containers in the file or not.
-   * @param filters The filters that we wish to reload
-   * @param filePath The file path that we are using for the reload
-   * @return Returns vector of valid data container filters to reload
-   */
-  std::vector<VSSIMPLDataContainerFilter*> validateDCFilters(DataContainerArrayProxy dcaProxy, std::vector<VSAbstractDataFilter*> filters, const QString &filePath);
 };

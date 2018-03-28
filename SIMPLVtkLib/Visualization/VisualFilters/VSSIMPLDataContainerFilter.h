@@ -171,10 +171,4 @@ private:
   SIMPLVtkBridge::WrappedDataContainerPtr m_WrappedDataContainer = nullptr;
   VTK_PTR(vtkTrivialProducer) m_TrivialProducer = nullptr;
   QFutureWatcher<void> m_WrappingWatcher;
-
-  /**
-   * @brief wrapDataContainer
-   * @param dc
-   */
-  void wrapDataContainer(DataContainer::Pointer dc);
 };

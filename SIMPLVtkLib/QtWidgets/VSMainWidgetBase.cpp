@@ -631,80 +631,28 @@ void VSMainWidgetBase::reloadFilters(std::vector<VSAbstractDataFilter*> filters)
       int err = 0;
       DataContainerArrayProxy dcaProxy = reader->readDataContainerArrayStructure(nullptr, err);
 
-      std::vector<VSSIMPLDataContainerFilter*> validFilters = validateDCFilters(dcaProxy, filters, fileNameFilter->getFilePath());
-      if (validFilters.size() > 0)
+      for (size_t i = 0; i < filters.size(); i++)
       {
-        for (int i = 0; i < validFilters.size(); i++)
-        {
-          VSSIMPLDataContainerFilter* validFilter = validFilters[i];
+        VSSIMPLDataContainerFilter* validFilter = dynamic_cast<VSSIMPLDataContainerFilter*>(filters[i]);
 
-          DataContainerProxy dcProxy = dcaProxy.dataContainers.value(validFilter->getFilterName());
+        DataContainerProxy dcProxy = dcaProxy.dataContainers.value(validFilter->getFilterName());
 
-          AttributeMatrixProxy::AMTypeFlags amFlags(AttributeMatrixProxy::AMTypeFlag::Cell_AMType);
-          DataArrayProxy::PrimitiveTypeFlags pFlags(DataArrayProxy::PrimitiveTypeFlag::Any_PType);
-          DataArrayProxy::CompDimsVector compDimsVector;
+        AttributeMatrixProxy::AMTypeFlags amFlags(AttributeMatrixProxy::AMTypeFlag::Cell_AMType);
+        DataArrayProxy::PrimitiveTypeFlags pFlags(DataArrayProxy::PrimitiveTypeFlag::Any_PType);
+        DataArrayProxy::CompDimsVector compDimsVector;
 
-          dcProxy.setFlags(Qt::Checked, amFlags, pFlags, compDimsVector);
-          dcaProxy.dataContainers[dcProxy.name] = dcProxy;
-        }
-
-        DataContainerArray::Pointer dca = reader->readSIMPLDataUsingProxy(dcaProxy, false);
-        m_Controller->reloadDataContainerArray(fileNameFilter, dca);
+        dcProxy.setFlags(Qt::Checked, amFlags, pFlags, compDimsVector);
+        dcaProxy.dataContainers[dcProxy.name] = dcProxy;
       }
-    }
 
+      DataContainerArray::Pointer dca = reader->readSIMPLDataUsingProxy(dcaProxy, false);
+      m_Controller->reloadDataContainerArray(fileNameFilter, dca);
+    }
   }
   else
   {
     // This should not happen, so throw an error and bail!
   }
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-std::vector<VSSIMPLDataContainerFilter*> VSMainWidgetBase::validateDCFilters(DataContainerArrayProxy dcaProxy, std::vector<VSAbstractDataFilter*> filters, const QString &filePath)
-{
-  QStringList dcNames = dcaProxy.dataContainers.keys();
-  std::vector<VSSIMPLDataContainerFilter*> filtersToReload;
-  QStringList problemFilterNames;
-  for (int i = 0; i < filters.size(); i++)
-  {
-    VSAbstractDataFilter* filter = filters[i];
-    VSSIMPLDataContainerFilter* simplFilter = dynamic_cast<VSSIMPLDataContainerFilter*>(filter);
-    if (simplFilter != nullptr && dcNames.contains(simplFilter->getFilterName()))
-    {
-      DataContainerProxy dcProxy = dcaProxy.dataContainers.value(simplFilter->getFilterName());
-      if (dcProxy.dcType == static_cast<unsigned int>(IGeometry::Type::Unknown))
-      {
-        problemFilterNames.push_back(simplFilter->getFilterName());
-      }
-      else
-      {
-        filtersToReload.push_back(simplFilter);
-      }
-    }
-    else
-    {
-      problemFilterNames.push_back(filter->getFilterName());
-    }
-  }
-
-  QMessageBox::StandardButton buttonPressed = QMessageBox::StandardButton::Yes;
-  if (problemFilterNames.isEmpty() == false)
-  {
-    QString problemFilterList = problemFilterNames.join(' ');
-    QString title = "File Reload Warning";
-    QString msg = tr("The filters\n\n<b>%1</b>\n\nhave an underlying data container that either no longer exists"
-                  "or has an unknown geometry in the file '%2'.").arg(problemFilterList).arg(filePath);
-    buttonPressed = QMessageBox::warning(this, title, msg, QMessageBox::StandardButton::No | QMessageBox::StandardButton::Yes, QMessageBox::StandardButton::No);
-    if (buttonPressed == QMessageBox::StandardButton::No)
-    {
-      return std::vector<VSSIMPLDataContainerFilter*>();
-    }
-  }
-
-  return filtersToReload;
 }
 
 // -----------------------------------------------------------------------------

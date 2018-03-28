@@ -281,14 +281,6 @@ void VSSIMPLDataContainerFilter::reloadData()
 // -----------------------------------------------------------------------------
 void VSSIMPLDataContainerFilter::reloadData(DataContainer::Pointer dc)
 {
-  m_WrappingWatcher.setFuture(QtConcurrent::run(this, &VSSIMPLDataContainerFilter::wrapDataContainer, dc));
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSSIMPLDataContainerFilter::wrapDataContainer(DataContainer::Pointer dc)
-{
   m_WrappedDataContainer = SIMPLVtkBridge::WrapDataContainerAsStruct(dc);
 }
 

@@ -57,6 +57,8 @@ VSConcurrentImport::VSConcurrentImport(VSController* controller)
   connect(this, SIGNAL(importedFilter(VSAbstractFilter*, bool)),
     controller->getFilterModel(), SLOT(addFilter(VSAbstractFilter*, bool)));
 
+  connect(this, SIGNAL(finishedPartialWrapping()), this, SLOT(partialWrappingThreadFinished()));
+
   int threadsUsed = 2;
   m_ThreadCount = QThreadPool::globalInstance()->maxThreadCount();
   if(m_ThreadCount > threadsUsed)
@@ -131,10 +133,7 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
   m_ThreadsRemaining = m_ThreadCount;
   for(int i = 0; i < m_ThreadCount; i++)
   {
-    QFutureWatcher<void>* watcher = new QFutureWatcher<void>();
-    connect(watcher, SIGNAL(finished()), this, SLOT(partialWrappingThreadFinished()));
-
-    watcher->setFuture(QtConcurrent::run(this, &VSConcurrentImport::wrapDataContainer));
+    QtConcurrent::run(this, &VSConcurrentImport::wrapDataContainer);
   }
 }
 
@@ -143,11 +142,6 @@ void VSConcurrentImport::importDataContainerArray(DcaFilePair filePair)
 // -----------------------------------------------------------------------------
 void VSConcurrentImport::partialWrappingThreadFinished()
 {
-  if (sender() != nullptr)
-  {
-    sender()->deleteLater();
-  }
-
   m_ThreadsRemaining--;
   if(m_ThreadsRemaining <= 0)
   {
@@ -170,7 +164,7 @@ void VSConcurrentImport::partialWrappingThreadFinished()
             continue;
           }
 
-          VSSIMPLDataContainerFilter* filter = dynamic_cast<VSSIMPLDataContainerFilter*>(childFilter);
+          filter = dynamic_cast<VSSIMPLDataContainerFilter*>(childFilter);
           filter->setWrappedDataContainer(wrappedDc);
         }
       }
@@ -221,6 +215,8 @@ void VSConcurrentImport::wrapDataContainer()
       m_WrappedDcLock.release();
     }
   }
+
+  emit finishedPartialWrapping();
 }
 
 // -----------------------------------------------------------------------------
@@ -238,6 +234,11 @@ void VSConcurrentImport::applyDataFilters()
 
     filter->apply();
     emit dataFilterApplied(++m_AppliedFilterCount);
+
+    if (m_LoadType == LoadType::Reload)
+    {
+      emit filter->dataReloaded();
+    }
   }
 }
 
