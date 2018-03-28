@@ -36,6 +36,7 @@
 #pragma once
 
 #include <QtCore/QFutureWatcher>
+#include <QtCore/QSemaphore>
 
 #include <QtWidgets/QWidget>
 
@@ -113,6 +114,11 @@ public:
   void apply();
 
   /**
+  * @brief finishWrapping
+  */
+  void finishWrapping();
+
+  /**
   * @brief Returns the WrappedDataContainerPtr used by the filter
   * @return
   */
@@ -171,4 +177,5 @@ private:
   SIMPLVtkBridge::WrappedDataContainerPtr m_WrappedDataContainer = nullptr;
   VTK_PTR(vtkTrivialProducer) m_TrivialProducer = nullptr;
   QFutureWatcher<void> m_WrappingWatcher;
+  QSemaphore m_ApplyLock;
 };
