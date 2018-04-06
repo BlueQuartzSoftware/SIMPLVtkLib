@@ -167,6 +167,12 @@ protected:
    */
   void createFilter() override;
 
+  /**
+   * @brief Transfers the geometry's origin to the VSTransform to better 
+   * represent the position when performing custom transformations.
+   */
+  void unwrapDataTranslation();
+
 private slots:
   /**
    * @brief This slot is called when a data container is finished being wrapped on a separate thread

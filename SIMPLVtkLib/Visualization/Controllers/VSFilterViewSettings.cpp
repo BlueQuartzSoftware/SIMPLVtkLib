@@ -715,6 +715,10 @@ void VSFilterViewSettings::setupImageActors()
   }
 
   mapper->SetInputConnection(m_Filter->getOutputPort());
+  VSTransform* transform = m_Filter->getTransform();
+  actor->SetPosition(transform->getPosition());
+  actor->SetOrientation(transform->getRotation());
+  actor->SetScale(transform->getScale());
 
   if(ActorType::DataSet == m_ActorType && isVisible())
   {
@@ -824,7 +828,6 @@ void VSFilterViewSettings::updateInputPort(VSAbstractFilter* filter)
   else
   {
     m_Mapper->SetInputConnection(filter->getOutputPort());
-
     m_Actor->SetUserTransform(m_Filter->getTransform()->getGlobalTransform());
   }
   emit requiresRender();
@@ -859,7 +862,7 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
   if(m_Filter)
   {
     disconnect(m_Filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
-    disconnect(m_Filter, SIGNAL(transformChanged()), this, SIGNAL(requiresRender()));
+    disconnect(m_Filter, SIGNAL(transformChanged()), this, SIGNAL(updateTransform()));
 
     if(dynamic_cast<VSAbstractDataFilter*>(m_Filter))
     {

@@ -44,7 +44,9 @@
 #include <vtkCellData.h>
 #include <vtkDataArray.h>
 #include <vtkDataSet.h>
+#include <vtkImageData.h>
 
+#include "SIMPLib/Geometry/ImageGeom.h"
 #include "SIMPLib/Utilities/SIMPLH5DataReader.h"
 #include "SIMPLib/Utilities/SIMPLH5DataReaderRequirements.h"
 
@@ -321,6 +323,7 @@ void VSSIMPLDataContainerFilter::wrappingFinished()
     }
   }
 
+  unwrapDataTranslation();
   m_TrivialProducer->SetOutput(dataSet);
 
   emit updatedOutputPort(this);
@@ -354,6 +357,7 @@ void VSSIMPLDataContainerFilter::apply()
     m_TrivialProducer->SetOutput(m_WrappedDataContainer->m_DataSet);
     m_ApplyLock.release();
 
+    unwrapDataTranslation();
     emit dataImported();
   }
 }
@@ -368,6 +372,28 @@ void VSSIMPLDataContainerFilter::finishWrapping()
   {
     SIMPLVtkBridge::FinishWrappingDataContainerStruct(m_WrappedDataContainer);
     m_ApplyLock.release();
+  }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSSIMPLDataContainerFilter::unwrapDataTranslation()
+{
+  VTK_PTR(vtkImageData) imageData = vtkImageData::SafeDownCast(m_WrappedDataContainer->m_DataSet);
+  if(nullptr == imageData)
+  {
+    return;
+  }
+  
+  double origin[3];
+  imageData->GetOrigin(origin);
+
+  if(origin[0] != 0.0 || origin[1] != 0.0 || origin[2] != 0.0)
+  {
+    double newOrigin[3] = { 0.0, 0.0, 0.0 };
+    imageData->SetOrigin(newOrigin);
+    getTransform()->setLocalPosition(origin);
   }
 }
 
