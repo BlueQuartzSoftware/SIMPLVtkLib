@@ -715,10 +715,6 @@ void VSFilterViewSettings::setupImageActors()
   }
 
   mapper->SetInputConnection(m_Filter->getOutputPort());
-  VSTransform* transform = m_Filter->getTransform();
-  actor->SetPosition(transform->getPosition());
-  actor->SetOrientation(transform->getRotation());
-  actor->SetScale(transform->getScale());
 
   if(ActorType::DataSet == m_ActorType && isVisible())
   {
@@ -729,6 +725,7 @@ void VSFilterViewSettings::setupImageActors()
   m_Actor = actor;
 
   m_ActorType = ActorType::Image2D;
+  updateTransform();
 }
 
 // -----------------------------------------------------------------------------
