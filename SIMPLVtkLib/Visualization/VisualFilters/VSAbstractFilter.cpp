@@ -107,6 +107,7 @@ void VSAbstractFilter::setParentFilter(VSAbstractFilter* parent)
 
     // Sets the transform's parent as well
     m_Transform->setParent(parent->getTransform());
+    setInputPort(parent->getOutputPort());
 
     connect(parent, SIGNAL(updatedOutput()), this, SIGNAL(updatedOutput()));
   }
@@ -443,6 +444,7 @@ VTK_PTR(vtkAlgorithmOutput) VSAbstractFilter::getInputPort()
 void VSAbstractFilter::setInputPort(VTK_PTR(vtkAlgorithmOutput) inputPort)
 {
   m_InputPort = inputPort;
+  m_OutlineFilter->SetInputConnection(getOutputPort());
 }
 
 // -----------------------------------------------------------------------------

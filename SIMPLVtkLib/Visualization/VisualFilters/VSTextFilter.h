@@ -123,7 +123,7 @@ public:
    * @return
    */
   static dataType_t getRequiredInputType();
-
+  
   /**
    * @brief Writes values to a json file from the filter
    * @param json

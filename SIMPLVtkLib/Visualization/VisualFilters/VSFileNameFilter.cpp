@@ -59,13 +59,12 @@ QString fetchFileName(QString filePath)
 //
 // -----------------------------------------------------------------------------
 VSFileNameFilter::VSFileNameFilter(QString filePath, VSAbstractFilter* parent)
-: VSTextFilter(nullptr, fetchFileName(filePath), filePath)
+: VSTextFilter(parent, fetchFileName(filePath), filePath)
 , m_FilePath(filePath)
 {
   setCheckState(Qt::Unchecked);
   setCheckable(false);
   setEditable(false);
-  setParentFilter(parent);
 }
 
 // -----------------------------------------------------------------------------
