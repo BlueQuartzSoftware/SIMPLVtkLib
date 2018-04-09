@@ -109,11 +109,6 @@ public:
   static QUuid GetUuid();
 
   /**
-   * @brief Wrap the entire DataContainer
-   */
-  void apply();
-
-  /**
    * @brief finishWrapping
    */
   void finishWrapping();
@@ -161,6 +156,15 @@ public:
    */
   static bool compatibleWithParent(VSAbstractFilter* filter);
 
+public slots:
+  /**
+  * @brief Wrap the entire DataContainer
+  */
+  void apply();
+
+signals:
+  void finishedWrapping();
+
 protected:
   /**
    * @brief Initializes the trivial producer and connects it to the vtkMapper
@@ -177,7 +181,7 @@ private slots:
   /**
    * @brief This slot is called when a data container is finished being wrapped on a separate thread
    */
-  void wrappingFinished();
+  void reloadWrappingFinished();
 
 private:
   SIMPLVtkBridge::WrappedDataContainerPtr m_WrappedDataContainer = nullptr;

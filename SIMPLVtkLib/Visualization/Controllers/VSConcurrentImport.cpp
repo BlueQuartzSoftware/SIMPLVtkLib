@@ -61,8 +61,6 @@ VSConcurrentImport::VSConcurrentImport(VSController* controller)
     connect(this, SIGNAL(importedFilter(VSAbstractFilter*, bool)), controller->getFilterModel(), SLOT(addFilter(VSAbstractFilter*, bool)));
   }
 
-  connect(this, &VSConcurrentImport::finishedWrappingFilter, this, &VSConcurrentImport::applyDataFilter);
-
   connect(this, SIGNAL(finishedPartialWrapping()), this, SLOT(partialWrappingThreadFinished()));
 
   int threadsUsed = 2;
@@ -216,19 +214,6 @@ void VSConcurrentImport::partialWrappingThreadFinished()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSConcurrentImport::applyDataFilter(VSSIMPLDataContainerFilter* filter)
-{
-  if(nullptr == filter)
-  {
-    return;
-  }
-
-  filter->apply();
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
 void VSConcurrentImport::wrapDataContainer()
 {
   m_ImportDataContainerOrderLock.acquire();
@@ -267,17 +252,15 @@ void VSConcurrentImport::applyDataFilters()
     m_UnappliedDataFilterLock.release();
 
     filter->finishWrapping();
-    emit finishedWrappingFilter(filter);
 
     m_AppliedFilterCountLock.acquire();
     emit dataFilterApplied(++m_AppliedFilterCount);
+    m_AppliedFilterCountLock.release();
 
     if(m_LoadType == LoadType::Reload)
     {
       emit filter->dataReloaded();
     }
-
-    m_AppliedFilterCountLock.release();
 
     // Lock semaphore before the while statement is checked again
     m_UnappliedDataFilterLock.acquire();

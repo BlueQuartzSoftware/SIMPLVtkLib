@@ -111,19 +111,12 @@ signals:
   void applyingDataFilters(int count);
   void dataFilterApplied(int num);
   void finishedPartialWrapping();
-  void finishedWrappingFilter(VSSIMPLDataContainerFilter* filter);
 
 protected slots:
   /**
    * @brief partialWrappingThreadFinished
    */
   void partialWrappingThreadFinished();
-
-  /**
-   * @brief applyFilter
-   * @param filter
-   */
-  void applyDataFilter(VSSIMPLDataContainerFilter* filter);
 
 protected:
   /**
@@ -139,21 +132,9 @@ protected:
   void importDataContainerArray(DcaFilePair filePair);
 
   /**
-   * @brief Begins reloading the given DataContainerArray into the given file name filter
-   * @param filePair
-   */
-  void reloadDataContainerArray(DcaFilePair filePair);
-
-  /**
    * @brief Wraps the DataContainers in vtkDataSets and prepares to add the generated filters to the filter model
    */
   void wrapDataContainer();
-
-  /**
-   * @brief Wraps the DataContainers in vtkDataSets and reloads the data into the filters in the filter model
-   * @param fileFilter
-   */
-  void reloadDataContainer(VSFileNameFilter* fileFilter);
 
   /**
    * @brief Applies the unapplied DataContainer filters to finish the import process.

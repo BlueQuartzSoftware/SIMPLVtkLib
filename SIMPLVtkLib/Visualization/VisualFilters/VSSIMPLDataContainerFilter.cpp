@@ -67,6 +67,8 @@ VSSIMPLDataContainerFilter::VSSIMPLDataContainerFilter(SIMPLVtkBridge::WrappedDa
   setText(wrappedDataContainer->m_Name);
   setToolTip(getToolTip());
   setParentFilter(parent);
+
+  connect(this, SIGNAL(finishedWrapping()), this, SLOT(apply()));
 }
 
 // -----------------------------------------------------------------------------
@@ -210,7 +212,7 @@ QUuid VSSIMPLDataContainerFilter::GetUuid()
 // -----------------------------------------------------------------------------
 void VSSIMPLDataContainerFilter::createFilter()
 {
-  connect(&m_WrappingWatcher, SIGNAL(finished()), this, SLOT(wrappingFinished()));
+  connect(&m_WrappingWatcher, SIGNAL(finished()), this, SLOT(reloadWrappingFinished()));
 
   VTK_PTR(vtkDataSet) dataSet = m_WrappedDataContainer->m_DataSet;
   dataSet->ComputeBounds();
@@ -307,7 +309,7 @@ void VSSIMPLDataContainerFilter::reloadData(DataContainer::Pointer dc)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSSIMPLDataContainerFilter::wrappingFinished()
+void VSSIMPLDataContainerFilter::reloadWrappingFinished()
 {
   VTK_PTR(vtkDataSet) dataSet = m_WrappedDataContainer->m_DataSet;
   dataSet->ComputeBounds();
@@ -355,9 +357,9 @@ void VSSIMPLDataContainerFilter::apply()
   if(m_ApplyLock.tryAcquire())
   {
     m_TrivialProducer->SetOutput(m_WrappedDataContainer->m_DataSet);
+    unwrapDataTranslation();
     m_ApplyLock.release();
 
-    unwrapDataTranslation();
     emit dataImported();
   }
 }
@@ -372,6 +374,8 @@ void VSSIMPLDataContainerFilter::finishWrapping()
   {
     SIMPLVtkBridge::FinishWrappingDataContainerStruct(m_WrappedDataContainer);
     m_ApplyLock.release();
+
+    emit finishedWrapping();
   }
 }
 
