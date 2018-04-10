@@ -60,11 +60,6 @@ public:
   void OnLeftButtonDown() override;
 
   /**
-  * @brief Handles left mouse button releases
-  */
-  void OnLeftButtonUp() override;
-
-  /**
   * @brief Cancels any drag operations.
   */
   void OnRightButtonDown() override;
@@ -101,25 +96,58 @@ protected:
   ActionType getActionType();
 
   /**
-  * @brief Sets the ActionType for the interactor style
-  * @param type
-  */
+   * @brief Sets the ActionType for the interactor style
+   * @param type
+   */
   void setActionType(ActionType type);
 
   /**
-  * @brief Ends the current action
-  */
+   * @brief Ends the current action
+   */
   void endAction();
 
   /**
-  * @brief Cancels the current action and resets the filter to the way it was when the action began
-  */
+   * @brief Cancels the current action and resets the filter to the way it was when the action began
+   */
   void cancelAction();
 
   /**
-  * @brief Finds the filter at the current mouse cordinates and grabs it.
-  */
+   * @brief Finds the filter at the current mouse cordinates and grabs it.
+   */
   void grabFilter();
+
+  /**
+   * @brief Adds the filter and prop to the current selection
+   * @param filter
+   * @param prop
+   */
+  void addSelection(VSAbstractFilter* filter, vtkProp3D* prop);
+
+  /**
+   * @brief Removes the filter from the current selection
+   * @param filter
+   */
+  void removeSelection(VSAbstractFilter* filter);
+
+  /**
+   * @brief Clears the current selection
+   */
+  void clearSelection();
+
+  /**
+   * @brief Toggles the filter into or out of the current selection
+   * @param filter
+   * @param prop
+   */
+  void toggleSelection(VSAbstractFilter* filter, vtkProp3D* prop);
+
+  /**
+   * @brief Returns true if the current selection includes the given filter.
+   * Returns false otherwise.
+   * @param filter
+   * @return
+   */
+  bool selectionIncludes(VSAbstractFilter* filter);
 
   /**
   * @brief Releases the selected filter
@@ -196,20 +224,21 @@ protected:
   bool dragFilterKey();
 
 private:
-  VSAbstractFilter* m_GrabbedFilter = nullptr;
-  vtkProp3D* m_GrabbedProp = nullptr;
+  VSAbstractFilter* m_ActiveFilter = nullptr;
+  vtkProp3D* m_ActiveProp = nullptr;
+  std::list<VSAbstractFilter*> m_Selection;
   int m_MousePress = 0;
   ActionType m_ActionType = ActionType::None;
   // Position
   double* m_InitialPosition;
+  double m_Translation[3];
   // Rotation
-  double* m_InitialRotation;
   int* m_InitialMousePos;
   double* m_CameraAxis;
+  double m_RotationAmt;
   // Scaling
-  double* m_InitialScale;
   double* m_InitialCenter;
-  double m_InitialDistance;
+  double m_LastDistance;
   double m_ScaleAmt = 1.0;
   
 

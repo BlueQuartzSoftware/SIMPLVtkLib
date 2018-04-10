@@ -206,6 +206,26 @@ void VSTransform::rotate(double amount, double axis[3])
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSTransform::scale(double amount)
+{
+  m_LocalTransform->Scale(amount, amount, amount);
+  emit emitScale();
+  emit updatedLocalScale(m_LocalTransform->GetScale());
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSTransform::scale(double amount[3])
+{
+  m_LocalTransform->Scale(amount);
+  emit emitScale();
+  emit updatedLocalScale(m_LocalTransform->GetScale());
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 VTK_PTR(vtkTransform) VSTransform::getGlobalTransform()
 {
   VTK_NEW(vtkTransform, transform);
