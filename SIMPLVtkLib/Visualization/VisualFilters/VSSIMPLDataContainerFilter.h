@@ -77,7 +77,7 @@ public:
    * @brief Returns the bounds of the vtkDataSet
    * @return
    */
-  double* getBounds() const;
+  double* getBounds() const override;
 
   /**
    * @brief Returns the output port for the filter
@@ -171,12 +171,6 @@ protected:
    */
   void createFilter() override;
 
-  /**
-   * @brief Transfers the geometry's origin to the VSTransform to better 
-   * represent the position when performing custom transformations.
-   */
-  void unwrapDataTranslation();
-
 private slots:
   /**
    * @brief This slot is called when a data container is finished being wrapped on a separate thread
@@ -188,4 +182,5 @@ private:
   VTK_PTR(vtkTrivialProducer) m_TrivialProducer = nullptr;
   QFutureWatcher<void> m_WrappingWatcher;
   QSemaphore m_ApplyLock;
+  bool m_WrappingTransform = false;
 };

@@ -65,7 +65,6 @@ VSDataSetFilter::VSDataSetFilter(const QString& filePath, VSAbstractFilter* pare
 , m_FilePath(filePath)
 {
   createFilter();
-
   setParentFilter(parent);
 }
 

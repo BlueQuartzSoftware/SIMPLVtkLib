@@ -52,6 +52,8 @@ VSClipFilter::VSClipFilter(VSAbstractFilter* parent)
   m_ClipAlgorithm = nullptr;
   setParentFilter(parent);
 
+  VSAbstractFilter* parentFilter = getParentFilter();
+
   for(int i = 0; i < 3; i++)
   {
     m_LastPlaneOrigin[i] = 0.0;

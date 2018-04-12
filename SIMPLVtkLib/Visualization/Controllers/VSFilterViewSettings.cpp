@@ -50,6 +50,7 @@
 #include <vtkTextProperty.h>
 
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractDataFilter.h"
+#include "SIMPLVtkLib/Visualization/VisualFilters/VSSIMPLDataContainerFilter.h"
 
 double* VSFilterViewSettings::NULL_COLOR = new double[3]{0.0, 0.0, 0.0};
 
@@ -62,8 +63,12 @@ VSFilterViewSettings::VSFilterViewSettings(VSAbstractFilter* filter)
 , m_ShowScalarBar(true)
 {
   connectFilter(filter);
-  setupActors();
-  setRepresentation(Representation::Default);
+  bool isSIMPL = dynamic_cast<VSSIMPLDataContainerFilter*>(filter);
+  setupActors(isSIMPL);
+  if(false == isSIMPL)
+  {
+    setRepresentation(Representation::Default);
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -740,6 +745,7 @@ void VSFilterViewSettings::setupDataSetActors()
   if(ActorType::Image2D == m_ActorType || nullptr == m_Actor)
   {
     m_DataSetFilter = VTK_PTR(vtkDataSetSurfaceFilter)::New();
+    m_OutlineFilter = VTK_PTR(vtkOutlineFilter)::New();
     mapper = vtkDataSetMapper::New();
     mapper->ReleaseDataFlagOn();
     actor = vtkActor::New();
@@ -771,6 +777,7 @@ void VSFilterViewSettings::setupDataSetActors()
   }
 
   m_DataSetFilter->SetInputConnection(m_Filter->getTransformedOutputPort());
+  m_OutlineFilter->SetInputConnection(m_Filter->getOutputPort());
 
   mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
   actor->SetMapper(mapper);
@@ -805,6 +812,7 @@ void VSFilterViewSettings::setupDataSetActors()
   m_Actor = actor;
 
   m_ActorType = ActorType::DataSet;
+  updateTransform();
 }
 
 // -----------------------------------------------------------------------------
@@ -840,12 +848,18 @@ void VSFilterViewSettings::updateTransform()
     return;
   }
 
-  if(ActorType::Image2D == m_ActorType)
+  if(ActorType::Image2D == m_ActorType || Representation::Outline == m_Representation)
   {
     VSTransform* transform = m_Filter->getTransform();
     m_Actor->SetPosition(transform->getPosition());
     m_Actor->SetOrientation(transform->getRotation());
     m_Actor->SetScale(transform->getScale());
+  }
+  else
+  {
+    m_Actor->SetPosition(0.0, 0.0, 0.0);
+    m_Actor->SetOrientation(0.0, 0.0, 0.0);
+    m_Actor->SetScale(1.0, 1.0, 1.0);
   }
 
   emit requiresRender();
@@ -964,7 +978,8 @@ void VSFilterViewSettings::setRepresentation(Representation type)
   m_Representation = type;
   if(type == Representation::Outline)
   {
-    getDataSetMapper()->SetInputConnection(m_Filter->getOutlinePort());
+    getDataSetMapper()->SetInputConnection(m_OutlineFilter->GetOutputPort());
+    actor->GetProperty()->SetRepresentation(static_cast<int>(Representation::Wireframe));
   }
   else
   {
@@ -982,6 +997,7 @@ void VSFilterViewSettings::setRepresentation(Representation type)
     }
   }
 
+  updateTransform();
   emit representationChanged(this, type);
   emit requiresRender();
 }
@@ -994,6 +1010,11 @@ void VSFilterViewSettings::importedData()
   if(dynamic_cast<VSAbstractDataFilter*>(getFilter()) && getRepresentation() == Representation::Outline)
   {
     setupActors(false);
+    if(getImageMapper() && getDataSetActor())
+    {
+      getDataSetActor()->VisibilityOff();
+      getDataSetMapper()->ScalarVisibilityOff();
+    }
     setRepresentation(Representation::Surface);
     emit requiresRender();
   }

@@ -37,6 +37,9 @@
 
 #include <QtWidgets/QWidget>
 
+#include <vtkDataSet.h>
+#include <vtkTrivialProducer.h>
+
 #include "SIMPLVtkLib/SIMPLBridge/SIMPLVtkBridge.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractDataFilter.h"
 
@@ -78,7 +81,7 @@ public:
    * @brief Returns the bounds of the vtkDataSet
    * @return
    */
-  double* getBounds() const;
+  double* getBounds() const override;
 
   /**
    * @brief Returns the output port for the filter

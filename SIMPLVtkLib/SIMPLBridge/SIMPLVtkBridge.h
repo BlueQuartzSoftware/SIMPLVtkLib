@@ -87,6 +87,7 @@ public:
     WrappedDataArrayPtrCollection m_CellData;
     QString m_Name;
     DataContainer::Pointer m_DataContainer;
+    double m_Origin[3] = { 0.0, 0.0, 0.0 };
   };
 
   using WrappedDataContainerPtr = std::shared_ptr<WrappedDataContainer>;

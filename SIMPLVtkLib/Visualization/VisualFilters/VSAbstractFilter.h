@@ -44,7 +44,6 @@
 #include <vtkAlgorithmOutput.h>
 #include <vtkDataArray.h>
 #include <vtkDataSet.h>
-#include <vtkOutlineFilter.h>
 #include <vtkTransformFilter.h>
 #include <vtkTrivialProducer.h>
 
@@ -192,12 +191,6 @@ public:
   virtual VTK_PTR(vtkDataSet) getOutput() = 0;
 
   /**
-   * @brief Returns the outline data port for the filter
-   * @return
-   */
-  vtkAlgorithmOutput* getOutlinePort();
-
-  /**
    * @brief Returns the output port for the transformed filtered data
    * @return
    */
@@ -257,7 +250,6 @@ signals:
   void updatedOutputPort(VSAbstractFilter* filter);
   void updatedOutput();
   void transformChanged();
-
   void errorGenerated(const QString& title, const QString& msg, const int& errorCode);
 
 protected slots:
@@ -364,7 +356,6 @@ private:
 
   std::shared_ptr<VSTransform> m_Transform;
   VTK_PTR(vtkTransformFilter) m_TransformFilter;
-  VTK_PTR(vtkOutlineFilter) m_OutlineFilter;
   QSemaphore m_ChildLock;
   bool m_ConnectedInput = false;
   VTK_PTR(vtkAlgorithmOutput) m_InputPort;

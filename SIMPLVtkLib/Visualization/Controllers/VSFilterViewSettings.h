@@ -44,6 +44,7 @@
 #include <vtkAbstractMapper3D.h>
 #include <vtkActor.h>
 #include <vtkDataSetSurfaceFilter.h>
+#include <vtkOutlineFilter.h>
 #include <vtkScalarBarActor.h>
 #include <vtkScalarBarWidget.h>
 
@@ -79,7 +80,7 @@ public:
     Wireframe,
     Surface,
     SurfaceWithEdges,
-    Default = Outline
+    Default = Surface
   };
 
   enum class ActorType : int
@@ -426,6 +427,7 @@ private:
   Representation m_Representation = Representation::Default;
   VTK_PTR(vtkAbstractMapper3D) m_Mapper = nullptr;
   VTK_PTR(vtkProp3D) m_Actor = nullptr;
+  VTK_PTR(vtkOutlineFilter) m_OutlineFilter = nullptr;
   bool m_ShowScalarBar = true;
   VSLookupTableController* m_LookupTable = nullptr;
   double m_Alpha = 1.0;

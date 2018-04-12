@@ -36,11 +36,9 @@
 #include "VSSIMPLDataContainerFilter.h"
 
 #include <QtConcurrent>
-
 #include <QtCore/QUuid>
 
 #include <vtkAlgorithmOutput.h>
-
 #include <vtkCellData.h>
 #include <vtkDataArray.h>
 #include <vtkDataSet.h>
@@ -214,6 +212,9 @@ void VSSIMPLDataContainerFilter::createFilter()
 {
   connect(&m_WrappingWatcher, SIGNAL(finished()), this, SLOT(reloadWrappingFinished()));
 
+  getTransform()->setLocalPosition(m_WrappedDataContainer->m_Origin);
+  updateTransformFilter();
+
   VTK_PTR(vtkDataSet) dataSet = m_WrappedDataContainer->m_DataSet;
   dataSet->ComputeBounds();
 
@@ -325,7 +326,6 @@ void VSSIMPLDataContainerFilter::reloadWrappingFinished()
     }
   }
 
-  unwrapDataTranslation();
   m_TrivialProducer->SetOutput(dataSet);
 
   emit updatedOutputPort(this);
@@ -356,8 +356,6 @@ void VSSIMPLDataContainerFilter::apply()
   // Do not lock the main thread trying to apply a filter that is already being applied.
   if(m_ApplyLock.tryAcquire())
   {
-    m_TrivialProducer->SetOutput(m_WrappedDataContainer->m_DataSet);
-    unwrapDataTranslation();
     m_ApplyLock.release();
 
     emit dataImported();
@@ -376,28 +374,6 @@ void VSSIMPLDataContainerFilter::finishWrapping()
     m_ApplyLock.release();
 
     emit finishedWrapping();
-  }
-}
-
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void VSSIMPLDataContainerFilter::unwrapDataTranslation()
-{
-  VTK_PTR(vtkImageData) imageData = vtkImageData::SafeDownCast(m_WrappedDataContainer->m_DataSet);
-  if(nullptr == imageData)
-  {
-    return;
-  }
-  
-  double origin[3];
-  imageData->GetOrigin(origin);
-
-  if(origin[0] != 0.0 || origin[1] != 0.0 || origin[2] != 0.0)
-  {
-    double newOrigin[3] = { 0.0, 0.0, 0.0 };
-    imageData->SetOrigin(newOrigin);
-    getTransform()->setLocalPosition(origin);
   }
 }
 

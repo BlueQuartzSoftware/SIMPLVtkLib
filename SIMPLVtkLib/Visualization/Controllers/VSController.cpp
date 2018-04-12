@@ -129,17 +129,19 @@ void VSController::importDataContainer(DataContainer::Pointer dc)
 // -----------------------------------------------------------------------------
 void VSController::importData(const QString& filePath)
 {
-  VSDataSetFilter* filter = new VSDataSetFilter(filePath);
+  VSFileNameFilter* textFilter = new VSFileNameFilter(filePath);
+  VSDataSetFilter* filter = new VSDataSetFilter(filePath, textFilter);
   // Check if any data was imported
   if(filter->getOutput())
   {
-    VSFileNameFilter* textFilter = new VSFileNameFilter(filePath);
     m_FilterModel->addFilter(textFilter, false);
-
-    filter->setParentFilter(textFilter);
     m_FilterModel->addFilter(filter);
 
     emit dataImported();
+  }
+  else
+  {
+    textFilter->deleteLater();
   }
 }
 
