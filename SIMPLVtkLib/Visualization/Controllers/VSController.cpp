@@ -112,17 +112,18 @@ void VSController::importPipelineOutput(FilterPipeline::Pointer pipeline, DataCo
 // -----------------------------------------------------------------------------
 void VSController::reloadPipelineOutput(FilterPipeline::Pointer pipeline, DataContainerArray::Pointer dca)
 {
-  VSAbstractFilter* parentFilter = getFilterModel()->getPipelineFilter(pipeline->getName());
+  VSPipelineFilter* parentFilter = dynamic_cast<VSPipelineFilter*>(getFilterModel()->getPipelineFilter(pipeline->getName()));
   if(parentFilter)
   {
     m_ImportObject->setLoadType(VSConcurrentImport::LoadType::Reload);
+    m_ImportObject->addDataContainerArray(parentFilter, dca);
   }
   else
   {
     m_ImportObject->setLoadType(VSConcurrentImport::LoadType::Import);
+    m_ImportObject->addDataContainerArray(pipeline, dca);
   }
-  
-  m_ImportObject->addDataContainerArray(pipeline, dca);
+
   m_ImportObject->run();
 }
 
