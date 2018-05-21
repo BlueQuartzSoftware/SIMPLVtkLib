@@ -171,17 +171,15 @@ void VSConcurrentImport::partialWrappingThreadFinished()
   if(m_ThreadsRemaining <= 0)
   {
     m_ThreadCountLock.release();
+
+    QVector<VSAbstractFilter*> childFilters = m_DataParentFilter->getChildren();
     for(SIMPLVtkBridge::WrappedDataContainerPtr wrappedDc : m_WrappedDataContainers)
     {
       VSSIMPLDataContainerFilter* filter = nullptr;
-      if(m_LoadType == LoadType::Import)
+      
+      // Reload existing data and search for old DataContainers that no longer exist
+      if(m_LoadType == LoadType::Reload)
       {
-        filter = new VSSIMPLDataContainerFilter(wrappedDc, m_DataParentFilter);
-        m_Controller->getFilterModel()->addFilter(filter, false);
-      }
-      else
-      {
-        QVector<VSAbstractFilter*> childFilters = m_DataParentFilter->getChildren();
         for(int i = 0; i < childFilters.size(); i++)
         {
           VSAbstractFilter* childFilter = childFilters[i];
@@ -194,14 +192,37 @@ void VSConcurrentImport::partialWrappingThreadFinished()
           if(filter)
           {
             filter->setWrappedDataContainer(wrappedDc);
+            // Remove from the list of childFilters
+            int index = childFilters.indexOf(filter);
+            childFilters.remove(index);
           }
         }
       }
 
-      // Attempting to run applyDataFilters requires the QSemaphore to lock when modifying this vector
-      m_UnappliedDataFilterLock.acquire();
-      m_UnappliedDataFilters.push_back(filter);
-      m_UnappliedDataFilterLock.release();
+      // Import data if it was not there to reload
+      if(m_LoadType == LoadType::Import || nullptr == filter)
+      {
+        filter = new VSSIMPLDataContainerFilter(wrappedDc, m_DataParentFilter);
+        m_Controller->getFilterModel()->addFilter(filter, false);
+      }
+
+      // Do not append a nullptr to the list to be applied later
+      if(filter)
+      {
+        // Attempting to run applyDataFilters requires the QSemaphore to lock when modifying this vector
+        m_UnappliedDataFilterLock.acquire();
+        m_UnappliedDataFilters.push_back(filter);
+        m_UnappliedDataFilterLock.release();
+      }
+    }
+
+    // When reloading, delete any extra data that no longer exists
+    if(m_LoadType == LoadType::Reload)
+    {
+      for(VSAbstractFilter* filter : childFilters)
+      {
+        filter->deleteFilter();
+      }
     }
 
     // Select the last filter
