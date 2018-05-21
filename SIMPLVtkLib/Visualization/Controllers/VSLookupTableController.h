@@ -100,6 +100,12 @@ public:
   void copy(const VSLookupTableController& other);
 
   /**
+   * @brief Returns a pointer to a VSLookupTableController with all the same values
+   * @return
+   */
+  VSLookupTableController* deepCopy();
+
+  /**
    * @brief Inverts the placement values for colors in the lookup table
    */
   void invert();

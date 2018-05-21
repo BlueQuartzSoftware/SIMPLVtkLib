@@ -199,6 +199,16 @@ void VSLookupTableController::copy(const VSLookupTableController& other)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+VSLookupTableController* VSLookupTableController::deepCopy()
+{
+  VSLookupTableController* other = new VSLookupTableController();
+  other->copy(*this);
+  return other;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSLookupTableController::invert()
 {
   double minRange = m_Range[0];

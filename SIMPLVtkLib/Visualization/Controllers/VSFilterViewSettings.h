@@ -393,6 +393,11 @@ protected:
   void connectFilter(VSAbstractFilter* filter);
 
   /**
+   * @brief Handles the target filter being deleted.
+   */
+  void filterDeleted();
+
+  /**
    * @brief Returns the array at the given index
    * @param index
    * @return

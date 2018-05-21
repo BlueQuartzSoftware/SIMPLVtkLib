@@ -74,6 +74,8 @@ VSAbstractFilter::VSAbstractFilter()
 // -----------------------------------------------------------------------------
 void VSAbstractFilter::deleteFilter()
 {
+  emit removeFilter();
+
   if(getParentFilter())
   {
     getParentFilter()->removeChild(this);

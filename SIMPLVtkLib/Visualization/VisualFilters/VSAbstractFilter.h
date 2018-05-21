@@ -251,6 +251,7 @@ signals:
   void updatedOutput();
   void transformChanged();
   void errorGenerated(const QString& title, const QString& msg, const int& errorCode);
+  void removeFilter();
 
 protected slots:
   /**

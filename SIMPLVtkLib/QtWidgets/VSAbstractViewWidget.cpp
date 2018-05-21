@@ -68,6 +68,8 @@ void VSAbstractViewWidget::copyFilters(VSFilterViewSettings::Map filters)
     VSFilterViewSettings* viewSettings = new VSFilterViewSettings(*(iter->second));
     m_FilterViewSettings[filter] = viewSettings;
 
+    connect(filter, &VSAbstractFilter::removeFilter, this, [=] { filterRemoved(filter); });
+
     connect(viewSettings, SIGNAL(filterAdded(VSAbstractFilter*)), this, SLOT(filterAdded(VSAbstractFilter*)));
     connect(viewSettings, SIGNAL(filterRemoved(VSAbstractFilter*)), this, SLOT(filterRemoved(VSAbstractFilter*)));
 
@@ -129,7 +131,7 @@ void VSAbstractViewWidget::filterRemoved(VSAbstractFilter* filter)
     return;
   }
 
-  VSFilterViewSettings* viewSettings = getFilterViewSettings(filter);
+  VSFilterViewSettings* viewSettings = m_FilterViewSettings[filter];
   if(viewSettings)
   {
     setFilterVisibility(viewSettings, false);
@@ -232,6 +234,8 @@ VSFilterViewSettings* VSAbstractViewWidget::createFilterViewSettings(VSAbstractF
   }
 
   VSFilterViewSettings* viewSettings = new VSFilterViewSettings(filter);
+
+  connect(filter, &VSAbstractFilter::removeFilter, this, [=] { filterRemoved(filter); });
 
   connect(viewSettings, SIGNAL(visibilityChanged(VSFilterViewSettings*, bool)), this, SLOT(setFilterVisibility(VSFilterViewSettings*, bool)));
   connect(viewSettings, SIGNAL(activeArrayIndexChanged(VSFilterViewSettings*, int)), this, SLOT(setFilterArrayIndex(VSFilterViewSettings*, int)));

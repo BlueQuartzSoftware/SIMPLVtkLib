@@ -225,9 +225,9 @@ VSAbstractFilter* VSFilterModel::getPipelineFilter(QString pipelineName)
 // -----------------------------------------------------------------------------
 void VSFilterModel::updateModelForView(VSFilterViewSettings::Map viewSettings)
 {
-  for(auto iter = viewSettings.begin(); iter != viewSettings.end(); iter++)
+  for(auto iter : viewSettings)
   {
-    VSFilterViewSettings* settings = iter->second;
+    VSFilterViewSettings* settings = iter.second;
     VSAbstractFilter* filter = settings->getFilter();
     filter->setCheckState(settings->isVisible() ? Qt::Checked : Qt::Unchecked);
   }

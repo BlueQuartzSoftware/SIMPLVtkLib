@@ -88,7 +88,15 @@ VSFilterViewSettings::VSFilterViewSettings(const VSFilterViewSettings& copy)
 
   if(copy.m_LookupTable)
   {
-    m_LookupTable->copy(*(copy.m_LookupTable));
+    // Create a new VSLookupTableController if necessary
+    if(nullptr == m_LookupTable)
+    {
+      m_LookupTable = copy.m_LookupTable->deepCopy();
+    }
+    else
+    {
+      m_LookupTable->copy(*(copy.m_LookupTable));
+    }
   }
 }
 
@@ -102,6 +110,8 @@ VSFilterViewSettings::~VSFilterViewSettings()
     delete m_LookupTable;
     m_LookupTable = nullptr;
   }
+
+  m_Filter = nullptr;
 }
 
 // -----------------------------------------------------------------------------
@@ -874,6 +884,7 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
   {
     disconnect(m_Filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
     disconnect(m_Filter, SIGNAL(transformChanged()), this, SIGNAL(updateTransform()));
+    disconnect(m_Filter, &VSAbstractFilter::removeFilter, this, &VSFilterViewSettings::filterDeleted);
 
     if(dynamic_cast<VSAbstractDataFilter*>(m_Filter))
     {
@@ -887,6 +898,7 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
   {
     connect(filter, SIGNAL(updatedOutputPort(VSAbstractFilter*)), this, SLOT(updateInputPort(VSAbstractFilter*)));
     connect(filter, SIGNAL(transformChanged()), this, SLOT(updateTransform()));
+    connect(filter, &VSAbstractFilter::removeFilter, this, &VSFilterViewSettings::filterDeleted);
 
     if(filter->getArrayNames().size() < 1)
     {
@@ -906,6 +918,15 @@ void VSFilterViewSettings::connectFilter(VSAbstractFilter* filter)
       connect(filter, SIGNAL(dataReloaded()), this, SLOT(reloadedData()));
     }
   }
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSFilterViewSettings::filterDeleted()
+{
+  setVisible(false);
+  deleteLater();
 }
 
 // -----------------------------------------------------------------------------

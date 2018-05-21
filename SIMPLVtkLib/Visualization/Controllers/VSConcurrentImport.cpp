@@ -219,9 +219,10 @@ void VSConcurrentImport::partialWrappingThreadFinished()
     // When reloading, delete any extra data that no longer exists
     if(m_LoadType == LoadType::Reload)
     {
-      for(VSAbstractFilter* filter : childFilters)
+      int count = childFilters.size();
+      for(int i = 0; i < count; i++)
       {
-        filter->deleteFilter();
+        childFilters[i]->deleteFilter();
       }
     }
 
