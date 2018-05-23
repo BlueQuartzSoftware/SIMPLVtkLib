@@ -272,6 +272,9 @@ target_compile_definitions(SIMPLVtkLib PRIVATE -DQT_CORE_LIB)
 # LibraryProperties( SIMPLVtkLib ${EXE_DEBUG_EXTENSION})
 target_link_libraries(SIMPLVtkLib ${SIMPLVtkLib_LINK_LIBRARIES} )
 
+set_target_properties(SIMPLVtkLib
+                          PROPERTIES FOLDER SIMPLVtkLib)
+
 set(install_dir "tools")
 set(lib_install_dir "lib")
 if(WIN32)
