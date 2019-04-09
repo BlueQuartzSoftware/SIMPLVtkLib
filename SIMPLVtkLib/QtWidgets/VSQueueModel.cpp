@@ -40,7 +40,7 @@
 
 #include "QtWidgets/VSQueueItem.h"
 
-#include "SIMPLVtkLib/Wizards/ImportMontage/ImporterWorker.h"
+#include "SIMPLVtkLib/Dialogs/Utilities/ImporterWorker.h"
 
 VSQueueModel* VSQueueModel::self = nullptr;
 

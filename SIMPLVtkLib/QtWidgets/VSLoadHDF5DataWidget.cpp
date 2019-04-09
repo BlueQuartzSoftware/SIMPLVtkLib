@@ -45,8 +45,6 @@
 #include "SIMPLib/Utilities/SIMPLH5DataReaderRequirements.h"
 
 #include "SIMPLVtkLib/Dialogs/Utilities/DREAM3DFileTreeModel.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/DataDisplayOptionsPage.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/ImportMontageWizard.h"
 
 // -----------------------------------------------------------------------------
 //

@@ -68,7 +68,6 @@
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSTextFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSThresholdFilter.h"
 #include "SIMPLVtkLib/Wizards/ExecutePipeline/ExecutePipelineConstants.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/ImportMontageConstants.h"
 #include "SIMPLVtkLib/Wizards/PerformMontage/PerformMontageConstants.h"
 
 // -----------------------------------------------------------------------------

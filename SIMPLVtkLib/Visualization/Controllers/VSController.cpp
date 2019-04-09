@@ -46,6 +46,9 @@
 #include "SIMPLib/Utilities/SIMPLH5DataReader.h"
 #include "SIMPLib/Utilities/SIMPLH5DataReaderRequirements.h"
 
+#include "SIMPLVtkLib/Dialogs/FijiListWidget.h"
+#include "SIMPLVtkLib/Dialogs/Utilities/TileConfigFileGenerator.h"
+
 #include "SIMPLVtkLib/QtWidgets/VSFilterFactory.h"
 
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSClipFilter.h"
@@ -58,13 +61,9 @@
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSTextFilter.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSThresholdFilter.h"
 
-#include "SIMPLVtkLib/Wizards/ImportMontage/FijiListWidget.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/ImportMontageConstants.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/ImportMontageWizard.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/ImporterWorker.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/RobometListWidget.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/TileConfigFileGenerator.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/ZeissListWidget.h"
+#include "SIMPLVtkLib/Dialogs/RobometListWidget.h"
+#include "SIMPLVtkLib/Dialogs/Utilities/ImporterWorker.h"
+#include "SIMPLVtkLib/Dialogs/ZeissListWidget.h"
 
 #include "SIMPLVtkLib/Wizards/PerformMontage/PerformMontageConstants.h"
 #include "SIMPLVtkLib/Wizards/PerformMontage/PerformMontageWizard.h"

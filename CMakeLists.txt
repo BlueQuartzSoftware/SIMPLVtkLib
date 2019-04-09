@@ -292,6 +292,7 @@ target_include_directories(SIMPLVtkLib
                               ${SIMPLVtkLib_SOURCE_DIR}/SIMPLVtkLib/Visualization/Controllers
                               ${SIMPLVtkLib_SOURCE_DIR}/SIMPLVtkLib/Visualization/VisualFilters
                               ${SIMPLVtkLib_SOURCE_DIR}/SIMPLVtkLib/Visualization/VtkWidgets
+                              ${SIMPLVtkLib_SOURCE_DIR}/SIMPLVtkLib/Dialogs
                               ${SIMPLVtkLib_SOURCE_DIR}/SIMPLVtkLib/Wizards
                               ${SIMPLVtkLib_SOURCE_DIR}/SIMPLVtkLib/Wizards/ExecutePipeline
                               ${SIMPLVtkLib_SOURCE_DIR}/SIMPLVtkLib/Wizards/GenericMontage

@@ -48,8 +48,6 @@
 #include "SVWidgetsLib/QtSupport/QtSFileUtils.h"
 #include "SVWidgetsLib/QtSupport/QtSDisclosableWidget.h"
 
-#include "SIMPLVtkLib/Wizards/ImportMontage/DataDisplayOptionsPage.h"
-
 #include "PerformMontage/PerformMontageConstants.h"
 
 #include "PerformMontageWizard.h"

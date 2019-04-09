@@ -39,7 +39,6 @@
 
 #include "SIMPLVtkLib/Visualization/Controllers/VSFilterModel.h"
 #include "SIMPLVtkLib/Visualization/Controllers/VSFilterViewSettings.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/ImportMontageWizard.h"
 
 #include <vtkActor.h>
 #include <vtkImageSlice.h>
@@ -287,7 +286,7 @@ public:
    * @brief Set the display type for visualization output
    * @param displayType
    */
-  void setDisplayType(ImportMontageWizard::DisplayType displayType);
+  void setDisplayType(AbstractMontageDialog::DisplayType displayType);
 
 signals:
   void viewSettingsCreated(VSFilterViewSettings*) const;
@@ -345,7 +344,7 @@ protected:
 private:
   VSFilterModel* m_FilterModel = nullptr;
   mutable VSFilterViewSettings::Map m_FilterViewSettings;
-  ImportMontageWizard::DisplayType m_DisplayType = ImportMontageWizard::DisplayType::NotSpecified;
+  AbstractMontageDialog::DisplayType m_DisplayType = AbstractMontageDialog::DisplayType::NotSpecified;
 };
 
 Q_DECLARE_METATYPE(VSFilterViewModel)

@@ -42,7 +42,7 @@
 #include "SIMPLib/Common/SIMPLibSetGetMacros.h"
 #include "SIMPLib/Filtering/FilterPipeline.h"
 
-#include "SIMPLVtkLib/Wizards/ImportMontage/ImportMontageWizard.h"
+#include "SIMPLVtkLib/SIMPLVtkLib.h"
 
 class SIMPLVtkLib_EXPORT PipelineWorker : public QObject
 {

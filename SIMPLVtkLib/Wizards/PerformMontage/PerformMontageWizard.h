@@ -35,10 +35,9 @@
 
 #pragma once
 
+#include "SIMPLVtkLib/Dialogs/Utilities/MontageSettings.h"
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 #include "SIMPLVtkLib/Wizards/AbstractMontageWizard.h"
-#include "SIMPLVtkLib/Wizards/ImportMontage/MontageSettings.h"
-
 
 class SIMPLVtkLib_EXPORT PerformMontageWizard : public AbstractMontageWizard
 {

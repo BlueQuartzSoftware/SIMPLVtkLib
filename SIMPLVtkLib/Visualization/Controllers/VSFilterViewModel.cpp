@@ -293,16 +293,15 @@ VSFilterViewSettings* VSFilterViewModel::createFilterViewSettings(VSAbstractFilt
   static int imageIndex = 0;
 
   VSFilterViewSettings* viewSettings;
-  if(m_DisplayType == ImportMontageWizard::DisplayType::NotSpecified)
+  if(m_DisplayType == AbstractMontageDialog::DisplayType::NotSpecified)
   {
 	  viewSettings = new VSFilterViewSettings(filter);
   }
   else
   {
 	  VSFilterViewSettings::Representation representation = VSFilterViewSettings::Representation::Outline;
-	  if(m_DisplayType == ImportMontageWizard::DisplayType::SideBySide ||
-		  m_DisplayType == ImportMontageWizard::DisplayType::Montage)
-	  {
+    if(m_DisplayType == AbstractMontageDialog::DisplayType::SideBySide || m_DisplayType == AbstractMontageDialog::DisplayType::Montage)
+    {
 		  representation = VSFilterViewSettings::Representation::Surface;
 	  }
 	  viewSettings = new VSFilterViewSettings(filter, representation, m_DisplayType);
@@ -749,7 +748,7 @@ QModelIndexList VSFilterViewModel::convertIndicesFromFilterModel(const QModelInd
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSFilterViewModel::setDisplayType(ImportMontageWizard::DisplayType displayType)
+void VSFilterViewModel::setDisplayType(AbstractMontageDialog::DisplayType displayType)
 {
 	m_DisplayType = displayType;
 }

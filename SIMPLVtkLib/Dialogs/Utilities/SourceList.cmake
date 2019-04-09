@@ -3,6 +3,9 @@
 set(${PROJECT_NAME}_Dialogs_Utilities_Moc_HDRS
   ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/DREAM3DFileItemDelegate.h
   ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/DREAM3DFileTreeModel.h
+  ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/ImporterWorker.h
+  ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/MontageSettings.h
+  ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/TileConfigFileGenerator.h
   )
 # --------------------------------------------------------------------
 # Run Qts automoc program to generate some source files that get compiled
@@ -17,6 +20,9 @@ set(${PROJECT_NAME}_Dialogs_Utilities_SRCS
   ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/DREAM3DFileItem.cpp
   ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/DREAM3DFileItemDelegate.cpp
   ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/DREAM3DFileTreeModel.cpp
+  ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/ImporterWorker.cpp
+  ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/MontageSettings.cpp
+  ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/Dialogs/Utilities/TileConfigFileGenerator.cpp
 )
 
 cmp_IDE_SOURCE_PROPERTIES( "Utilities" "${${PROJECT_NAME}_Dialogs_Utilities_HDRS};${${PROJECT_NAME}_Dialogs_Utilities_Moc_HDRS}" "${${PROJECT_NAME}_Dialogs_Utilities_SRCS}" "${PROJECT_INSTALL_HEADERS}")

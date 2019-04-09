@@ -81,7 +81,7 @@ AbstractFilter::Pointer VSFilterFactory::createDataContainerReaderFilter(const Q
         return AbstractFilter::NullPointer();
       }
     }
-	return dataContainerReader;
+    return dataContainerReader;
   }
   return AbstractFilter::NullPointer();
 }
@@ -106,24 +106,24 @@ AbstractFilter::Pointer VSFilterFactory::createDataContainerWriterFilter(const Q
 	  // Set output file
 	  var.setValue(outputFile);
 	  if(!setFilterProperty(dataContainerWriter, "OutputFile", var))
-	  {
-		return AbstractFilter::NullPointer();
-	  }
+    {
+      return AbstractFilter::NullPointer();
+    }
 
-	  // Set whether to write Xdmf file
+    // Set whether to write Xdmf file
 	  var.setValue(writeXdmfFile);
 	  if(!setFilterProperty(dataContainerWriter, "WriteXdmfFile", var))
 	  {
 		return AbstractFilter::NullPointer();
-	  }
+    }
 
-	  // Set whether to include Xdmf time markers
+    // Set whether to include Xdmf time markers
 	  var.setValue(writeTimeSeriesMarkers);
 	  if(!setFilterProperty(dataContainerWriter, "WriteTimeSeries", var))
 	  {
 		return AbstractFilter::NullPointer();
-	  }
-	}
+    }
+  }
 	return dataContainerWriter;
   }
   return AbstractFilter::NullPointer();
