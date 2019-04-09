@@ -57,6 +57,7 @@ VSTransform::VSTransform(const VSTransform& copy)
   m_LocalTransform->DeepCopy(copy.m_LocalTransform);
 
   setParent(copy.getParent());
+  setOriginPosition(copy.getOriginPosition());
   setupSignals();
 }
 
@@ -701,4 +702,52 @@ void VSTransform::updateTransform(vtkTransform* transform)
 
   transform->SetInput(nullptr);
   transform->SetMatrix(matrix);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+double* VSTransform::getOriginPosition() const
+{
+  return m_OriginPosition;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSTransform::setOriginPosition(double* originPosition)
+{
+  m_OriginPosition = originPosition;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+double* VSTransform::getOriginRotation() const
+{
+  return m_OriginRotation;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSTransform::setOriginRotation(double* originRotation)
+{
+  m_OriginRotation = originRotation;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+double* VSTransform::getOriginScale() const
+{
+  return m_OriginScale;
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void VSTransform::setOriginScale(double* originScale)
+{
+  m_OriginScale= originScale;
 }

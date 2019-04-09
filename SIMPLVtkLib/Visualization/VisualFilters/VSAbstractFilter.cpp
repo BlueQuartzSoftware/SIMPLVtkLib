@@ -942,6 +942,7 @@ void VSAbstractFilter::readTransformJson(QJsonObject& json)
 
   VSTransform* transform = getTransform();
   transform->setLocalPosition(localPos);
+  transform->setOriginPosition(localPos);
   transform->setLocalRotation(localRot);
   transform->setLocalScale(localScale);
 }

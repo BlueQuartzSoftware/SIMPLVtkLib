@@ -152,16 +152,40 @@ void VSTransformWidget::setTransform(VSTransform* transform)
 
     // local
     double* localPos = transform->getLocalPosition();
+	double* originPosition = transform->getOriginPosition();
+	if(originPosition != nullptr)
+	{
+	  for(int i = 0; i < 3; i++)
+	  {
+		localPos[i] -= originPosition[i];
+	  }
+	}
     m_Internals->posXEdit->setText(QString::number(localPos[0]));
     m_Internals->posYEdit->setText(QString::number(localPos[1]));
     m_Internals->posZEdit->setText(QString::number(localPos[2]));
 
     double* localRot = transform->getLocalRotation();
+	double* originRotation = transform->getOriginRotation();
+	if(originRotation != nullptr)
+	{
+	  for(int i = 0; i < 3; i++)
+	  {
+		localRot[i] -= originRotation[i];
+	  }
+	}
     m_Internals->rotXEdit->setText(QString::number(localRot[0]));
     m_Internals->rotYEdit->setText(QString::number(localRot[1]));
     m_Internals->rotZEdit->setText(QString::number(localRot[2]));
 
     double* localScale = transform->getLocalScale();
+	double* originScale = transform->getOriginScale();
+	if(originScale != nullptr)
+	{
+	  for(int i = 0; i < 3; i++)
+	  {
+		localScale[i] /= originScale[i];
+	  }
+	}
     m_Internals->scaleXEdit->setText(QString::number(localScale[0]));
     m_Internals->scaleYEdit->setText(QString::number(localScale[1]));
     m_Internals->scaleZEdit->setText(QString::number(localScale[2]));
@@ -379,6 +403,7 @@ void VSTransformWidget::updateScaleLabels()
 void VSTransformWidget::updateLocalTranslation()
 {
   double* position;
+  double* origin;
   if(nullptr == m_Transform)
   {
     position = new double[3];
@@ -390,6 +415,11 @@ void VSTransformWidget::updateLocalTranslation()
   else
   {
     position = m_Transform->getLocalPosition();
+	double* origin = m_Transform->getOriginPosition();
+	for(int i = 0; i < 3; i++)
+	{
+	  position[i] -= origin[i];
+	}
   }
 
   m_Internals->posXEdit->setText(QString::number(position[0]));

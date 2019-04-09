@@ -220,6 +220,7 @@ void VSSIMPLDataContainerFilter::createFilter()
   connect(&m_WrappingWatcher, SIGNAL(finished()), this, SLOT(reloadWrappingFinished()));
 
   getTransform()->setLocalPosition(m_DCValues->getWrappedDataContainer()->m_Origin);
+  getTransform()->setOriginPosition(m_DCValues->getWrappedDataContainer()->m_Origin);
   updateTransformFilter();
 
   VTK_PTR(vtkDataSet) dataSet = m_DCValues->getWrappedDataContainer()->m_DataSet;

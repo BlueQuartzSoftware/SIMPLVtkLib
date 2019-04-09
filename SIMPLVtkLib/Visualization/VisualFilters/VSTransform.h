@@ -323,6 +323,42 @@ public:
    */
   void globalizeTransform(vtkTransform* transform);
 
+  /**
+   * @brief Get the origin position of the transform
+   * @return origin
+   */
+  double* getOriginPosition() const;
+
+  /**
+   * @brief Set the origin position of the transform
+   * @param originPosition
+   */
+  void setOriginPosition(double* originPosition);
+
+  /**
+   * @brief Get the origin of the transform
+   * @return originRotation
+   */
+  double* getOriginRotation() const;
+
+  /**
+   * @brief Set the origin rotation of the transform
+   * @param originRotation
+   */
+  void setOriginRotation(double* originRotation);
+
+  /**
+   * @brief Get the origin scale of the transform
+   * @return originScale
+   */
+  double* getOriginScale() const;
+
+  /**
+   * @brief Set the origin scale of the transform
+   * @param originScale
+   */
+  void setOriginScale(double* originScale);
+
 signals:
   void updatedPosition();
   void updatedRotation();
@@ -390,5 +426,9 @@ protected:
 
 private:
   VSTransform* m_Parent = nullptr;
+
+  double* m_OriginPosition;
+  double* m_OriginRotation;
+  double* m_OriginScale;
   VTK_PTR(vtkTransform) m_LocalTransform;
 };

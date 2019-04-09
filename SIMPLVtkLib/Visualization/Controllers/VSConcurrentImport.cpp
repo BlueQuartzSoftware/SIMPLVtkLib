@@ -221,6 +221,7 @@ void VSConcurrentImport::partialWrappingThreadFinished()
 		origin[2] = std::get<2>(originTuple);
 
 		filter->getTransform()->setLocalPosition(origin);
+		filter->getTransform()->setOriginPosition(origin);
         m_Controller->getFilterModel()->addFilter(filter, false);
 
         // SemiReload differs from Reload in that it does not fully load new filters
