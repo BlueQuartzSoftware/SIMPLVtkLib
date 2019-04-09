@@ -202,8 +202,6 @@ void ImportDREAM3DMontageDialog::proxyChanged(DataContainerArrayProxy proxy)
   int rowCount = 0;
   int colCount = 0;
 
-  bool variablesSet = false;
-
   for(QMap<QString, DataContainerProxy>::iterator iter = dataContainers.begin(); iter != dataContainers.end(); iter++)
   {
     DataContainerProxy dcProxy = iter.value();

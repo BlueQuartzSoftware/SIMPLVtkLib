@@ -39,7 +39,7 @@
 
 #include "ui_ImportZeissMontageDialog.h"
 
-class ImportZeissMontageDialog : public AbstractImportMontageDialog
+class SIMPLVtkLib_EXPORT ImportZeissMontageDialog : public AbstractImportMontageDialog
 {
   Q_OBJECT
 

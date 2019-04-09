@@ -41,7 +41,7 @@
 
 #include "ui_ImportGenericMontageDialog.h"
 
-class ImportGenericMontageDialog : public AbstractImportMontageDialog
+class SIMPLVtkLib_EXPORT ImportGenericMontageDialog : public AbstractImportMontageDialog
 {
   Q_OBJECT
 

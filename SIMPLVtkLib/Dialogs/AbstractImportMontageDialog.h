@@ -39,7 +39,9 @@
 
 #include "SIMPLib/Common/SIMPLibSetGetMacros.h"
 
-class AbstractImportMontageDialog : public QDialog
+#include "SIMPLVtkLib/SIMPLVtkLib.h"
+
+class SIMPLVtkLib_EXPORT AbstractImportMontageDialog : public QDialog
 {
   Q_OBJECT
 

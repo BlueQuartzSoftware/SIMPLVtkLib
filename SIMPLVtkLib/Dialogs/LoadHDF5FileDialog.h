@@ -37,11 +37,13 @@
 
 #include <QtWidgets/QDialog>
 
+#include "SIMPLVtkLib/SIMPLVtkLib.h"
+
 #include "ui_LoadHDF5FileDialog.h"
 
 class DataContainerArrayProxy;
 
-class LoadHDF5FileDialog : public QDialog
+class SIMPLVtkLib_EXPORT LoadHDF5FileDialog : public QDialog
 {
   Q_OBJECT
 

@@ -43,7 +43,7 @@
 
 class DataContainerArrayProxy;
 
-class ImportDREAM3DMontageDialog : public AbstractImportMontageDialog
+class SIMPLVtkLib_EXPORT ImportDREAM3DMontageDialog : public AbstractImportMontageDialog
 {
   Q_OBJECT
 

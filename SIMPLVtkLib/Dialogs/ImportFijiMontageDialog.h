@@ -41,7 +41,7 @@
 
 #include "ui_ImportFijiMontageDialog.h"
 
-class ImportFijiMontageDialog : public AbstractImportMontageDialog
+class SIMPLVtkLib_EXPORT ImportFijiMontageDialog : public AbstractImportMontageDialog
 {
   Q_OBJECT
 

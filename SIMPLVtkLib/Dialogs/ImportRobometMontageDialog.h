@@ -39,7 +39,7 @@
 
 #include "ui_ImportRobometMontageDialog.h"
 
-class ImportRobometMontageDialog : public AbstractImportMontageDialog
+class SIMPLVtkLib_EXPORT ImportRobometMontageDialog : public AbstractImportMontageDialog
 {
   Q_OBJECT
 
