@@ -286,7 +286,7 @@ public:
    * @brief Set the display type for visualization output
    * @param displayType
    */
-  void setDisplayType(AbstractMontageDialog::DisplayType displayType);
+  void setDisplayType(AbstractImportMontageDialog::DisplayType displayType);
 
 signals:
   void viewSettingsCreated(VSFilterViewSettings*) const;
@@ -344,7 +344,7 @@ protected:
 private:
   VSFilterModel* m_FilterModel = nullptr;
   mutable VSFilterViewSettings::Map m_FilterViewSettings;
-  AbstractMontageDialog::DisplayType m_DisplayType = AbstractMontageDialog::DisplayType::NotSpecified;
+  AbstractImportMontageDialog::DisplayType m_DisplayType = AbstractImportMontageDialog::DisplayType::NotSpecified;
 };
 
 Q_DECLARE_METATYPE(VSFilterViewModel)

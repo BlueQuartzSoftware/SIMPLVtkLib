@@ -80,7 +80,7 @@ VSFilterViewSettings::VSFilterViewSettings()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-VSFilterViewSettings::VSFilterViewSettings(VSAbstractFilter* filter, Representation representation, AbstractMontageDialog::DisplayType displayType)
+VSFilterViewSettings::VSFilterViewSettings(VSAbstractFilter* filter, Representation representation, AbstractImportMontageDialog::DisplayType displayType)
 : QObject(nullptr)
 , m_ShowFilter(true)
 , m_DisplayType(displayType)
@@ -2734,7 +2734,7 @@ void VSFilterViewSettings::inputUpdated(VSAbstractFilter* filter)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSFilterViewSettings::setDisplayType(AbstractMontageDialog::DisplayType displayType)
+void VSFilterViewSettings::setDisplayType(AbstractImportMontageDialog::DisplayType displayType)
 {
   m_DisplayType = displayType;
 }
@@ -2742,7 +2742,7 @@ void VSFilterViewSettings::setDisplayType(AbstractMontageDialog::DisplayType dis
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-AbstractMontageDialog::DisplayType VSFilterViewSettings::getDisplayType()
+AbstractImportMontageDialog::DisplayType VSFilterViewSettings::getDisplayType()
 {
   return m_DisplayType;
 }

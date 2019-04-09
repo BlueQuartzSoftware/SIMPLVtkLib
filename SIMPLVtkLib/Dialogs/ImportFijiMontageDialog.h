@@ -35,13 +35,13 @@
 
 #pragma once
 
-#include "SIMPLVtkLib/Dialogs/AbstractMontageDialog.h"
+#include "SIMPLVtkLib/Dialogs/AbstractImportMontageDialog.h"
 
 #include "SIMPLVtkLib/Dialogs/FijiListWidget.h"
 
 #include "ui_ImportFijiMontageDialog.h"
 
-class ImportFijiMontageDialog : public AbstractMontageDialog
+class ImportFijiMontageDialog : public AbstractImportMontageDialog
 {
   Q_OBJECT
 

@@ -55,7 +55,7 @@ QString ImportRobometMontageDialog::m_OpenDialogLastDirectory = "";
 //
 // -----------------------------------------------------------------------------
 ImportRobometMontageDialog::ImportRobometMontageDialog(QWidget* parent)
-: AbstractMontageDialog(parent)
+: AbstractImportMontageDialog(parent)
 , m_Ui(new Ui::ImportRobometMontageDialog)
 {
   m_Ui->setupUi(this);
@@ -99,7 +99,7 @@ void ImportRobometMontageDialog::setupGui()
 // -----------------------------------------------------------------------------
 void ImportRobometMontageDialog::connectSignalsSlots()
 {
-  connect(m_Ui->dataDisplayTypeCB, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) { setDisplayType(static_cast<AbstractMontageDialog::DisplayType>(index)); });
+  connect(m_Ui->dataDisplayTypeCB, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) { setDisplayType(static_cast<AbstractImportMontageDialog::DisplayType>(index)); });
 
   connect(m_Ui->tileOverlapSB, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=] { checkComplete(); });
 

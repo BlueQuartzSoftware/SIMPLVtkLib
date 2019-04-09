@@ -55,7 +55,7 @@ QString ImportZeissMontageDialog::m_OpenDialogLastDirectory = "";
 //
 // -----------------------------------------------------------------------------
 ImportZeissMontageDialog::ImportZeissMontageDialog(QWidget* parent)
-: AbstractMontageDialog(parent)
+: AbstractImportMontageDialog(parent)
 , m_Ui(new Ui::ImportZeissMontageDialog)
 {
   m_Ui->setupUi(this);
@@ -108,7 +108,7 @@ void ImportZeissMontageDialog::setupGui()
 // -----------------------------------------------------------------------------
 void ImportZeissMontageDialog::connectSignalsSlots()
 {
-  connect(m_Ui->dataDisplayTypeCB, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) { setDisplayType(static_cast<AbstractMontageDialog::DisplayType>(index)); });
+  connect(m_Ui->dataDisplayTypeCB, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) { setDisplayType(static_cast<AbstractImportMontageDialog::DisplayType>(index)); });
 
   connect(m_Ui->zeissListWidget, &ZeissListWidget::inputDirectoryChanged, this, &ImportZeissMontageDialog::zeissListWidgetChanged);
   connect(m_Ui->zeissListWidget, &ZeissListWidget::numberOfRowsChanged, this, &ImportZeissMontageDialog::zeissListWidgetChanged);

@@ -33,33 +33,63 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#include "AbstractMontageDialog.h"
+#pragma once
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-const char* AbstractMontageDialog::InvalidOKButtonException::what() const noexcept
+#include <QtWidgets/QDialog>
+
+#include "SIMPLib/Common/SIMPLibSetGetMacros.h"
+
+class AbstractImportMontageDialog : public QDialog
 {
-  return "AbstractMontageDialog: Attempted to get the OK button pointer and failed.";
-}
+  Q_OBJECT
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-AbstractMontageDialog::AbstractMontageDialog(QWidget* parent)
-: QDialog(parent)
-{
-}
+public:
+  SIMPL_SHARED_POINTERS(AbstractImportMontageDialog)
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-AbstractMontageDialog::~AbstractMontageDialog() = default;
+  ~AbstractImportMontageDialog() override;
 
-// -----------------------------------------------------------------------------
-//
-// -----------------------------------------------------------------------------
-void AbstractMontageDialog::setDisplayType(AbstractMontageDialog::DisplayType displayType)
-{
-  m_DisplayType = displayType;
-}
+  enum DisplayType
+  {
+    Outline,
+    SideBySide,
+    Montage,
+    NotSpecified
+  };
+
+  SIMPL_GET_PROPERTY(AbstractImportMontageDialog::DisplayType, DisplayType)
+
+  class InvalidOKButtonException : public std::exception
+  {
+    const char* what() const noexcept;
+  };
+
+  /**
+   * @brief checkComplete
+   * @return
+   */
+  virtual void checkComplete() const = 0;
+
+protected:
+  /**
+   * @brief Constructor
+   * @param parameter The FilterParameter object that this widget represents
+   * @param filter The instance of the filter that this parameter is a part of
+   * @param parent The parent QWidget for this Widget
+   */
+  AbstractImportMontageDialog(QWidget* parent = nullptr);
+
+  /**
+   * @brief setDisplayType
+   * @param displayType
+   */
+  void setDisplayType(AbstractImportMontageDialog::DisplayType displayType);
+
+private:
+  DisplayType m_DisplayType = DisplayType::NotSpecified;
+
+public:
+  AbstractImportMontageDialog(const AbstractImportMontageDialog&) = delete;            // Copy Constructor Not Implemented
+  AbstractImportMontageDialog(AbstractImportMontageDialog&&) = delete;                 // Move Constructor Not Implemented
+  AbstractImportMontageDialog& operator=(const AbstractImportMontageDialog&) = delete; // Copy Assignment Not Implemented
+  AbstractImportMontageDialog& operator=(AbstractImportMontageDialog&&) = delete;      // Move Assignment Not Implemented
+};

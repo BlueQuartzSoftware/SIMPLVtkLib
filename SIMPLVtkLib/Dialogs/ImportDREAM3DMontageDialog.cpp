@@ -57,7 +57,7 @@ QString ImportDREAM3DMontageDialog::m_OpenDialogLastDirectory = "";
 //
 // -----------------------------------------------------------------------------
 ImportDREAM3DMontageDialog::ImportDREAM3DMontageDialog(QWidget* parent)
-: AbstractMontageDialog(parent)
+: AbstractImportMontageDialog(parent)
 , m_Ui(new Ui::ImportDREAM3DMontageDialog)
 {
   m_Ui->setupUi(this);
@@ -119,7 +119,7 @@ void ImportDREAM3DMontageDialog::setupGui()
 // -----------------------------------------------------------------------------
 void ImportDREAM3DMontageDialog::connectSignalsSlots()
 {
-  connect(m_Ui->dataDisplayTypeCB, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) { setDisplayType(static_cast<AbstractMontageDialog::DisplayType>(index)); });
+  connect(m_Ui->dataDisplayTypeCB, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) { setDisplayType(static_cast<AbstractImportMontageDialog::DisplayType>(index)); });
 
   connect(m_Ui->loadHDF5DataWidget, &VSLoadHDF5DataWidget::proxyChanged, this, &ImportDREAM3DMontageDialog::proxyChanged);
   connect(m_Ui->selectButton, &QPushButton::clicked, this, &ImportDREAM3DMontageDialog::selectBtn_clicked);

@@ -47,7 +47,7 @@
 //
 // -----------------------------------------------------------------------------
 ImportGenericMontageDialog::ImportGenericMontageDialog(QWidget* parent)
-: AbstractMontageDialog(parent)
+: AbstractImportMontageDialog(parent)
 , m_Ui(new Ui::ImportGenericMontageDialog)
 {
   m_Ui->setupUi(this);
@@ -104,7 +104,7 @@ void ImportGenericMontageDialog::setupGui()
 // -----------------------------------------------------------------------------
 void ImportGenericMontageDialog::connectSignalsSlots()
 {
-  connect(m_Ui->dataDisplayTypeCB, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) { setDisplayType(static_cast<AbstractMontageDialog::DisplayType>(index)); });
+  connect(m_Ui->dataDisplayTypeCB, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) { setDisplayType(static_cast<AbstractImportMontageDialog::DisplayType>(index)); });
 
   connect(m_Ui->numOfRowsSB, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=] { checkComplete(); });
   connect(m_Ui->numOfColsSB, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=] { checkComplete(); });

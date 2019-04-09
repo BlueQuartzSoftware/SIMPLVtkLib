@@ -6,7 +6,7 @@ include(${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/Utilities/Sourc
 # --------------------------------------------------------------------
 # Any Class that inherits from QObject, either directly or through the heirarchy needs to have its header listed here
 set(${PROJECT_NAME}_${SUBDIR_NAME}_Moc_HDRS
-  ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/AbstractMontageDialog.h
+  ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/AbstractImportMontageDialog.h
   ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/FijiListWidget.h
   ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/ImportDREAM3DMontageDialog.h
   ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/ImportFijiMontageDialog.h
@@ -28,7 +28,7 @@ set(${PROJECT_NAME}_${SUBDIR_NAME}_HDRS
 )
 
 set(${PROJECT_NAME}_${SUBDIR_NAME}_SRCS
-${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/AbstractMontageDialog.cpp
+${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/AbstractImportMontageDialog.cpp
 ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/FijiListWidget.cpp
 ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/ImportDREAM3DMontageDialog.cpp
 ${${PROJECT_NAME}_SOURCE_DIR}/SIMPLVtkLib/${SUBDIR_NAME}/ImportFijiMontageDialog.cpp

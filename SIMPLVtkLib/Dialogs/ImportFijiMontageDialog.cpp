@@ -55,7 +55,7 @@ QString ImportFijiMontageDialog::m_OpenDialogLastDirectory = "";
 //
 // -----------------------------------------------------------------------------
 ImportFijiMontageDialog::ImportFijiMontageDialog(QWidget* parent)
-: AbstractMontageDialog(parent)
+: AbstractImportMontageDialog(parent)
 , m_Ui(new Ui::ImportFijiMontageDialog)
 {
   m_Ui->setupUi(this);
@@ -106,7 +106,7 @@ void ImportFijiMontageDialog::setupGui()
 // -----------------------------------------------------------------------------
 void ImportFijiMontageDialog::connectSignalsSlots()
 {
-  connect(m_Ui->dataDisplayTypeCB, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) { setDisplayType(static_cast<AbstractMontageDialog::DisplayType>(index)); });
+  connect(m_Ui->dataDisplayTypeCB, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) { setDisplayType(static_cast<AbstractImportMontageDialog::DisplayType>(index)); });
 
   connect(m_Ui->tileOverlapSB, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=] { checkComplete(); });
 

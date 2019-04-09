@@ -54,7 +54,7 @@
 #include <vtkTexture.h>
 #include <vtkPlaneSource.h>
 
-#include "SIMPLVtkLib/Dialogs/AbstractMontageDialog.h"
+#include "SIMPLVtkLib/Dialogs/AbstractImportMontageDialog.h"
 #include "SIMPLVtkLib/Visualization/Controllers/VSLookupTableController.h"
 #include "SIMPLVtkLib/Visualization/VisualFilters/VSAbstractFilter.h"
 
@@ -147,7 +147,7 @@ public:
    * @param filter
    */
   VSFilterViewSettings(VSAbstractFilter* filter, Representation representation = Representation::Default,
-                       AbstractMontageDialog::DisplayType displayType = AbstractMontageDialog::DisplayType::NotSpecified);
+                       AbstractImportMontageDialog::DisplayType displayType = AbstractImportMontageDialog::DisplayType::NotSpecified);
 
   /**
    * @brief Copy constructor
@@ -450,13 +450,13 @@ public:
    * @brief Set the display type
    * @param displayType
    */
-  void setDisplayType(AbstractMontageDialog::DisplayType displayType);
+  void setDisplayType(AbstractImportMontageDialog::DisplayType displayType);
 
   /**
    * @brief Get the display type
    * @return
    */
-  AbstractMontageDialog::DisplayType getDisplayType();
+  AbstractImportMontageDialog::DisplayType getDisplayType();
 
   /**
    * @brief Set the default transform
@@ -1001,7 +1001,7 @@ private:
   int m_Subsampling = 1;
   ColorMapping m_MapColors = ColorMapping::NonColors;
   Representation m_Representation = Representation::Default;
-  AbstractMontageDialog::DisplayType m_DisplayType = AbstractMontageDialog::DisplayType::NotSpecified;
+  AbstractImportMontageDialog::DisplayType m_DisplayType = AbstractImportMontageDialog::DisplayType::NotSpecified;
   VSTransform* m_DefaultTransform = nullptr;
   VTK_PTR(vtkAbstractMapper3D) m_Mapper = nullptr;
   VTK_PTR(vtkProp3D) m_Actor = nullptr;

@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "SIMPLVtkLib/Dialogs/AbstractMontageDialog.h"
+#include "SIMPLVtkLib/Dialogs/AbstractImportMontageDialog.h"
 
 #include "SIMPLib/DataContainers/DataContainerArrayProxy.h"
 
@@ -43,7 +43,7 @@
 
 class DataContainerArrayProxy;
 
-class ImportDREAM3DMontageDialog : public AbstractMontageDialog
+class ImportDREAM3DMontageDialog : public AbstractImportMontageDialog
 {
   Q_OBJECT
 

@@ -33,63 +33,33 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-#pragma once
+#include "AbstractImportMontageDialog.h"
 
-#include <QtWidgets/QDialog>
-
-#include "SIMPLib/Common/SIMPLibSetGetMacros.h"
-
-class AbstractMontageDialog : public QDialog
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+const char* AbstractImportMontageDialog::InvalidOKButtonException::what() const noexcept
 {
-  Q_OBJECT
+  return "AbstractImportMontageDialog: Attempted to get the OK button pointer and failed.";
+}
 
-public:
-  SIMPL_SHARED_POINTERS(AbstractMontageDialog)
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+AbstractImportMontageDialog::AbstractImportMontageDialog(QWidget* parent)
+: QDialog(parent)
+{
+}
 
-  ~AbstractMontageDialog() override;
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+AbstractImportMontageDialog::~AbstractImportMontageDialog() = default;
 
-  enum DisplayType
-  {
-    Outline,
-    SideBySide,
-    Montage,
-    NotSpecified
-  };
-
-  SIMPL_GET_PROPERTY(AbstractMontageDialog::DisplayType, DisplayType)
-
-  class InvalidOKButtonException : public std::exception
-  {
-    const char* what() const noexcept;
-  };
-
-  /**
-   * @brief checkComplete
-   * @return
-   */
-  virtual void checkComplete() const = 0;
-
-protected:
-  /**
-   * @brief Constructor
-   * @param parameter The FilterParameter object that this widget represents
-   * @param filter The instance of the filter that this parameter is a part of
-   * @param parent The parent QWidget for this Widget
-   */
-  AbstractMontageDialog(QWidget* parent = nullptr);
-
-  /**
-   * @brief setDisplayType
-   * @param displayType
-   */
-  void setDisplayType(AbstractMontageDialog::DisplayType displayType);
-
-private:
-  DisplayType m_DisplayType = DisplayType::NotSpecified;
-
-public:
-  AbstractMontageDialog(const AbstractMontageDialog&) = delete;            // Copy Constructor Not Implemented
-  AbstractMontageDialog(AbstractMontageDialog&&) = delete;                 // Move Constructor Not Implemented
-  AbstractMontageDialog& operator=(const AbstractMontageDialog&) = delete; // Copy Assignment Not Implemented
-  AbstractMontageDialog& operator=(AbstractMontageDialog&&) = delete;      // Move Assignment Not Implemented
-};
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
+void AbstractImportMontageDialog::setDisplayType(AbstractImportMontageDialog::DisplayType displayType)
+{
+  m_DisplayType = displayType;
+}

@@ -35,11 +35,11 @@
 
 #pragma once
 
-#include "SIMPLVtkLib/Dialogs/AbstractMontageDialog.h"
+#include "SIMPLVtkLib/Dialogs/AbstractImportMontageDialog.h"
 
 #include "ui_ImportZeissMontageDialog.h"
 
-class ImportZeissMontageDialog : public AbstractMontageDialog
+class ImportZeissMontageDialog : public AbstractImportMontageDialog
 {
   Q_OBJECT
 
