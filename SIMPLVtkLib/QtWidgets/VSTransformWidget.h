@@ -81,6 +81,12 @@ public:
    */
   void setFilters(VSAbstractFilter::FilterListType filters);
 
+  /**
+   * @brief Sets the VSTransform from the given filters
+   * @return filters
+   */
+  VSAbstractFilter::FilterListType getFilters();
+  
 protected slots:
   /**
    * @brief Updates the translation spin boxes to match the transformation's local values
@@ -138,4 +144,5 @@ private:
   VSInternals* m_Internals;
 
   VSTransform* m_Transform = nullptr;
+  VSAbstractFilter::FilterListType m_SelectedFilters;
 };
