@@ -100,6 +100,8 @@ void ImportZeissMontageDialog::setupGui()
 
   m_Ui->montageNameLE->setText("Untitled Montage");
 
+  setDisplayType(static_cast<AbstractImportMontageDialog::DisplayType>(0));
+
   checkComplete();
 }
 

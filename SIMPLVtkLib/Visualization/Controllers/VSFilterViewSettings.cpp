@@ -1330,13 +1330,13 @@ void VSFilterViewSettings::setupDataSetActors()
 
   updateTexture();
 
-  if(!isFlatImage())
-  {
-    mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
-  }
-  else if(getRepresentation() == Representation::Outline)
+  if(getRepresentation() == Representation::Outline)
   {
     mapper->SetInputConnection(m_OutlineFilter->GetOutputPort());
+  }
+  else if(!isFlatImage())
+  {
+    mapper->SetInputConnection(m_DataSetFilter->GetOutputPort());
   }
   else
   {
