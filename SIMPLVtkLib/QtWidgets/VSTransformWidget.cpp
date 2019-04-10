@@ -264,9 +264,10 @@ void VSTransformWidget::translationEditChanged()
   }
 
   double position[3];
-  position[0] = m_Internals->posXEdit->text().toDouble();
-  position[1] = m_Internals->posYEdit->text().toDouble();
-  position[2] = m_Internals->posZEdit->text().toDouble();
+  double* originPosition = m_Transform->getOriginPosition();
+  position[0] = m_Internals->posXEdit->text().toDouble() + originPosition[0];
+  position[1] = m_Internals->posYEdit->text().toDouble() + originPosition[1];
+  position[2] = m_Internals->posZEdit->text().toDouble() + originPosition[2];
 
   m_Transform->setLocalPosition(position);
 }
@@ -282,9 +283,10 @@ void VSTransformWidget::rotationEditChanged()
   }
 
   double rotation[3];
-  rotation[0] = m_Internals->rotXEdit->text().toDouble();
-  rotation[1] = m_Internals->rotYEdit->text().toDouble();
-  rotation[2] = m_Internals->rotZEdit->text().toDouble();
+  double* originRotation = m_Transform->getOriginRotation();
+  rotation[0] = m_Internals->rotXEdit->text().toDouble() + originRotation[0];
+  rotation[1] = m_Internals->rotYEdit->text().toDouble() + originRotation[1];
+  rotation[2] = m_Internals->rotZEdit->text().toDouble() + originRotation[2];
 
   m_Transform->setLocalRotation(rotation);
 }
@@ -300,11 +302,12 @@ void VSTransformWidget::scaleEditChanged()
   }
 
   double scale[3];
-  scale[0] = m_Internals->scaleXEdit->text().toDouble();
-  scale[1] = m_Internals->scaleYEdit->text().toDouble();
-  scale[2] = m_Internals->scaleZEdit->text().toDouble();
+  double* originScale = m_Transform->getOriginScale();
+  scale[0] = m_Internals->scaleXEdit->text().toDouble() * originScale[0];
+  scale[1] = m_Internals->scaleYEdit->text().toDouble() * originScale[1];
+  scale[2] = m_Internals->scaleZEdit->text().toDouble() * originScale[2];
 
-  m_Transform->setLocalScale(scale);
+  m_Transform->scale(scale);
 }
 
 // -----------------------------------------------------------------------------
