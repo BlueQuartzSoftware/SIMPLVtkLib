@@ -552,6 +552,8 @@ void VSFilterViewSettings::setIsSelected(bool selected)
   {
     actor->GetProperty()->EdgeVisibilityOn();
     actor->GetProperty()->SetEdgeColor(0.0, 1.0, 0.0);
+    actor->SetPosition(actor->GetPosition()[0], actor->GetPosition()[1],
+      actor->GetPosition()[2] + 1.0);
   }
   else
   {
@@ -563,6 +565,8 @@ void VSFilterViewSettings::setIsSelected(bool selected)
     {
       actor->GetProperty()->SetEdgeColor(1.0, 1.0, 1.0);
     }
+    actor->SetPosition(actor->GetPosition()[0], actor->GetPosition()[1],
+      actor->GetPosition()[2] - 1.0);
   }
 }
 
