@@ -67,6 +67,19 @@
        <number>0</number>
       </property>
       <item>
+       <widget class="QPushButton" name="interactiveModeBtn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>3D</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="transformTextLabel">
         <property name="text">
          <string/>

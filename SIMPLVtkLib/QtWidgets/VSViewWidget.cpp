@@ -107,6 +107,7 @@ void VSViewWidget::setupGui()
 
   setStyleSheet(styleString);
   getVisualizationWidget()->render();
+  m_InteractorStyle->SetInteractionModeToImage3D();
 }
 
 // -----------------------------------------------------------------------------
@@ -125,6 +126,21 @@ void VSViewWidget::connectSlots()
 
   // Control the visualization widget's context menu
   connect(getVisualizationWidget(), &VSVisualizationWidget::customContextMenuRequested, this, &VSViewWidget::showVisualizationContextMenu);
+
+  // Set up the interactive mode button
+  connect(m_Internals->interactiveModeBtn, &QPushButton::clicked, [=]()
+  {
+    if(m_Internals->interactiveModeBtn->text() == "3D")
+    {
+      m_Internals->interactiveModeBtn->setText("2D");
+      m_InteractorStyle->SetInteractionModeToImage2D();
+    }
+    else
+    {
+      m_Internals->interactiveModeBtn->setText("3D");
+      m_InteractorStyle->SetInteractionModeToImage3D();
+    }
+  });
 }
 
 // -----------------------------------------------------------------------------
