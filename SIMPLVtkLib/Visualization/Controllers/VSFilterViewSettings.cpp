@@ -1458,14 +1458,7 @@ void VSFilterViewSettings::updateTransform()
     return;
   }
 
-  if(Representation::Outline == m_Representation)
-  {
-    VSTransform* transform = m_Filter->getTransform();
-    m_Actor->SetPosition(transform->getPosition());
-    m_Actor->SetOrientation(transform->getRotation());
-    m_Actor->SetScale(transform->getScale());
-  }
-  else if(ActorType::Image2D == m_ActorType || ActorType::DataSet == m_ActorType)
+  if(ActorType::Image2D == m_ActorType || ActorType::DataSet == m_ActorType)
   {
 	VTK_PTR(vtkDataSet) outputData = m_Filter->getOutput();
 	vtkImageData* imageData = dynamic_cast<vtkImageData*>(outputData.Get());
