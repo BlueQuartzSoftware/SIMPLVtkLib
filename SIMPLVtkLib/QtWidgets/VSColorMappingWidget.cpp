@@ -62,7 +62,10 @@ void VSColorMappingWidget::setupGui()
   connect(m_Ui->mapScalarsComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setScalarsMapped(int)));
   connect(m_Ui->showScalarBarComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setScalarBarSetting(int)));
   connect(m_Ui->invertColorScaleBtn, &QPushButton::clicked, this, &VSColorMappingWidget::invertScalarBar);
-  connect(m_Ui->alphaSlider, &QSlider::valueChanged, this, &VSColorMappingWidget::alphaSliderMoved);
+  connect(m_Ui->alphaSlider, &QSlider::sliderReleased, [=]() {
+    int value = m_Ui->alphaSlider->value();
+    alphaSliderMoved(value);
+  });
   connect(m_Ui->selectPresetColorsBtn, &QPushButton::clicked, this, &VSColorMappingWidget::selectPresetColors);
   connect(m_presetsDialog, &ColorPresetsDialog::applyPreset, this, &VSColorMappingWidget::loadPresetColors);
 }
