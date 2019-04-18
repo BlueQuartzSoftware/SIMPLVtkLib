@@ -86,7 +86,7 @@ public:
    * @return filters
    */
   VSAbstractFilter::FilterListType getFilters();
-  
+
 protected slots:
   /**
    * @brief Updates the translation spin boxes to match the transformation's local values
