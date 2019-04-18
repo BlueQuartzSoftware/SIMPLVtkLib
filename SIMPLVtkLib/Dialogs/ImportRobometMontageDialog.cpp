@@ -91,7 +91,7 @@ void ImportRobometMontageDialog::setupGui()
 
   connectSignalsSlots();
 
-  setDisplayType(static_cast<AbstractImportMontageDialog::DisplayType>(0));
+  setDisplayType(AbstractImportMontageDialog::DisplayType::Outline);
 
   checkComplete();
 }

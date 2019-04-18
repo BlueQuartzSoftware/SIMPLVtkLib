@@ -98,7 +98,7 @@ void ImportFijiMontageDialog::setupGui()
   m_Ui->spacingY->setValidator(new QDoubleValidator);
   m_Ui->spacingZ->setValidator(new QDoubleValidator);
 
-  setDisplayType(static_cast<AbstractImportMontageDialog::DisplayType>(0));
+  setDisplayType(AbstractImportMontageDialog::DisplayType::Outline);
 
   checkComplete();
 }
