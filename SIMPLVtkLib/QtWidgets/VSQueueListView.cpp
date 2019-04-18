@@ -106,22 +106,24 @@ void VSQueueListView::requestContextMenu(const QPoint& pos)
       menu.addAction(separator);
     }
 
-    menu.addAction("Reset Import", [=] { resetImporter(index); });
+    menu.exec(mapped);
+
+//    menu.addAction("Reset Import", [=] { resetImporter(index); });
   }
 
-  {
-    QAction* separator = new QAction(this);
-    separator->setSeparator(true);
-    menu.addAction(separator);
-  }
-  if(index.isValid())
-  {
-    menu.addAction("Clear Selected Import", [=] { clearImporter(index); });
-  }
-  menu.addAction("Clear All Imports", [=] { handleClearAllImports(); });
-  menu.addAction("Clear Completed Imports", [=] { handleClearCompletedImports(); });
+//  {
+//    QAction* separator = new QAction(this);
+//    separator->setSeparator(true);
+//    menu.addAction(separator);
+//  }
+//  if(index.isValid())
+//  {
+//    menu.addAction("Clear Selected Import", [=] { clearImporter(index); });
+//  }
+//  menu.addAction("Clear All Imports", [=] { handleClearAllImports(); });
+//  menu.addAction("Clear Completed Imports", [=] { handleClearCompletedImports(); });
 
-  menu.exec(mapped);
+//  menu.exec(mapped);
 }
 
 // -----------------------------------------------------------------------------
