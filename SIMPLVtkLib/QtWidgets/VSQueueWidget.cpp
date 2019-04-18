@@ -175,19 +175,25 @@ void VSQueueWidget::connectSignalsSlots()
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void VSQueueWidget::addDataImporter(const QString &name, VSAbstractImporter::Pointer importer)
+void VSQueueWidget::addDataImporter(const QString& name, VSAbstractImporter::Pointer importer)
 {
-  if (!importer)
+  if(!importer)
   {
     return;
   }
 
   VSQueueModel* queueModel = getQueueModel();
 
-  if (queueModel)
+  if(queueModel)
   {
     queueModel->addImporter(name, importer, QIcon(":/SIMPL/icons/images/bullet_ball_blue.png"));
     queueModel->startQueue();
+    connect(importer.get(), &VSAbstractImporter::stateChanged, [=](VSAbstractImporter* dataImporter, VSAbstractImporter::State state) {
+      if(state == VSAbstractImporter::State::Finished)
+      {
+        removeDataImporter(importer);
+      }
+    });
   }
 }
 
