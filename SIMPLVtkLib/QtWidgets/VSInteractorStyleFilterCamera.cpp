@@ -1115,6 +1115,10 @@ void VSInteractorStyleFilterCamera::resetTransform()
 // -----------------------------------------------------------------------------
 void VSInteractorStyleFilterCamera::undoTransform()
 {
+  if(m_PreviousTransforms.empty())
+  {
+    return;
+  }
   VSAbstractFilter::FilterListType selection = getFilterSelection();
 
   for(VSAbstractFilter* filter : selection)
@@ -1140,6 +1144,10 @@ void VSInteractorStyleFilterCamera::undoTransform()
 // -----------------------------------------------------------------------------
 void VSInteractorStyleFilterCamera::redoTransform()
 {
+  if(m_LastUndoneTransforms.empty())
+  {
+    return;
+  }
   VSAbstractFilter::FilterListType selection = getFilterSelection();
 
   for(VSAbstractFilter* filter : selection)
