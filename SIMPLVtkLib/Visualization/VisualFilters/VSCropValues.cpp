@@ -157,6 +157,7 @@ QWidget* VSCropValues::createFilterWidget()
 {
   Ui::VSCropFilterWidget ui;
   QWidget* widget = new QWidget();
+  ui.setupUi(widget);
 
   auto updateVOI = [=] {
     int voi[6];

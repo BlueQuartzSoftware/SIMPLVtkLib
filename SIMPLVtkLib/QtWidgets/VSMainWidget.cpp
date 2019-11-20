@@ -193,6 +193,14 @@ void VSMainWidget::setCurrentFilter(VSAbstractFilter* filter)
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
+void VSMainWidget::updateCurrentFilter(VSAbstractFilter* filter)
+{
+  setCurrentFilter(filter);
+}
+
+// -----------------------------------------------------------------------------
+//
+// -----------------------------------------------------------------------------
 void VSMainWidget::activeCameraXPlus()
 {
   VSAbstractViewWidget* activeView = getActiveViewWidget();

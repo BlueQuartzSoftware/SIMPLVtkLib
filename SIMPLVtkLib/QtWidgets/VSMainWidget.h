@@ -70,6 +70,11 @@ public:
    * @return
    */
   QMenu* getFilterMenu();
+    
+  /**
+   * @brief Update the current filter
+   */
+  void updateCurrentFilter(VSAbstractFilter* filter);
 
 protected:
   /**
@@ -94,7 +99,6 @@ protected slots:
    * @param filter
    */
   void setCurrentFilter(VSAbstractFilter* filter) override;
-
   /**
    * @brief Sets the active view camera position to the X+ axis
    */

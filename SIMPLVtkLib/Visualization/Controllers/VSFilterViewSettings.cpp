@@ -1523,7 +1523,7 @@ void VSFilterViewSettings::updateTransform()
     return;
   }
 
-  if(ActorType::Image2D == m_ActorType || ActorType::DataSet == m_ActorType)
+  if((ActorType::Image2D == m_ActorType || ActorType::DataSet == m_ActorType) && isFlatImage())
   {
     VTK_PTR(vtkDataSet) outputData = m_Filter->getOutput();
     vtkImageData* imageData = dynamic_cast<vtkImageData*>(outputData.Get());
