@@ -64,6 +64,8 @@
 
 #include "SIMPLVtkLib/SIMPLVtkLib.h"
 
+#include "SIMPLib/Common/SIMPLibSetGetMacros.h"
+
 class VSAbstractFilterValues;
 class VSAbstractDataFilter;
 class VSFilterModel;
